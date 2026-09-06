@@ -11,7 +11,8 @@
 
 - Branche : `hermes-autonomous`
 - Dernier commit de référence avant ce cycle : `bb90fd8` (`docs: add NairolFlipper project framework`)
-- Commit livré par ce cycle : `bbf33c9` (`feat: add Godot bootstrap scene`)
+- Dernier commit : `860e645` (`docs: record autonomous bootstrap delivery`)
+- Commit fonctionnel du cycle : `bbf33c9` (`feat: add Godot bootstrap scene`)
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : non modifiée par ce cycle
 
