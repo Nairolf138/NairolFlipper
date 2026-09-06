@@ -1,0 +1,39 @@
+# Godot
+.godot/
+.import/
+*.translation
+export_credentials.cfg
+.godot/export_credentials.cfg
+
+# Builds
+build/
+builds/
+dist/
+exports/
+
+# Android
+android/build/
+android/.gradle/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Apple
+DerivedData/
+*.xcarchive
+*.ipa
+*.mobileprovision
+*.p12
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs / temp
+*.log
+*.tmp
+*.swp
+*~

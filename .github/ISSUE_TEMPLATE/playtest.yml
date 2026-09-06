@@ -1,0 +1,42 @@
+name: Playtest
+description: Retour structuré après avoir joué un build
+title: "[Playtest] "
+labels: ["playtest"]
+body:
+  - type: input
+    id: build
+    attributes:
+      label: Build / commit
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Plateforme / appareil
+    validations:
+      required: true
+  - type: input
+    id: duration
+    attributes:
+      label: Durée approximative
+  - type: textarea
+    id: feel
+    attributes:
+      label: Sensations
+      placeholder: |
+        Bille:
+        Flippers:
+        Rythme:
+        Lisibilité:
+        Audio:
+        Performance:
+    validations:
+      required: true
+  - type: textarea
+    id: bugs
+    attributes:
+      label: Bugs observés
+  - type: textarea
+    id: changes
+    attributes:
+      label: Modifications souhaitées
