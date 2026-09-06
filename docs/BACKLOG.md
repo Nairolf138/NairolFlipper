@@ -4,9 +4,9 @@ Ordre volontaire. Ne pas sauter plusieurs étapes sans raison.
 
 ## P0 — Bootstrap
 
-### T001 — Valider le projet Godot
+### T001 — Valider le projet Godot ✅
 
-But : ouvrir le dépôt avec Godot 4.7.2 sans erreur. Done : `project.godot` valide, scène bootstrap créée, fenêtre portrait, aucun addon.
+But : ouvrir le dépôt avec Godot 4.7.2 sans erreur. Done : `project.godot` valide, scène bootstrap créée, fenêtre portrait, aucun addon. Validation Godot headless à compléter lorsque l’éditeur sera disponible dans l’environnement.
 
 ### T002 — Input Map
 
