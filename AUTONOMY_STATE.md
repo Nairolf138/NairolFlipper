@@ -2,25 +2,26 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-06 09:50 UTC / 11:50 Europe/Paris
-- Cycle : initialisation autonome, T001
-- Statut : terminé avec limitation d’environnement
-- Temps restant : environ 174 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Date : 2026-09-07 02:02 UTC / 04:02 Europe/Paris
+- Cycle : T002 — Input Map
+- Statut : commit créé, push de branche à effectuer
+- Temps restant : environ 157 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
-- Dernier commit de référence avant ce cycle : `bb90fd8` (`docs: add NairolFlipper project framework`)
-- Dernier commit : `860e645` (`docs: record autonomous bootstrap delivery`)
-- Commit fonctionnel du cycle : `bbf33c9` (`feat: add Godot bootstrap scene`)
+- Dernier commit de référence avant ce cycle : `ed12104` (merge de T001)
+- Dernier commit : `118c36b` (`feat(lab): declare MVP keyboard input map`)
+- Commit fonctionnel du cycle : `118c36b` (`feat(lab): declare MVP keyboard input map`)
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : non modifiée par ce cycle
 
 ## État actuel
 
-Le dépôt contient maintenant un bootstrap Godot minimal :
+Le dépôt contient maintenant un bootstrap Godot minimal avec les actions clavier MVP :
 
 - `project.godot` déclare `res://scenes/app/Main.tscn` comme scène principale ;
+- `project.godot` déclare `flipper_left` (A), `flipper_right` (D), `launch_ball` (Espace) et `pause` (Échap) ;
 - `scenes/app/Main.tscn` contient une racine `Node2D` nommée `Main` ;
 - aucun addon ou asset externe n’a été ajouté ;
 - le projet reste compatible avec l’architecture 2D GL Compatibility documentée.
@@ -35,23 +36,24 @@ Le dépôt contient maintenant un bootstrap Godot minimal :
 - Test repassé au vert : `2 passed`.
 - Backlog mis à jour.
 
-## Tâche suivante probable
-
 ### T002 — Input Map
 
-Créer les actions minimales :
+- Test de contrat ajouté dans `tests/test_bootstrap.py`.
+- Test observé en échec avant l'ajout des actions.
+- Quatre actions clavier ajoutées dans `project.godot` : `flipper_left` (A), `flipper_right` (D), `launch_ball` (Espace) et `pause` (Échap).
+- Suite complète repassée au vert : `3 passed`.
+- Backlog mis à jour.
 
-- `flipper_left` ;
-- `flipper_right` ;
-- `launch_ball` ;
-- `pause`.
+## Tâche suivante probable
 
-Les actions doivent rester compatibles clavier et préparer l’extension tactile/manette sans ajouter de dépendance native.
+### T003 — Greybox table
+
+Créer les limites, le drain et la lane launcher en greybox 2D, sans art final.
 
 ## Tests
 
-- `python3 -m pytest tests/test_bootstrap.py -q` → `2 passed`.
-- Suite complète : à exécuter avant livraison du cycle.
+- `python3 -m pytest tests/test_bootstrap.py -q` → `3 passed`.
+- `python3 -m pytest -q` → `3 passed`.
 - Smoke test Godot headless : non exécuté, binaire Godot absent de l’environnement.
 
 ## Builds
@@ -83,4 +85,4 @@ Ces blocages ne justifient pas l’arrêt du développement des éléments véri
 
 ## Prochaine exécution
 
-Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T002. Ne pas commencer T003 tant que les actions d’entrée et leurs tests ne sont pas terminés.
+Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T003 — Greybox table. Ne pas commencer T004 tant que les limites, le drain, la lane launcher et leurs tests ne sont pas terminés.
