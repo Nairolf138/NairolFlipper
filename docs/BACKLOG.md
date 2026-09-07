@@ -8,9 +8,9 @@ Ordre volontaire. Ne pas sauter plusieurs étapes sans raison.
 
 But : ouvrir le dépôt avec Godot 4.7.2 sans erreur. Done : `project.godot` valide, scène bootstrap créée, fenêtre portrait, aucun addon. Validation Godot headless à compléter lorsque l’éditeur sera disponible dans l’environnement.
 
-### T002 — Input Map
+### T002 — Input Map ✅
 
-Créer `flipper_left`, `flipper_right`, `launch_ball`, `pause` avec clavier et architecture tactile future.
+Actions `flipper_left`, `flipper_right`, `launch_ball`, `pause` déclarées dans `project.godot` avec raccourcis clavier. La même map pourra être consommée par les contrôles tactiles et manette sans dépendance native.
 
 ### T003 — Greybox table
 

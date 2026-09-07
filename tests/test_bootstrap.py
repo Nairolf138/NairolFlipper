@@ -16,3 +16,14 @@ def test_bootstrap_scene_has_node2d_root():
     scene_text = MAIN_SCENE.read_text(encoding="utf-8")
     assert '[gd_scene load_steps=1 format=3]' in scene_text
     assert '[node name="Main" type="Node2D"]' in scene_text
+
+
+def test_project_declares_keyboard_actions_for_mvp_controls():
+    project_text = PROJECT.read_text(encoding="utf-8")
+    for action in ("flipper_left", "flipper_right", "launch_ball", "pause"):
+        assert f"{action}={{" in project_text
+
+    assert 'physical_keycode":65' in project_text
+    assert 'physical_keycode":68' in project_text
+    assert 'physical_keycode":32' in project_text
+    assert 'physical_keycode":4194305' in project_text
