@@ -14,7 +14,8 @@ def test_project_declares_existing_main_scene():
 
 def test_bootstrap_scene_has_node2d_root():
     scene_text = MAIN_SCENE.read_text(encoding="utf-8")
-    assert '[gd_scene load_steps=1 format=3]' in scene_text
+    assert scene_text.startswith('[gd_scene load_steps=')
+    assert ' format=3]' in scene_text.splitlines()[0]
     assert '[node name="Main" type="Node2D"]' in scene_text
 
 
@@ -27,3 +28,12 @@ def test_project_declares_keyboard_actions_for_mvp_controls():
     assert 'physical_keycode":68' in project_text
     assert 'physical_keycode":32' in project_text
     assert 'physical_keycode":4194305' in project_text
+
+
+def test_greybox_scene_declares_playfield_boundaries_and_launcher():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    for node_name in ("LeftWall", "RightWall", "TopWall", "Drain", "LauncherLane"):
+        assert f'name="{node_name}"' in scene_text
+
+    assert scene_text.count("type=\"StaticBody2D\"") == 4
+    assert scene_text.count("type=\"CollisionShape2D\"") == 5

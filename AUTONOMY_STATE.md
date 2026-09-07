@@ -2,31 +2,32 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-07 11:24 UTC / 13:24 Europe/Paris
-- Cycle : diagnostic et déblocage de l’environnement Godot
-- Statut : smoke test Godot réussi ; nettoyage du dépôt effectué
-- Temps restant : environ 130 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Date : 2026-09-07 18:11 UTC / 20:11 Europe/Paris
+- Cycle : T003 — Greybox table
+- Statut : implémenté et validé par tests Python + smoke test Godot
+- Temps restant : environ 118 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
-- Dernier commit de référence avant ce cycle : `ed12104` (merge de T001)
-- Dernier commit : `e3efdef` (`feat: declare MVP keyboard input map (#2)`)
-- Commit fonctionnel du cycle : `e3efdef` (`feat: declare MVP keyboard input map (#2)`)
+- Dernier commit de référence avant ce cycle : `0454797` (merge de l'environnement précédent)
+- Dernier commit : à créer après validation de ce cycle
+- Commit fonctionnel du cycle : à créer après validation de ce cycle
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : non modifiée par ce cycle
 
 ## État actuel
 
-Le dépôt contient maintenant un bootstrap Godot minimal avec les actions clavier MVP :
+Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox et les actions clavier MVP :
 
 - `project.godot` déclare `res://scenes/app/Main.tscn` comme scène principale ;
 - `project.godot` déclare `flipper_left` (A), `flipper_right` (D), `launch_ball` (Espace) et `pause` (Échap) ;
 - `scenes/app/Main.tscn` contient une racine `Node2D` nommée `Main` ;
+- `scenes/app/Main.tscn` contient un plateau visible, quatre corps statiques pour les limites/drain et une lane launcher ;
 - aucun addon ou asset externe n’a été ajouté ;
 - le projet reste compatible avec l’architecture 2D GL Compatibility documentée.
 
-## Tâche terminée
+## Tâches terminées
 
 ### T001 — Bootstrap Godot minimal
 
@@ -44,18 +45,27 @@ Le dépôt contient maintenant un bootstrap Godot minimal avec les actions clavi
 - Suite complète repassée au vert : `3 passed`.
 - Backlog mis à jour.
 
-## Tâche suivante probable
-
 ### T003 — Greybox table
 
-Créer les limites, le drain et la lane launcher en greybox 2D, sans art final.
+- Test de contrat ajouté dans `tests/test_bootstrap.py` pour les cinq zones de collision.
+- Test observé en échec avant l'ajout de la scène greybox.
+- Limites gauche/droite/haut, drain et lane launcher ajoutés en scène Godot, sans asset externe.
+- Rendu minimal du plateau ajouté avec `Polygon2D`.
+- Suite complète repassée au vert : `4 passed`.
+- Backlog mis à jour.
+
+## Tâche suivante probable
+
+### T004 — Ball
+
+Ajouter une bille `RigidBody2D` avec collision, CCD et un reset testable. Ne pas commencer les flippers dans le même cycle.
 
 ## Tests
 
-- `python3 -m pytest tests/test_bootstrap.py -q` → `3 passed`.
-- `python3 -m pytest -q` → `3 passed`.
-- Tests Python : `python3 -m pytest -q` → `3 passed`.
+- `python3 -m pytest tests/test_bootstrap.py -q` → `4 passed`.
+- `python3 -m pytest -q` → `4 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
+- `git diff --check` → réussi.
 
 ## Builds
 
@@ -66,7 +76,7 @@ Créer les limites, le drain et la lane launcher en greybox 2D, sans art final.
 
 ## Problèmes connus
 
-- Le projet est encore un squelette : aucune mécanique de flipper n’est implémentée.
+- Le dépôt est encore un greybox : aucune bille ni mécanique de flipper n’est implémentée.
 - Le mode `--headless --editor --quit` crashe sous root/PRoot (signal 11), mais le mode d’exécution headless du projet passe.
 - La validation réelle Web/Android/Windows reste à faire via des presets et une CI.
 
@@ -81,11 +91,11 @@ Ces blocages ne justifient pas l’arrêt du développement des éléments véri
 ## Livrables actuellement disponibles
 
 - `project.godot` configuré avec scène principale.
-- `scenes/app/Main.tscn`.
-- `tests/test_bootstrap.py`.
+- `scenes/app/Main.tscn` avec limites, drain et lane launcher greybox.
+- `tests/test_bootstrap.py` avec contrats bootstrap, input map et greybox.
 - `docs/BACKLOG.md` mis à jour.
 - Ce journal `AUTONOMY_STATE.md`.
 
 ## Prochaine exécution
 
-Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T003 — Greybox table. Ne pas commencer T004 tant que les limites, le drain, la lane launcher et leurs tests ne sont pas terminés. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.
+Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T004 — Ball. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.
