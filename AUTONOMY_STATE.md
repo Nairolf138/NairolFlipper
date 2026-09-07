@@ -4,15 +4,15 @@
 
 - Date : 2026-09-07 02:02 UTC / 04:02 Europe/Paris
 - Cycle : T002 — Input Map
-- Statut : terminé, tests verts, livraison de branche en préparation
+- Statut : commit créé, push de branche à effectuer
 - Temps restant : environ 157 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
 - Dernier commit de référence avant ce cycle : `ed12104` (merge de T001)
-- Dernier commit : à créer sur `hermes-autonomous`
-- Commit fonctionnel du cycle : à créer sur `hermes-autonomous`
+- Dernier commit : `118c36b` (`feat(lab): declare MVP keyboard input map`)
+- Commit fonctionnel du cycle : `118c36b` (`feat(lab): declare MVP keyboard input map`)
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : non modifiée par ce cycle
 
