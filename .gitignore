@@ -37,3 +37,8 @@ Thumbs.db
 *.tmp
 *.swp
 *~
+__pycache__/
+.pytest_cache/
+
+# Local automation state accidentally created outside the project
+critical-unavailable.json
