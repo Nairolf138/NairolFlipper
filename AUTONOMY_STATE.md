@@ -2,17 +2,17 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-08 02:17 UTC / 04:17 Europe/Paris
-- Cycle : T004 — Ball
-- Statut : implémenté et validé par tests Python + smoke test Godot
-- Temps restant : environ 109 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Date : 2026-09-08 10:24 UTC / 12:24 Europe/Paris
+- Cycle : T005 — Flippers
+- Statut : implémenté, testé, committé et poussé
+- Temps restant : environ 101 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
-- Dernier commit de référence avant ce cycle : `0454797` (merge de l'environnement précédent)
-- Dernier commit : `78f1e81` — ajout de la bille physique réinitialisable
-- Commit fonctionnel du cycle : `78f1e81`
+- Dernier commit de référence avant ce cycle : `c913c80` (merge de l'environnement précédent)
+- Dernier commit : `9bea2a7` (`feat: add playable flippers`)
+- Commit fonctionnel du cycle : `9bea2a7` (`feat: add playable flippers`)
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : non modifiée par ce cycle
 
@@ -66,16 +66,23 @@ Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, un
 - Suite ciblée repassée au vert : `5 passed`.
 - Backlog mis à jour.
 
+### T005 — Flippers ✅
+
+- `Flipper.tscn` ajouté avec `AnimatableBody2D`, collision et rendu greybox.
+- `flipper.gd` ajoute l’activation press/release via `Input.is_action_pressed` et une rotation interpolée.
+- Deux flippers instanciés dans `Main.tscn`, avec actions clavier gauche/droite.
+- Suite complète repassée au vert : `6 passed`.
+
 ## Tâche suivante probable
 
-### T005 — Flippers
+### T006 — Launcher
 
-Ajouter une paire de flippers avec activation clavier/tactile/manette, sans commencer les bumpers dans le même cycle.
+Ajouter le lancement contrôlé de la bille, sans commencer les bumpers dans le même cycle.
 
 ## Tests
 
-- `python3 -m pytest tests/test_bootstrap.py -q` → `5 passed`.
-- `python3 -m pytest -q` → `5 passed`.
+- `python3 -m pytest tests/test_bootstrap.py -q` → `6 passed`.
+- `python3 -m pytest -q` → `6 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
 
@@ -88,7 +95,7 @@ Ajouter une paire de flippers avec activation clavier/tactile/manette, sans comm
 
 ## Problèmes connus
 
-- Le dépôt est encore un greybox : les flippers et autres mécaniques ne sont pas implémentés.
+- Le dépôt est encore un greybox : launcher, bumpers, score et cycle de billes restent à implémenter.
 - Le mode `--headless --editor --quit` crashe sous root/PRoot (signal 11), mais le mode d’exécution headless du projet passe.
 - La validation réelle Web/Android/Windows reste à faire via des presets et une CI.
 

@@ -20,7 +20,7 @@ Limites, drain, lane launcher, zones simples. Pas d'art final. La scène princip
 
 `RigidBody2D`, collision, CCD, tuning, reset. La scène `Ball.tscn` instancie une bille physique avec collision continue et le script expose `reset_ball()`.
 
-### T005 — Flippers
+### T005 — Flippers ✅
 
 Gauche/droite, press/release, collisions, tuning.
 
