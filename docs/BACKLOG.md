@@ -16,9 +16,9 @@ Actions `flipper_left`, `flipper_right`, `launch_ball`, `pause` déclarées dans
 
 Limites, drain, lane launcher, zones simples. Pas d'art final. La scène principale contient maintenant les limites physiques et un rendu de plateau minimal.
 
-### T004 — Ball
+### T004 — Ball ✅
 
-`RigidBody2D`, collision, CCD, tuning, reset.
+`RigidBody2D`, collision, CCD, tuning, reset. La scène `Ball.tscn` instancie une bille physique avec collision continue et le script expose `reset_ball()`.
 
 ### T005 — Flippers
 

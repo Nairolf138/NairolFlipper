@@ -37,3 +37,17 @@ def test_greybox_scene_declares_playfield_boundaries_and_launcher():
 
     assert scene_text.count("type=\"StaticBody2D\"") == 4
     assert scene_text.count("type=\"CollisionShape2D\"") == 5
+
+
+def test_main_scene_declares_resettable_ball_instance():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    ball_scene = ROOT / "scenes" / "gameplay" / "Ball.tscn"
+    ball_script = ROOT / "scripts" / "gameplay" / "ball.gd"
+
+    assert ball_scene.is_file()
+    assert ball_script.is_file()
+    assert 'type="RigidBody2D"' in ball_scene.read_text(encoding="utf-8")
+    assert 'ext_resource' in ball_scene.read_text(encoding="utf-8")
+    assert 'Ball.tscn' in scene_text
+    assert "reset_ball" in ball_script.read_text(encoding="utf-8")
+    assert "continuous_cd = 1" in ball_scene.read_text(encoding="utf-8")
