@@ -11,8 +11,8 @@
 
 - Branche : `hermes-autonomous`
 - Dernier commit de référence avant ce cycle : `0454797` (merge de l'environnement précédent)
-- Dernier commit : à créer après validation de ce cycle
-- Commit fonctionnel du cycle : à créer après validation de ce cycle
+- Dernier commit : `78f1e81` — ajout de la bille physique réinitialisable
+- Commit fonctionnel du cycle : `78f1e81`
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : non modifiée par ce cycle
 
@@ -75,7 +75,7 @@ Ajouter une paire de flippers avec activation clavier/tactile/manette, sans comm
 ## Tests
 
 - `python3 -m pytest tests/test_bootstrap.py -q` → `5 passed`.
-- `python3 -m pytest -q` → à exécuter après ce cycle.
+- `python3 -m pytest -q` → `5 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
 
