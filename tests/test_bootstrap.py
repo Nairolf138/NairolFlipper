@@ -71,3 +71,16 @@ def test_main_scene_declares_two_pressable_flippers():
     assert "action_name" in script_text
     assert "flipper_left" in scene_text
     assert "flipper_right" in scene_text
+
+
+def test_ball_has_a_controlled_launcher_contract():
+    ball_script = (ROOT / "scripts" / "gameplay" / "ball.gd").read_text(encoding="utf-8")
+    ball_scene = (ROOT / "scenes" / "gameplay" / "Ball.tscn").read_text(encoding="utf-8")
+    project_text = PROJECT.read_text(encoding="utf-8")
+
+    assert "launch_ball" in project_text
+    assert "launch_force" in ball_script
+    assert "launch_ball()" in ball_script
+    assert "launch_ready" in ball_script
+    assert "Input.is_action_just_pressed" in ball_script
+    assert "launch_force" in ball_scene

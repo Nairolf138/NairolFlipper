@@ -24,9 +24,9 @@ Limites, drain, lane launcher, zones simples. Pas d'art final. La scène princip
 
 Gauche/droite, press/release, collisions, tuning.
 
-### T006 — Launcher
+### T006 — Launcher ✅
 
-Placement, lancement, bloqué si aucune bille prête.
+Placement dans la lane, lancement contrôlé via `launch_ball`, bloqué si aucune bille prête. La bille est immobilisée au démarrage et propulsée une seule fois par l'action `launch_ball`.
 
 ### T007 — Bumpers
 

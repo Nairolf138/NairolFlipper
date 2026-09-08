@@ -2,17 +2,17 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-08 10:24 UTC / 12:24 Europe/Paris
-- Cycle : T005 — Flippers
-- Statut : implémenté, testé, committé et poussé
-- Temps restant : environ 101 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Date : 2026-09-08 18:29 UTC / 20:29 Europe/Paris
+- Cycle : T006 — Launcher
+- Statut : implémenté, testé, prêt à committer
+- Temps restant : environ 117 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
 - Dernier commit de référence avant ce cycle : `c913c80` (merge de l'environnement précédent)
-- Dernier commit : `9bea2a7` (`feat: add playable flippers`)
-- Commit fonctionnel du cycle : `9bea2a7` (`feat: add playable flippers`)
+- Dernier commit : `74474ed` (`docs: record flipper delivery state`)
+- Commit fonctionnel du cycle : en préparation
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : non modifiée par ce cycle
 
@@ -73,16 +73,24 @@ Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, un
 - Deux flippers instanciés dans `Main.tscn`, avec actions clavier gauche/droite.
 - Suite complète repassée au vert : `6 passed`.
 
-## Tâche suivante probable
+### T006 — Launcher ✅
 
-### T006 — Launcher
+- Contrat de test ajouté pour le lancement contrôlé et le verrouillage quand la bille n'est plus prête.
+- Test rouge observé avant implémentation.
+- La bille démarre immobilisée au centre de la lane launcher.
+- `launch_ball` libère la bille et applique une impulsion verticale une seule fois.
+- Un second lancement est refusé tant que la bille n'a pas été réinitialisée.
 
-Ajouter le lancement contrôlé de la bille, sans commencer les bumpers dans le même cycle.
+### Tâche suivante probable
+
+### T007 — Bumpers
+
+Ajouter trois bumpers avec impulsion, score event et feedback visuel, sans commencer le score global dans le même cycle.
 
 ## Tests
 
-- `python3 -m pytest tests/test_bootstrap.py -q` → `6 passed`.
-- `python3 -m pytest -q` → `6 passed`.
+- `python3 -m pytest tests/test_bootstrap.py -q` → `7 passed`.
+- `python3 -m pytest -q` → `7 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
 
@@ -117,4 +125,4 @@ Ces blocages ne justifient pas l’arrêt du développement des éléments véri
 
 ## Prochaine exécution
 
-Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T005 — Flippers. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.
+Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T007 — Bumpers. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.
