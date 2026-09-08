@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/gameplay/flipper.gd" id="1_flipper"]
+
+[sub_resource type="RectangleShape2D" id="FlipperShape"]
+size = Vector2(180, 34)
+
+[node name="Flipper" type="AnimatableBody2D"]
+script = ExtResource("1_flipper")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(90, 0)
+shape = SubResource("FlipperShape")
+
+[node name="Visual" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, -17, 145, -17, 180, 0, 145, 17, 0, 17)
+color = Color(0.95, 0.32, 0.58, 1)

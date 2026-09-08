@@ -51,3 +51,23 @@ def test_main_scene_declares_resettable_ball_instance():
     assert 'Ball.tscn' in scene_text
     assert "reset_ball" in ball_script.read_text(encoding="utf-8")
     assert "continuous_cd = 1" in ball_scene.read_text(encoding="utf-8")
+
+
+def test_main_scene_declares_two_pressable_flippers():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    flipper_scene = ROOT / "scenes" / "gameplay" / "Flipper.tscn"
+    flipper_script = ROOT / "scripts" / "gameplay" / "flipper.gd"
+
+    assert flipper_scene.is_file()
+    assert flipper_script.is_file()
+    assert scene_text.count('parent="." instance=ExtResource("2_flipper")') == 2
+    assert 'name="LeftFlipper"' in scene_text
+    assert 'name="RightFlipper"' in scene_text
+    flipper_text = flipper_scene.read_text(encoding="utf-8")
+    assert 'type="AnimatableBody2D"' in flipper_text
+    assert 'type="CollisionShape2D"' in flipper_text
+    script_text = flipper_script.read_text(encoding="utf-8")
+    assert "Input.is_action_pressed" in script_text
+    assert "action_name" in script_text
+    assert "flipper_left" in scene_text
+    assert "flipper_right" in scene_text

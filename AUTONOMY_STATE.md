@@ -2,17 +2,17 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-08 02:17 UTC / 04:17 Europe/Paris
-- Cycle : T004 — Ball
+- Date : 2026-09-08 10:24 UTC / 12:24 Europe/Paris
+- Cycle : T005 — Flippers
 - Statut : implémenté et validé par tests Python + smoke test Godot
-- Temps restant : environ 109 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Temps restant : environ 101 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
-- Dernier commit de référence avant ce cycle : `0454797` (merge de l'environnement précédent)
-- Dernier commit : `78f1e81` — ajout de la bille physique réinitialisable
-- Commit fonctionnel du cycle : `78f1e81`
+- Dernier commit de référence avant ce cycle : `c913c80` (merge de l'environnement précédent)
+- Dernier commit : à créer dans ce cycle
+- Commit fonctionnel du cycle : à créer dans ce cycle
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : non modifiée par ce cycle
 

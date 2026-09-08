@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Ball.tscn" id="1_ball"]
+[ext_resource type="PackedScene" path="res://scenes/gameplay/Flipper.tscn" id="2_flipper"]
 
 [sub_resource type="RectangleShape2D" id="LeftWallShape"]
 size = Vector2(40, 1600)
@@ -58,3 +59,16 @@ polygon = PackedVector2Array(-60, -350, 60, -350, 60, 350, -60, 350)
 color = Color(0.12, 0.2, 0.3, 1)
 
 [node name="Ball" parent="." instance=ExtResource("1_ball")]
+
+[node name="LeftFlipper" parent="." instance=ExtResource("2_flipper")]
+position = Vector2(300, 1700)
+action_name = &"flipper_left"
+rest_angle_degrees = -20.0
+active_angle_degrees = 25.0
+
+[node name="RightFlipper" parent="." instance=ExtResource("2_flipper")]
+position = Vector2(780, 1700)
+scale = Vector2(-1, 1)
+action_name = &"flipper_right"
+rest_angle_degrees = 20.0
+active_angle_degrees = -25.0
