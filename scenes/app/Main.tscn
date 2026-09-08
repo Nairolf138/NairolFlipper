@@ -1,3 +1,60 @@
-[gd_scene load_steps=1 format=3]
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/gameplay/Ball.tscn" id="1_ball"]
+
+[sub_resource type="RectangleShape2D" id="LeftWallShape"]
+size = Vector2(40, 1600)
+
+[sub_resource type="RectangleShape2D" id="RightWallShape"]
+size = Vector2(40, 1600)
+
+[sub_resource type="RectangleShape2D" id="TopWallShape"]
+size = Vector2(1040, 40)
+
+[sub_resource type="RectangleShape2D" id="DrainShape"]
+size = Vector2(1040, 40)
+
+[sub_resource type="RectangleShape2D" id="LauncherLaneShape"]
+size = Vector2(120, 700)
 
 [node name="Main" type="Node2D"]
+
+[node name="Playfield" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(40, 40, 1040, 40, 1040, 1880, 40, 1880)
+color = Color(0.035, 0.055, 0.09, 1)
+
+[node name="LeftWall" type="StaticBody2D" parent="."]
+position = Vector2(20, 960)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
+shape = SubResource("LeftWallShape")
+
+[node name="RightWall" type="StaticBody2D" parent="."]
+position = Vector2(1060, 960)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
+shape = SubResource("RightWallShape")
+
+[node name="TopWall" type="StaticBody2D" parent="."]
+position = Vector2(540, 20)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TopWall"]
+shape = SubResource("TopWallShape")
+
+[node name="Drain" type="StaticBody2D" parent="."]
+position = Vector2(540, 1900)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Drain"]
+shape = SubResource("DrainShape")
+
+[node name="LauncherLane" type="Area2D" parent="."]
+position = Vector2(960, 1510)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LauncherLane"]
+shape = SubResource("LauncherLaneShape")
+
+[node name="LauncherGuide" type="Polygon2D" parent="LauncherLane"]
+polygon = PackedVector2Array(-60, -350, 60, -350, 60, 350, -60, 350)
+color = Color(0.12, 0.2, 0.3, 1)
+
+[node name="Ball" parent="." instance=ExtResource("1_ball")]

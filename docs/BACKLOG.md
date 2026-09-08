@@ -12,13 +12,13 @@ But : ouvrir le dépôt avec Godot 4.7.2 sans erreur. Done : `project.godot` val
 
 Actions `flipper_left`, `flipper_right`, `launch_ball`, `pause` déclarées dans `project.godot` avec raccourcis clavier. La même map pourra être consommée par les contrôles tactiles et manette sans dépendance native.
 
-### T003 — Greybox table
+### T003 — Greybox table ✅
 
-Limites, drain, lane launcher, zones simples. Pas d'art final.
+Limites, drain, lane launcher, zones simples. Pas d'art final. La scène principale contient maintenant les limites physiques et un rendu de plateau minimal.
 
-### T004 — Ball
+### T004 — Ball ✅
 
-`RigidBody2D`, collision, CCD, tuning, reset.
+`RigidBody2D`, collision, CCD, tuning, reset. La scène `Ball.tscn` instancie une bille physique avec collision continue et le script expose `reset_ball()`.
 
 ### T005 — Flippers
 
