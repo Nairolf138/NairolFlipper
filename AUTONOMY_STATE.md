@@ -11,8 +11,8 @@
 
 - Branche : `hermes-autonomous`
 - Dernier commit de référence avant ce cycle : `f239c30` (`feat: add controlled ball launcher`)
-- Dernier commit : en préparation
-- Commit fonctionnel du cycle : en préparation
+- Dernier commit : `66ab304` (`feat: add rhythmic bumpers`)
+- Commit fonctionnel du cycle : `66ab304`
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : non modifiée par ce cycle
 
