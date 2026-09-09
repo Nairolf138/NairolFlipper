@@ -2,23 +2,23 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-08 10:24 UTC / 12:24 Europe/Paris
-- Cycle : T005 — Flippers
-- Statut : implémenté, testé, committé et poussé
-- Temps restant : environ 101 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Date : 2026-09-09 02:36 UTC / 04:36 Europe/Paris
+- Cycle : T007 — Bumpers
+- Statut : implémenté, testé, prêt à livrer sur `hermes-autonomous`
+- Temps restant : environ 109 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
-- Dernier commit de référence avant ce cycle : `c913c80` (merge de l'environnement précédent)
-- Dernier commit : `9bea2a7` (`feat: add playable flippers`)
-- Commit fonctionnel du cycle : `9bea2a7` (`feat: add playable flippers`)
+- Dernier commit de référence avant ce cycle : `f239c30` (`feat: add controlled ball launcher`)
+- Dernier commit : `66ab304` (`feat: add rhythmic bumpers`)
+- Commit fonctionnel du cycle : `66ab304`
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : non modifiée par ce cycle
 
 ## État actuel
 
-Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, une bille physique et les actions clavier MVP :
+Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, une bille physique, deux flippers, un launcher et trois bumpers :
 
 - `project.godot` déclare `res://scenes/app/Main.tscn` comme scène principale ;
 - `project.godot` déclare `flipper_left` (A), `flipper_right` (D), `launch_ball` (Espace) et `pause` (Échap) ;
@@ -27,6 +27,9 @@ Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, un
 - `scenes/app/Main.tscn` instancie `scenes/gameplay/Ball.tscn` ;
 - `Ball.tscn` utilise un `RigidBody2D`, une collision circulaire et le CCD ;
 - `scripts/gameplay/ball.gd` réinitialise position et vitesses via `reset_ball()` ;
+- `scenes/gameplay/Bumper.tscn` décrit un bumper réutilisable avec collision et rendu greybox ;
+- `scripts/gameplay/bumper.gd` applique une impulsion radiale, émet `bumper_hit` et flash le bumper à l'impact ;
+- `scenes/app/Main.tscn` instancie les bumpers Kick, Snare et Tom ;
 - aucun addon ou asset externe n’a été ajouté ;
 - le projet reste compatible avec l’architecture 2D GL Compatibility documentée.
 
@@ -73,16 +76,33 @@ Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, un
 - Deux flippers instanciés dans `Main.tscn`, avec actions clavier gauche/droite.
 - Suite complète repassée au vert : `6 passed`.
 
-## Tâche suivante probable
+### T006 — Launcher ✅
 
-### T006 — Launcher
+- Contrat de test ajouté pour le lancement contrôlé et le verrouillage quand la bille n'est plus prête.
+- Test rouge observé avant implémentation.
+- La bille démarre immobilisée au centre de la lane launcher.
+- `launch_ball` libère la bille et applique une impulsion verticale une seule fois.
+- Un second lancement est refusé tant que la bille n'a pas été réinitialisée.
 
-Ajouter le lancement contrôlé de la bille, sans commencer les bumpers dans le même cycle.
+### T007 — Bumpers ✅
+
+- Test de contrat ajouté pour trois instances, collision, impulsion, signal et flash.
+- Test rouge observé avant la création de `Bumper.tscn` et `bumper.gd`.
+- Bumper réutilisable ajouté en `Area2D`, avec impulsion radiale configurable et valeurs de score propres à chaque instance.
+- Les instances Kick, Snare et Tom sont placées dans la scène principale.
+- Aucun ScoreManager ni audio n'est ajouté : le signal prépare les prochains jalons sans élargir la tâche.
+- Suite complète repassée au vert : `8 passed`.
+
+### Tâche suivante probable
+
+### T008 — Score + HUD
+
+Ajouter le ScoreManager de session, connecter les signaux `bumper_hit`, afficher le score et permettre son reset.
 
 ## Tests
 
-- `python3 -m pytest tests/test_bootstrap.py -q` → `6 passed`.
-- `python3 -m pytest -q` → `6 passed`.
+- `python3 -m pytest tests/test_bootstrap.py::test_main_scene_declares_three_rhythmic_bumpers -v` → `1 passed` après échec rouge initial attendu.
+- `python3 -m pytest -q` → `8 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
 
@@ -95,7 +115,7 @@ Ajouter le lancement contrôlé de la bille, sans commencer les bumpers dans le 
 
 ## Problèmes connus
 
-- Le dépôt est encore un greybox : launcher, bumpers, score et cycle de billes restent à implémenter.
+- Le dépôt est encore un greybox : score et cycle de billes restent à implémenter.
 - Le mode `--headless --editor --quit` crashe sous root/PRoot (signal 11), mais le mode d’exécution headless du projet passe.
 - La validation réelle Web/Android/Windows reste à faire via des presets et une CI.
 
@@ -117,4 +137,4 @@ Ces blocages ne justifient pas l’arrêt du développement des éléments véri
 
 ## Prochaine exécution
 
-Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T005 — Flippers. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.
+Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T008 — Score + HUD. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.

@@ -24,13 +24,13 @@ Limites, drain, lane launcher, zones simples. Pas d'art final. La scène princip
 
 Gauche/droite, press/release, collisions, tuning.
 
-### T006 — Launcher
+### T006 — Launcher ✅
 
-Placement, lancement, bloqué si aucune bille prête.
+Placement dans la lane, lancement contrôlé via `launch_ball`, bloqué si aucune bille prête. La bille est immobilisée au démarrage et propulsée une seule fois par l'action `launch_ball`.
 
-### T007 — Bumpers
+### T007 — Bumpers ✅
 
-Trois bumpers : impulse, SFX placeholder, flash, score event.
+Trois bumpers : impulse, SFX placeholder, flash, score event. Les bumpers Kick, Snare et Tom émettent un signal de hit pour le futur ScoreManager ; aucun scoring global ni audio n'est ajouté à ce jalon.
 
 ### T008 — Score + HUD
 
