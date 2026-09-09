@@ -84,3 +84,24 @@ def test_ball_has_a_controlled_launcher_contract():
     assert "launch_ready" in ball_script
     assert "Input.is_action_just_pressed" in ball_script
     assert "launch_force" in ball_scene
+
+
+def test_main_scene_declares_three_rhythmic_bumpers():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    bumper_scene = ROOT / "scenes" / "gameplay" / "Bumper.tscn"
+    bumper_script = ROOT / "scripts" / "gameplay" / "bumper.gd"
+
+    assert bumper_scene.is_file()
+    assert bumper_script.is_file()
+    assert scene_text.count('parent="." instance=ExtResource("3_bumper")') == 3
+    for bumper_name in ("KickBumper", "SnareBumper", "TomBumper"):
+        assert f'name="{bumper_name}"' in scene_text
+
+    bumper_text = bumper_scene.read_text(encoding="utf-8")
+    script_text = bumper_script.read_text(encoding="utf-8")
+    assert 'type="Area2D"' in bumper_text
+    assert 'type="CollisionShape2D"' in bumper_text
+    assert "body_entered" in script_text
+    assert "apply_central_impulse" in script_text
+    assert "bumper_hit" in script_text
+    assert "flash" in script_text
