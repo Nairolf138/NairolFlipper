@@ -11,10 +11,10 @@
 
 - Branche : `hermes-autonomous`
 - Dernier commit de référence avant ce cycle : `2c9efba` (fusion de T007)
-- Dernier commit : changements locaux non commités de T008
-- Commit fonctionnel du cycle : à créer après vérification finale
+- Dernier commit : `141188d` (fusion de T008)
+- Commit fonctionnel du cycle : `141188d` (`feat: add score manager and HUD`)
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` : non modifiée par ce cycle
+- Branche `main` : mise à jour par fusion PR #7 après ce cycle
 
 ## État actuel
 
