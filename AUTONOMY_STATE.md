@@ -2,17 +2,17 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-09 02:36 UTC / 04:36 Europe/Paris
-- Cycle : T007 — Bumpers
+- Date : 2026-09-10 21:10 UTC / 23:10 Europe/Paris
+- Cycle : T008 — Score + HUD
 - Statut : implémenté, testé, prêt à livrer sur `hermes-autonomous`
-- Temps restant : environ 109 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Temps restant : environ 91 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
-- Dernier commit de référence avant ce cycle : `f239c30` (`feat: add controlled ball launcher`)
-- Dernier commit : `66ab304` (`feat: add rhythmic bumpers`)
-- Commit fonctionnel du cycle : `66ab304`
+- Dernier commit de référence avant ce cycle : `2c9efba` (fusion de T007)
+- Dernier commit : changements locaux non commités de T008
+- Commit fonctionnel du cycle : à créer après vérification finale
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : non modifiée par ce cycle
 
@@ -30,6 +30,9 @@ Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, un
 - `scenes/gameplay/Bumper.tscn` décrit un bumper réutilisable avec collision et rendu greybox ;
 - `scripts/gameplay/bumper.gd` applique une impulsion radiale, émet `bumper_hit` et flash le bumper à l'impact ;
 - `scenes/app/Main.tscn` instancie les bumpers Kick, Snare et Tom ;
+- `scripts/gameplay/score_manager.gd` accumule les points et émet `score_changed` ;
+- `scripts/app/main.gd` connecte les impacts des bumpers au ScoreManager et met à jour `ScoreLabel` ;
+- `ScoreManager` et `ScoreLabel` sont présents dans la scène principale ;
 - aucun addon ou asset externe n’a été ajouté ;
 - le projet reste compatible avec l’architecture 2D GL Compatibility documentée.
 
@@ -95,14 +98,15 @@ Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, un
 
 ### Tâche suivante probable
 
-### T008 — Score + HUD
+### T009 — Ball lifecycle
 
-Ajouter le ScoreManager de session, connecter les signaux `bumper_hit`, afficher le score et permettre son reset.
+Ajouter trois billes, drain, délai, respawn, game over et restart.
 
 ## Tests
 
-- `python3 -m pytest tests/test_bootstrap.py::test_main_scene_declares_three_rhythmic_bumpers -v` → `1 passed` après échec rouge initial attendu.
-- `python3 -m pytest -q` → `8 passed`.
+- `python3 -m pytest tests/test_bootstrap.py::test_main_scene_declares_score_manager_and_hud -v` → `1 passed` après échec rouge initial attendu.
+- `python3 -m pytest tests/test_bootstrap.py::test_score_manager_accumulates_and_resets_points -v` → `1 passed` après échec rouge initial attendu.
+- `python3 -m pytest -q` → `10 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
 
@@ -137,4 +141,4 @@ Ces blocages ne justifient pas l’arrêt du développement des éléments véri
 
 ## Prochaine exécution
 
-Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T008 — Score + HUD. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.
+Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T009 — Ball lifecycle. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.

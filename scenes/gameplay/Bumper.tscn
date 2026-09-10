@@ -5,7 +5,7 @@
 [sub_resource type="CircleShape2D" id="BumperShape"]
 radius = 58.0
 
-[node name="Bumper" type="Area2D"]
+[node name="Bumper" type="Area2D" groups=["score_bumpers"]]
 script = ExtResource("1_bumper")
 monitoring = true
 monitorable = true

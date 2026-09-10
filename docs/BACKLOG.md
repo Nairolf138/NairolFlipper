@@ -32,9 +32,9 @@ Placement dans la lane, lancement contrôlé via `launch_ball`, bloqué si aucun
 
 Trois bumpers : impulse, SFX placeholder, flash, score event. Les bumpers Kick, Snare et Tom émettent un signal de hit pour le futur ScoreManager ; aucun scoring global ni audio n'est ajouté à ce jalon.
 
-### T008 — Score + HUD
+### T008 — Score + HUD ✅
 
-ScoreManager de session, signal, score visible, reset.
+ScoreManager de session, signal connecté aux trois bumpers, score visible dans le HUD, reset au démarrage.
 
 ### T009 — Ball lifecycle
 

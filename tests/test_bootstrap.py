@@ -105,3 +105,29 @@ def test_main_scene_declares_three_rhythmic_bumpers():
     assert "apply_central_impulse" in script_text
     assert "bumper_hit" in script_text
     assert "flash" in script_text
+
+
+def test_main_scene_declares_score_manager_and_hud():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    score_script = ROOT / "scripts" / "gameplay" / "score_manager.gd"
+    main_script = ROOT / "scripts" / "app" / "main.gd"
+
+    assert score_script.is_file()
+    assert main_script.is_file()
+    assert 'name="ScoreManager"' in scene_text
+    assert 'name="ScoreLabel"' in scene_text
+    assert 'type="Label"' in scene_text
+    assert 'score_manager.gd' in scene_text
+    assert "bumper_hit" in main_script.read_text(encoding="utf-8")
+
+
+def test_score_manager_accumulates_and_resets_points():
+    score_script = (ROOT / "scripts" / "gameplay" / "score_manager.gd").read_text(encoding="utf-8")
+
+    assert "signal score_changed" in score_script
+    assert "func add_points" in score_script
+    assert "func reset_score" in score_script
+    assert "score += points" in score_script
+    assert "score = 0" in score_script
+    assert "class_name ScoreManager" in score_script
+    assert "ScoreManager" in (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
