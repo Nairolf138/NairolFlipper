@@ -1,8 +1,10 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Ball.tscn" id="1_ball"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Flipper.tscn" id="2_flipper"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Bumper.tscn" id="3_bumper"]
+[ext_resource type="Script" path="res://scripts/app/main.gd" id="4_main"]
+[ext_resource type="Script" path="res://scripts/gameplay/score_manager.gd" id="5_score"]
 
 [sub_resource type="RectangleShape2D" id="LeftWallShape"]
 size = Vector2(40, 1600)
@@ -20,10 +22,23 @@ size = Vector2(1040, 40)
 size = Vector2(120, 700)
 
 [node name="Main" type="Node2D"]
+script = ExtResource("4_main")
 
 [node name="Playfield" type="Polygon2D" parent="."]
 polygon = PackedVector2Array(40, 40, 1040, 40, 1040, 1880, 40, 1880)
 color = Color(0.035, 0.055, 0.09, 1)
+
+[node name="ScoreManager" type="Node" parent="."]
+script = ExtResource("5_score")
+
+[node name="ScoreLabel" type="Label" parent="."]
+offset_left = 60.0
+offset_top = 70.0
+offset_right = 430.0
+offset_bottom = 140.0
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 36
+text = "SCORE 000000"
 
 [node name="LeftWall" type="StaticBody2D" parent="."]
 position = Vector2(20, 960)
