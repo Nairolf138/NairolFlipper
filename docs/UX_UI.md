@@ -14,7 +14,9 @@ Bille → dangers → objectif → mode → score → décoration. Si l'UI gêne
 
 ## Mobile
 
-Zones de flippers larges, invisibles/discrètes hors tutoriel. Aucun bouton indispensable sous les pouces.
+Zones tactiles larges et discrètes : la moitié basse gauche/droite commande
+les flippers, tandis qu'un toucher dans la zone haute lance ou relance la
+bille. Aucun bouton indispensable n'est ajouté sous les pouces.
 
 ## Desktop
 

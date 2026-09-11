@@ -40,6 +40,15 @@ theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
 theme_override_font_sizes/font_size = 36
 text = "SCORE 000000"
 
+[node name="StatusLabel" type="Label" parent="."]
+offset_left = 60.0
+offset_top = 135.0
+offset_right = 500.0
+offset_bottom = 190.0
+theme_override_colors/font_color = Color(0.5, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 24
+text = "BALL 1 / 3"
+
 [node name="LeftWall" type="StaticBody2D" parent="."]
 position = Vector2(20, 960)
 
@@ -58,11 +67,13 @@ position = Vector2(540, 20)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TopWall"]
 shape = SubResource("TopWallShape")
 
-[node name="Drain" type="StaticBody2D" parent="."]
+[node name="Drain" type="Area2D" parent="."]
 position = Vector2(540, 1900)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Drain"]
 shape = SubResource("DrainShape")
+
+[node name="DrainBoundary" type="StaticBody2D" parent="."]
 
 [node name="LauncherLane" type="Area2D" parent="."]
 position = Vector2(960, 1510)
@@ -74,7 +85,11 @@ shape = SubResource("LauncherLaneShape")
 polygon = PackedVector2Array(-60, -350, 60, -350, 60, 350, -60, 350)
 color = Color(0.12, 0.2, 0.3, 1)
 
-[node name="Ball" parent="." instance=ExtResource("1_ball")]
+[node name="BallOne" parent="." instance=ExtResource("1_ball")]
+
+[node name="BallTwo" parent="." instance=ExtResource("1_ball")]
+
+[node name="BallThree" parent="." instance=ExtResource("1_ball")]
 
 [node name="LeftFlipper" parent="." instance=ExtResource("2_flipper")]
 position = Vector2(300, 1700)
