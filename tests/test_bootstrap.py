@@ -131,3 +131,17 @@ def test_score_manager_accumulates_and_resets_points():
     assert "score = 0" in score_script
     assert "class_name ScoreManager" in score_script
     assert "ScoreManager" in (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+
+
+def test_ball_lifecycle_declares_three_balls_drain_and_restart():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    ball_script = (ROOT / "scripts" / "gameplay" / "ball.gd").read_text(encoding="utf-8")
+
+    assert scene_text.count('parent="." instance=ExtResource("1_ball")') == 3
+    assert 'body_entered.connect' in main_script
+    assert "ball_drained" in ball_script
+    assert "remaining_balls" in main_script
+    assert "game_over" in main_script
+    assert "restart_game" in main_script
+    assert "respawn_delay" in main_script

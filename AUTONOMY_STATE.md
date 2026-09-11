@@ -2,17 +2,17 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-10 21:10 UTC / 23:10 Europe/Paris
-- Cycle : T008 — Score + HUD
+- Date : 2026-09-11 05:20 UTC / 07:20 Europe/Paris
+- Cycle : T009 — Ball lifecycle
 - Statut : implémenté, testé, prêt à livrer sur `hermes-autonomous`
-- Temps restant : environ 91 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Temps restant : environ 59 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
-- Dernier commit de référence avant ce cycle : `2c9efba` (fusion de T007)
-- Dernier commit : `141188d` (fusion de T008)
-- Commit fonctionnel du cycle : `141188d` (`feat: add score manager and HUD`)
+- Dernier commit de référence avant ce cycle : `b896466` (fusion de T008)
+- Dernier commit : à créer sur `hermes-autonomous`
+- Commit fonctionnel du cycle : à créer (`feat: add ball lifecycle`)
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : mise à jour par fusion PR #7 après ce cycle
 
@@ -33,6 +33,7 @@ Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, un
 - `scripts/gameplay/score_manager.gd` accumule les points et émet `score_changed` ;
 - `scripts/app/main.gd` connecte les impacts des bumpers au ScoreManager et met à jour `ScoreLabel` ;
 - `ScoreManager` et `ScoreLabel` sont présents dans la scène principale ;
+- la scène contient trois billes, un drain détectant leur entrée, un respawn temporisé, un compteur de vies, un état game over et un restart ;
 - aucun addon ou asset externe n’a été ajouté ;
 - le projet reste compatible avec l’architecture 2D GL Compatibility documentée.
 
@@ -98,15 +99,16 @@ Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, un
 
 ### Tâche suivante probable
 
-### T009 — Ball lifecycle
+### T010 — Mobile touch
 
-Ajouter trois billes, drain, délai, respawn, game over et restart.
+Ajouter des contrôles tactiles gauche/droite et launcher sans envahir le HUD.
 
 ## Tests
 
 - `python3 -m pytest tests/test_bootstrap.py::test_main_scene_declares_score_manager_and_hud -v` → `1 passed` après échec rouge initial attendu.
 - `python3 -m pytest tests/test_bootstrap.py::test_score_manager_accumulates_and_resets_points -v` → `1 passed` après échec rouge initial attendu.
-- `python3 -m pytest -q` → `10 passed`.
+- `python3 -m pytest tests/test_bootstrap.py::test_ball_lifecycle_declares_three_balls_drain_and_restart -v` → `1 passed` après échec rouge initial attendu.
+- `python3 -m pytest -q` → `11 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
 
@@ -119,7 +121,7 @@ Ajouter trois billes, drain, délai, respawn, game over et restart.
 
 ## Problèmes connus
 
-- Le dépôt est encore un greybox : score et cycle de billes restent à implémenter.
+- Le dépôt est encore un greybox : le cycle de billes est fonctionnel mais non encore validé par playtest humain.
 - Le mode `--headless --editor --quit` crashe sous root/PRoot (signal 11), mais le mode d’exécution headless du projet passe.
 - La validation réelle Web/Android/Windows reste à faire via des presets et une CI.
 
@@ -141,4 +143,4 @@ Ces blocages ne justifient pas l’arrêt du développement des éléments véri
 
 ## Prochaine exécution
 
-Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T009 — Ball lifecycle. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.
+Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T010 — Mobile touch. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.
