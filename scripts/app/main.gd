@@ -112,5 +112,7 @@ func restart_game() -> void:
 	game_over = false
 	score_manager.reset_score()
 	status_label.text = "BALL 1 / 3"
-	for ball in balls:
+	for index in balls.size():
+		var ball: Node = balls[index]
 		ball.reset_ball(ball.spawn_position)
+		ball.visible = index == active_ball_index

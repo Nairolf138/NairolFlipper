@@ -2,19 +2,19 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-11 13:22 UTC / 15:22 Europe/Paris
-- Cycle : T010 — Mobile touch
+- Date : 2026-09-11 21:30 UTC / 23:30 Europe/Paris
+- Cycle : T011 — Smoke tests
 - Statut : implémenté, testé, prêt à livrer sur `hermes-autonomous`
-- Temps restant : environ 50 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Temps restant : environ 42 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
 - Dernier commit de référence avant ce cycle : `c9af90e` (T009 Ball lifecycle)
 - Dernier commit : à créer sur `hermes-autonomous`
-- Commit fonctionnel du cycle : à créer (`feat: add mobile touch controls`)
+- Commit fonctionnel du cycle : à créer (`fix: keep inactive balls hidden`)
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` : mise à jour par fusion PR #7 après ce cycle
+- Branche `main` : mise à jour par fusion PR #9 après ce cycle
 
 ## État actuel
 
@@ -109,9 +109,9 @@ Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, un
 
 ### Tâche suivante probable
 
-### T011 — Smoke tests
+### T012 — CI P0
 
-Renforcer les tests de chargement et de cycle de jeu avant de préparer T012 CI/builds.
+Créer les presets d’export et une validation CI Web/Android/Windows.
 
 ## Tests
 
@@ -119,7 +119,8 @@ Renforcer les tests de chargement et de cycle de jeu avant de préparer T012 CI/
 - `python3 -m pytest tests/test_bootstrap.py::test_score_manager_accumulates_and_resets_points -v` → `1 passed` après échec rouge initial attendu.
 - `python3 -m pytest tests/test_bootstrap.py::test_ball_lifecycle_declares_three_balls_drain_and_restart -v` → `1 passed` après échec rouge initial attendu.
 - `python3 -m pytest tests/test_bootstrap.py::test_mobile_touch_controls_cover_flippers_and_launcher -v` → `1 passed` après échec rouge initial attendu.
-- `python3 -m pytest -q` → `12 passed`.
+- `python3 -m pytest tests/test_bootstrap.py::test_restart_keeps_only_the_active_ball_visible -q` → échec rouge attendu, puis `1 passed` après correction.
+- `python3 -m pytest -q` → `13 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
 
@@ -133,6 +134,7 @@ Renforcer les tests de chargement et de cycle de jeu avant de préparer T012 CI/
 ## Problèmes connus
 
 - Le dépôt est encore un greybox : le cycle de billes est fonctionnel mais non encore validé par playtest humain.
+- Le smoke test vérifie statiquement le contrat de visibilité et lance le projet headless ; il ne remplace pas un playtest physique.
 - Le mode `--headless --editor --quit` crashe sous root/PRoot (signal 11), mais le mode d’exécution headless du projet passe.
 - Le contrôle tactile n’a pas encore été validé sur un appareil réel ; il est couvert par contrat statique et par le chargement Godot headless.
 - La validation réelle Web/Android/Windows reste à faire via des presets et une CI.
@@ -150,9 +152,10 @@ Ces blocages ne justifient pas l’arrêt du développement des éléments véri
 - `project.godot` configuré avec scène principale.
 - `scenes/app/Main.tscn` avec limites, drain et lane launcher greybox.
 - `tests/test_bootstrap.py` avec contrats bootstrap, input map et greybox.
+- `scripts/app/main.gd` masque les billes inactives après un restart afin qu’une seule bille soit visible/en jeu.
 - `docs/BACKLOG.md` mis à jour.
 - Ce journal `AUTONOMY_STATE.md`.
 
 ## Prochaine exécution
 
-Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T011 — Smoke tests. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.
+Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T012 — CI P0. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.
