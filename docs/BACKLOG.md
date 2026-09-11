@@ -40,9 +40,11 @@ ScoreManager de session, signal connecté aux trois bumpers, score visible dans 
 
 Trois billes, drain détecté par `Area2D`, délai de respawn, game over et restart via `launch_ball`. Le score est remis à zéro au restart.
 
-### T010 — Mobile touch
+### T010 — Mobile touch ✅
 
-Gauche/droite, launcher, UI non envahissante.
+Zones tactiles portrait : moitié basse gauche/droite pour les flippers, zone
+haute pour lancer ou relancer. Les drags peuvent changer de flipper sans
+ajouter de boutons persistants au HUD.
 
 ### T011 — Smoke tests
 

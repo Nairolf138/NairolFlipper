@@ -11,6 +11,7 @@ extends Node2D
 var remaining_balls: int = 3
 var active_ball_index: int = 0
 var game_over: bool = false
+var active_touches: Dictionary[int, StringName] = {}
 
 
 func _ready() -> void:
@@ -26,10 +27,55 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("launch_ball"):
-		if game_over:
-			restart_game()
-		else:
-			balls[active_ball_index].launch_ball()
+		_launch_or_restart()
+	elif event is InputEventScreenTouch:
+		_handle_touch(event)
+	elif event is InputEventScreenDrag:
+		_handle_touch_drag(event)
+
+
+func _launch_or_restart() -> void:
+	if game_over:
+		restart_game()
+	else:
+		balls[active_ball_index].launch_ball()
+
+
+func _handle_touch(event: InputEventScreenTouch) -> void:
+	if event.pressed:
+		if event.position.y < get_viewport_rect().size.y * 0.65:
+			_launch_or_restart()
+			return
+		var action := _flipper_action_for_position(event.position)
+		active_touches[event.index] = action
+		Input.action_press(action)
+	else:
+		_release_touch(event.index)
+
+
+func _handle_touch_drag(event: InputEventScreenDrag) -> void:
+	if not active_touches.has(event.index):
+		return
+	var previous_action: StringName = active_touches[event.index]
+	var action := _flipper_action_for_position(event.position)
+	if action == previous_action:
+		return
+	Input.action_release(previous_action)
+	Input.action_press(action)
+	active_touches[event.index] = action
+
+
+func _release_touch(touch_index: int) -> void:
+	if not active_touches.has(touch_index):
+		return
+	Input.action_release(active_touches[touch_index])
+	active_touches.erase(touch_index)
+
+
+func _flipper_action_for_position(touch_position: Vector2) -> StringName:
+	if touch_position.x < get_viewport_rect().size.x * 0.5:
+		return &"flipper_left"
+	return &"flipper_right"
 
 
 func _on_bumper_hit(points: int, _bumper_name: StringName) -> void:

@@ -2,17 +2,17 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-11 05:20 UTC / 07:20 Europe/Paris
-- Cycle : T009 — Ball lifecycle
+- Date : 2026-09-11 13:22 UTC / 15:22 Europe/Paris
+- Cycle : T010 — Mobile touch
 - Statut : implémenté, testé, prêt à livrer sur `hermes-autonomous`
-- Temps restant : environ 59 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Temps restant : environ 50 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
-- Dernier commit de référence avant ce cycle : `b896466` (fusion de T008)
+- Dernier commit de référence avant ce cycle : `c9af90e` (T009 Ball lifecycle)
 - Dernier commit : à créer sur `hermes-autonomous`
-- Commit fonctionnel du cycle : à créer (`feat: add ball lifecycle`)
+- Commit fonctionnel du cycle : à créer (`feat: add mobile touch controls`)
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : mise à jour par fusion PR #7 après ce cycle
 
@@ -34,6 +34,7 @@ Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, un
 - `scripts/app/main.gd` connecte les impacts des bumpers au ScoreManager et met à jour `ScoreLabel` ;
 - `ScoreManager` et `ScoreLabel` sont présents dans la scène principale ;
 - la scène contient trois billes, un drain détectant leur entrée, un respawn temporisé, un compteur de vies, un état game over et un restart ;
+- `scripts/app/main.gd` accepte les touchers/drags : flippers en moitié basse, lancement dans la zone haute, sans bouton HUD persistant ;
 - aucun addon ou asset externe n’a été ajouté ;
 - le projet reste compatible avec l’architecture 2D GL Compatibility documentée.
 
@@ -97,18 +98,28 @@ Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, un
 - Aucun ScoreManager ni audio n'est ajouté : le signal prépare les prochains jalons sans élargir la tâche.
 - Suite complète repassée au vert : `8 passed`.
 
+### T010 — Mobile touch ✅
+
+- Test de contrat ajouté avant implémentation et observé en échec.
+- Toucher dans la moitié basse : presse l'action du flipper gauche ou droit.
+- Relâchement et glissement : libèrent ou transfèrent proprement l'action tactile.
+- Toucher dans la zone haute : lance la bille ou redémarre après game over.
+- Documentation UX et backlog mis à jour.
+- Suite complète repassée au vert : `12 passed`.
+
 ### Tâche suivante probable
 
-### T010 — Mobile touch
+### T011 — Smoke tests
 
-Ajouter des contrôles tactiles gauche/droite et launcher sans envahir le HUD.
+Renforcer les tests de chargement et de cycle de jeu avant de préparer T012 CI/builds.
 
 ## Tests
 
 - `python3 -m pytest tests/test_bootstrap.py::test_main_scene_declares_score_manager_and_hud -v` → `1 passed` après échec rouge initial attendu.
 - `python3 -m pytest tests/test_bootstrap.py::test_score_manager_accumulates_and_resets_points -v` → `1 passed` après échec rouge initial attendu.
 - `python3 -m pytest tests/test_bootstrap.py::test_ball_lifecycle_declares_three_balls_drain_and_restart -v` → `1 passed` après échec rouge initial attendu.
-- `python3 -m pytest -q` → `11 passed`.
+- `python3 -m pytest tests/test_bootstrap.py::test_mobile_touch_controls_cover_flippers_and_launcher -v` → `1 passed` après échec rouge initial attendu.
+- `python3 -m pytest -q` → `12 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
 
@@ -123,6 +134,7 @@ Ajouter des contrôles tactiles gauche/droite et launcher sans envahir le HUD.
 
 - Le dépôt est encore un greybox : le cycle de billes est fonctionnel mais non encore validé par playtest humain.
 - Le mode `--headless --editor --quit` crashe sous root/PRoot (signal 11), mais le mode d’exécution headless du projet passe.
+- Le contrôle tactile n’a pas encore été validé sur un appareil réel ; il est couvert par contrat statique et par le chargement Godot headless.
 - La validation réelle Web/Android/Windows reste à faire via des presets et une CI.
 
 ## Blocages
@@ -143,4 +155,4 @@ Ces blocages ne justifient pas l’arrêt du développement des éléments véri
 
 ## Prochaine exécution
 
-Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T010 — Mobile touch. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.
+Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T011 — Smoke tests. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.
