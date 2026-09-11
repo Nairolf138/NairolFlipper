@@ -46,9 +46,11 @@ Zones tactiles portrait : moitié basse gauche/droite pour les flippers, zone
 haute pour lancer ou relancer. Les drags peuvent changer de flipper sans
 ajouter de boutons persistants au HUD.
 
-### T011 — Smoke tests
+### T011 — Smoke tests ✅
 
-Import, main scene load, score logic, drain lifecycle.
+Import, main scene load, score logic, drain lifecycle. Les contrats Python couvrent
+désormais le cycle de visibilité des billes et le projet est lancé en headless avec
+Godot 4.7.2.
 
 ### T012 — CI P0
 

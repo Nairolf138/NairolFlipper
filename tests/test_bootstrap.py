@@ -156,3 +156,9 @@ def test_mobile_touch_controls_cover_flippers_and_launcher():
     assert "Input.action_press" in main_script
     assert "Input.action_release" in main_script
     assert 'event.is_action_pressed("launch_ball")' in main_script
+
+
+def test_restart_keeps_only_the_active_ball_visible():
+    main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+
+    assert "ball.visible = index == active_ball_index" in main_script
