@@ -2,23 +2,28 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-11 21:30 UTC / 23:30 Europe/Paris
-- Cycle : T011 — Smoke tests
-- Statut : implémenté, testé, prêt à livrer sur `hermes-autonomous`
-- Temps restant : environ 42 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Date : 2026-09-12 22:00 UTC / 2026-09-13 00:00 Europe/Paris
+- Cycle : T012 — correction CI export P0 (Android)
+- Statut : correction préparée, tests locaux verts, livraison en cours sur `hermes-autonomous`
+- Temps restant : environ 17 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
-- Dernier commit de référence avant ce cycle : `c9af90e` (T009 Ball lifecycle)
-- Dernier commit : à créer sur `hermes-autonomous`
-- Commit fonctionnel du cycle : à créer (`fix: keep inactive balls hidden`)
+- Dernier commit de référence avant ce cycle : `53bb1d1` (fusion T011)
+- Dernier commit : `6bbff07` (`ci: add Godot P0 export validation`)
+- Commit fonctionnel du cycle : à créer (`fix(ci): enable ETC2 Android export`)
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` : mise à jour par fusion PR #9 après ce cycle
+- Branche `main` : `53bb1d1`, inchangée pendant ce cycle
 
 ## État actuel
 
-Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, une bille physique, deux flippers, un launcher et trois bumpers :
+T012 complète le premier filet de livraison cross-platform :
+
+- `export_presets.cfg` déclare Web, Android debug et Windows Desktop, avec chemins d’artefacts reproductibles.
+- `.github/workflows/godot.yml` installe Godot 4.7.2 et ses templates, exécute les contrats Python, charge le projet headless et tente les trois exports.
+- Aucun secret, keystore ou mot de passe de signature n’est stocké dans les presets.
+- Le projet reste compatible avec l’architecture 2D GL Compatibility documentée.
 
 - `project.godot` déclare `res://scenes/app/Main.tscn` comme scène principale ;
 - `project.godot` déclare `flipper_left` (A), `flipper_right` (D), `launch_ball` (Espace) et `pause` (Échap) ;
@@ -107,55 +112,51 @@ Le dépôt contient maintenant un bootstrap Godot minimal, une table greybox, un
 - Documentation UX et backlog mis à jour.
 - Suite complète repassée au vert : `12 passed`.
 
-### Tâche suivante probable
+### T012 — CI P0 ✅
 
-### T012 — CI P0
-
-Créer les presets d’export et une validation CI Web/Android/Windows.
+- Test de contrat ajouté en premier et observé en échec avant les presets et la workflow.
+- `export_presets.cfg` couvre Web, Android debug et Windows Desktop sans secrets.
+- Workflow GitHub Actions ajouté : contrats Python, smoke headless et exports des trois plateformes.
+- Contrats ciblés puis suite complète repassés au vert : `2 passed`, puis `15 passed`.
 
 ## Tests
 
-- `python3 -m pytest tests/test_bootstrap.py::test_main_scene_declares_score_manager_and_hud -v` → `1 passed` après échec rouge initial attendu.
-- `python3 -m pytest tests/test_bootstrap.py::test_score_manager_accumulates_and_resets_points -v` → `1 passed` après échec rouge initial attendu.
-- `python3 -m pytest tests/test_bootstrap.py::test_ball_lifecycle_declares_three_balls_drain_and_restart -v` → `1 passed` après échec rouge initial attendu.
-- `python3 -m pytest tests/test_bootstrap.py::test_mobile_touch_controls_cover_flippers_and_launcher -v` → `1 passed` après échec rouge initial attendu.
-- `python3 -m pytest tests/test_bootstrap.py::test_restart_keeps_only_the_active_ball_visible -q` → échec rouge attendu, puis `1 passed` après correction.
-- `python3 -m pytest -q` → `13 passed`.
+- `cd tests && python3 -m pytest test_bootstrap.py::test_export_presets_cover_p0_platforms_without_secrets test_bootstrap.py::test_ci_validates_contract_and_headless_godot_load -q` → `2 passed`.
+- `cd tests && python3 -m pytest -q` → `15 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
+- La CI du commit `2973cac` passe Web mais échoue à l’export Android car ETC2/ASTC n’est pas activé ; le correctif active `textures/vram_compression/import_etc2_astc=true` dans `project.godot`.
 
 ## Builds
 
 - Godot 4.7.2 ARM64 installé localement sous `/root/.local/opt/godot/4.7.2`.
-- Export templates 4.7.2 installés sous `/root/.local/share/godot/export_templates/4.7.2.stable`.
-- Aucun export Web/Android/Windows généré : aucun `export_presets.cfg` n’est encore défini.
-- CI GitHub accessible via `gh`; aucun workflow de build n’est encore présent dans le dépôt.
+- Les templates locaux ne sont pas exploitables pour un export : l’export Web a terminé en crash signal 11 sous root/PRoot.
+- Les exports Web/Android/Windows sont donc délégués à la workflow GitHub Actions, qui télécharge les templates 4.7.2.
 
 ## Problèmes connus
 
 - Le dépôt est encore un greybox : le cycle de billes est fonctionnel mais non encore validé par playtest humain.
 - Le smoke test vérifie statiquement le contrat de visibilité et lance le projet headless ; il ne remplace pas un playtest physique.
-- Le mode `--headless --editor --quit` crashe sous root/PRoot (signal 11), mais le mode d’exécution headless du projet passe.
+- Le mode `--headless --editor --quit` et l’export local crashent sous root/PRoot (signal 11), mais le mode d’exécution headless du projet passe.
 - Le contrôle tactile n’a pas encore été validé sur un appareil réel ; il est couvert par contrat statique et par le chargement Godot headless.
-- La validation réelle Web/Android/Windows reste à faire via des presets et une CI.
 
 ## Blocages
 
 - Aucun blocage sur le chargement/exécution headless du projet.
-- T012 reste nécessaire pour créer les presets d’export et la CI Web/Android/Windows.
-- Le SDK Android n’a pas encore été vérifié pour produire un APK local.
+- Les artefacts exportés n’ont pas été vérifiés localement : le binaire Godot local attendu n’est plus disponible ; la CI doit être observée après push.
+- La dernière CI a validé Web et échoué Android sur la configuration ETC2/ASTC ; Windows n’a pas été exécuté après l’échec Android.
+- Le SDK Android local n’a pas été vérifié pour produire un APK.
 
-Ces blocages ne justifient pas l’arrêt du développement des éléments vérifiables par tests statiques et Python.
+Ces limites sont documentées et ne justifient pas l’arrêt des validations statiques.
 
 ## Livrables actuellement disponibles
 
-- `project.godot` configuré avec scène principale.
-- `scenes/app/Main.tscn` avec limites, drain et lane launcher greybox.
-- `tests/test_bootstrap.py` avec contrats bootstrap, input map et greybox.
-- `scripts/app/main.gd` masque les billes inactives après un restart afin qu’une seule bille soit visible/en jeu.
+- `export_presets.cfg` avec presets Web, Android debug et Windows Desktop.
+- `.github/workflows/godot.yml` avec validation et exports P0.
+- `tests/test_bootstrap.py` avec contrats T012 en plus des contrats gameplay.
 - `docs/BACKLOG.md` mis à jour.
 - Ce journal `AUTONOMY_STATE.md`.
 
 ## Prochaine exécution
 
-Reprendre depuis ce fichier, vérifier Git, puis implémenter uniquement T012 — CI P0. Le binaire Godot utilisable est `/root/.local/opt/godot/4.7.2/Godot_v4.7.2-stable_linux.arm64`.
+Vérifier le push et le résultat de la workflow GitHub Actions. Si la CI est verte, stabiliser/documenter uniquement ; ne pas commencer T020 avant la livraison finale.
