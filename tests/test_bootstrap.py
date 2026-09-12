@@ -171,7 +171,9 @@ def test_export_presets_cover_p0_platforms_without_secrets():
 
     for platform in ("Web", "Android", "Windows Desktop"):
         assert f'name="{platform}"' in preset_text
-    assert 'config/name="NairolFlipper"' in PROJECT.read_text(encoding="utf-8")
+    project_text = PROJECT.read_text(encoding="utf-8")
+    assert 'config/name="NairolFlipper"' in project_text
+    assert "textures/vram_compression/import_etc2_astc=true" in project_text
     assert "keystore" not in preset_text.lower()
     assert "password" not in preset_text.lower()
 
