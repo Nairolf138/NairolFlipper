@@ -1,0 +1,37 @@
+name: Godot P0 validation
+
+on:
+  push:
+    branches: [main, hermes-autonomous]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Godot 4.7.2
+        run: |
+          wget -q https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
+          unzip -q Godot_v4.7.2-stable_linux.x86_64.zip
+          install -m 0755 Godot_v4.7.2-stable_linux.x86_64 /usr/local/bin/godot
+          mkdir -p ~/.local/share/godot/export_templates/4.7.2.stable
+          wget -q https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz
+          unzip -q Godot_v4.7.2-stable_export_templates.tpz -d /tmp/godot-templates
+          cp -R /tmp/godot-templates/templates/. ~/.local/share/godot/export_templates/4.7.2.stable/
+      - name: Python contract tests
+        run: |
+          python3 -m pip install --disable-pip-version-check pytest
+          python3 -m pytest tests/ -q
+      - name: Headless project smoke test
+        run: godot --headless --display-driver headless --audio-driver Dummy --path . --quit-after 5
+      - name: Export Web
+        run: godot --headless --path . --export-release "Web" build/web/index.html
+      - name: Export Android debug APK
+        run: godot --headless --path . --export-debug "Android" build/android/nairolflipper-debug.apk
+      - name: Export Windows
+        run: godot --headless --path . --export-release "Windows Desktop" build/windows/NairolFlipper.exe

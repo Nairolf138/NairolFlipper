@@ -162,3 +162,28 @@ def test_restart_keeps_only_the_active_ball_visible():
     main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
 
     assert "ball.visible = index == active_ball_index" in main_script
+
+
+def test_export_presets_cover_p0_platforms_without_secrets():
+    presets = ROOT / "export_presets.cfg"
+    assert presets.is_file()
+    preset_text = presets.read_text(encoding="utf-8")
+
+    for platform in ("Web", "Android", "Windows Desktop"):
+        assert f'name="{platform}"' in preset_text
+    assert 'config/name="NairolFlipper"' in PROJECT.read_text(encoding="utf-8")
+    assert "keystore" not in preset_text.lower()
+    assert "password" not in preset_text.lower()
+
+
+def test_ci_validates_contract_and_headless_godot_load():
+    workflow = ROOT / ".github" / "workflows" / "godot.yml"
+    assert workflow.is_file()
+    workflow_text = workflow.read_text(encoding="utf-8")
+
+    assert "pytest" in workflow_text
+    assert "--headless" in workflow_text
+    assert "--export-release" in workflow_text
+    assert '--export-release "Web"' in workflow_text
+    assert '--export-debug "Android"' in workflow_text
+    assert '--export-release "Windows Desktop"' in workflow_text
