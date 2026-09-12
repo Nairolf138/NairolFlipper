@@ -2,17 +2,17 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-12 13:49 UTC / 15:49 Europe/Paris
-- Cycle : T012 — CI P0
-- Statut : implémenté, testé sur worktree propre, prêt à livrer sur `hermes-autonomous`
-- Temps restant : environ 26 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Date : 2026-09-12 22:00 UTC / 2026-09-13 00:00 Europe/Paris
+- Cycle : T012 — correction CI export P0
+- Statut : correction préparée, tests locaux verts, livraison en cours sur `hermes-autonomous`
+- Temps restant : environ 18 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
 - Dernier commit de référence avant ce cycle : `53bb1d1` (fusion T011)
-- Dernier commit : à créer sur `hermes-autonomous`
-- Commit fonctionnel du cycle : à créer (`ci: add Godot P0 export validation`)
+- Dernier commit : `6bbff07` (`ci: add Godot P0 export validation`)
+- Commit fonctionnel du cycle : à créer (`fix(ci): create export directories before Godot exports`)
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : `53bb1d1`, inchangée pendant ce cycle
 
@@ -125,6 +125,7 @@ T012 complète le premier filet de livraison cross-platform :
 - `cd tests && python3 -m pytest -q` → `15 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
+- La CI des commits `6bbff07` a échoué sur l’export Web avant création de `build/web` ; le correctif ajoute les trois répertoires avant le premier export.
 
 ## Builds
 
@@ -142,7 +143,7 @@ T012 complète le premier filet de livraison cross-platform :
 ## Blocages
 
 - Aucun blocage sur le chargement/exécution headless du projet.
-- Les artefacts exportés n’ont pas été vérifiés localement à cause du crash Godot root/PRoot ; la CI doit être observée après push.
+- Les artefacts exportés n’ont pas été vérifiés localement : le binaire Godot local attendu n’est plus disponible ; la CI doit être observée après push.
 - Le SDK Android local n’a pas été vérifié pour produire un APK.
 
 Ces limites sont documentées et ne justifient pas l’arrêt des validations statiques.
@@ -157,4 +158,4 @@ Ces limites sont documentées et ne justifient pas l’arrêt des validations st
 
 ## Prochaine exécution
 
-Vérifier le push et le résultat de la workflow GitHub Actions, puis corriger uniquement un éventuel échec CI avant de commencer T020 — Physics tuning resource.
+Vérifier le push et le résultat de la workflow GitHub Actions. Si la CI est verte, stabiliser/documenter uniquement ; ne pas commencer T020 avant la livraison finale.

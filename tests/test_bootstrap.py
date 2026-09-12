@@ -187,3 +187,4 @@ def test_ci_validates_contract_and_headless_godot_load():
     assert '--export-release "Web"' in workflow_text
     assert '--export-debug "Android"' in workflow_text
     assert '--export-release "Windows Desktop"' in workflow_text
+    assert "mkdir -p build/web build/android build/windows" in workflow_text

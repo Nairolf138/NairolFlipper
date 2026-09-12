@@ -30,7 +30,9 @@ jobs:
       - name: Headless project smoke test
         run: godot --headless --display-driver headless --audio-driver Dummy --path . --quit-after 5
       - name: Export Web
-        run: godot --headless --path . --export-release "Web" build/web/index.html
+        run: |
+          mkdir -p build/web build/android build/windows
+          godot --headless --path . --export-release "Web" build/web/index.html
       - name: Export Android debug APK
         run: godot --headless --path . --export-debug "Android" build/android/nairolflipper-debug.apk
       - name: Export Windows
