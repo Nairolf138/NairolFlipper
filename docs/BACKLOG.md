@@ -52,9 +52,9 @@ Import, main scene load, score logic, drain lifecycle. Les contrats Python couvr
 désormais le cycle de visibilité des billes et le projet est lancé en headless avec
 Godot 4.7.2.
 
-### T012 — CI P0
+### T012 — CI P0 ✅
 
-Validation, Web artifact, Android debug APK, Windows artifact.
+Presets d’export Web, Android debug et Windows ajoutés avec artefacts nommés. Une workflow GitHub Actions épinglée sur Godot 4.7.2 exécute les contrats Python, le smoke test headless et les trois exports. Les secrets de signature Android restent hors du dépôt.
 
 ## P1 — Feel
 
