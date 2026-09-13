@@ -2,19 +2,19 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-12 22:00 UTC / 2026-09-13 00:00 Europe/Paris
-- Cycle : T012 — correction CI export P0 (Android)
-- Statut : correction préparée, tests locaux verts, livraison en cours sur `hermes-autonomous`
-- Temps restant : environ 17 heures avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Date : 2026-09-14 00:00 Europe/Paris (2026-09-13 22:00 UTC)
+- Cycle : T012 — vérification et livraison CI export P0
+- Statut : livré, PR #11 verte et fusionnable ; échéance atteinte
+- Temps restant : 0 heure avant le 13 septembre 2026 à 18:00 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
-- Dernier commit de référence avant ce cycle : `53bb1d1` (fusion T011)
-- Dernier commit : `6bbff07` (`ci: add Godot P0 export validation`)
-- Commit fonctionnel du cycle : à créer (`fix(ci): enable ETC2 Android export`)
+- Dernier commit vérifié avant ce cycle : `3305ec1` (`fix(ci): enable ETC2 Android export`)
+- Dernier commit : `3305ec1` (déjà poussé sur `origin/hermes-autonomous`)
+- PR : #11, checks GitHub Actions verts, fusion à effectuer
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` : `53bb1d1`, inchangée pendant ce cycle
+- Branche `main` : `53bb1d1` au début du cycle ; ne pas pousser directement dessus
 
 ## État actuel
 
@@ -159,4 +159,4 @@ Ces limites sont documentées et ne justifient pas l’arrêt des validations st
 
 ## Prochaine exécution
 
-Vérifier le push et le résultat de la workflow GitHub Actions. Si la CI est verte, stabiliser/documenter uniquement ; ne pas commencer T020 avant la livraison finale.
+Échéance atteinte : ne pas démarrer de nouvelle fonctionnalité. Après fusion de la PR #11, vérifier `origin/main`, conserver le playtest humain et traiter uniquement les régressions/builds bloquants. Les fichiers Python/Git non suivis présents dans l’arbre de travail ne proviennent pas de ce cycle et n’ont pas été modifiés.
