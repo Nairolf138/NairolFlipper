@@ -11,10 +11,10 @@
 
 - Branche : `hermes-autonomous`
 - Dernier commit vérifié avant ce cycle : `3305ec1` (`fix(ci): enable ETC2 Android export`)
-- Dernier commit : `3305ec1` (déjà poussé sur `origin/hermes-autonomous`)
-- PR : #11, checks GitHub Actions verts, fusion à effectuer
+- Dernier commit : `6a5c04b` (`ci: validate Godot P0 exports`, fusionné sur `origin/main`)
+- PR : #11, fusionnée après checks GitHub Actions verts
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` : `53bb1d1` au début du cycle ; ne pas pousser directement dessus
+- Branche `main` : `6a5c04b`, vérifiée après fusion
 
 ## État actuel
 
