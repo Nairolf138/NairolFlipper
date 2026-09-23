@@ -86,6 +86,21 @@ def test_ball_has_a_controlled_launcher_contract():
     assert "launch_force" in ball_scene
 
 
+def test_ball_uses_shared_physics_tuning_resource():
+    ball_script = (ROOT / "scripts" / "gameplay" / "ball.gd").read_text(encoding="utf-8")
+    ball_scene = (ROOT / "scenes" / "gameplay" / "Ball.tscn").read_text(encoding="utf-8")
+    tuning_script = (ROOT / "scripts" / "gameplay" / "physics_tuning.gd").read_text(encoding="utf-8")
+    tuning_resource = ROOT / "data" / "tuning" / "PhysicsTuning.tres"
+
+    assert tuning_resource.is_file()
+    assert "class_name PhysicsTuning" in tuning_script
+    assert "@export var max_speed" in tuning_script
+    assert "@export var tuning: PhysicsTuning" in ball_script
+    assert "_apply_tuning()" in ball_script
+    assert "limit_length(tuning.max_speed)" in ball_script
+    assert 'path="res://data/tuning/PhysicsTuning.tres"' in ball_scene
+
+
 def test_main_scene_declares_three_rhythmic_bumpers():
     scene_text = MAIN_SCENE.read_text(encoding="utf-8")
     bumper_scene = ROOT / "scenes" / "gameplay" / "Bumper.tscn"

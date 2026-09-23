@@ -58,7 +58,9 @@ Presets d’export Web, Android debug et Windows ajoutés avec artefacts nommés
 
 ## P1 — Feel
 
-T020 Physics tuning resource; T021 Ball max speed/anti-tunneling; T022 Feedback hit; T023 Ball save; T024 Controller support; T025 instrumentation locale de playtest.
+T020 Physics tuning resource ✅; T021 Ball max speed/anti-tunneling; T022 Feedback hit; T023 Ball save; T024 Controller support; T025 instrumentation locale de playtest.
+
+T020 centralise les paramètres de bille dans `data/tuning/PhysicsTuning.tres`, appliqués par `Ball`.
 
 ## P1 — Show systems
 

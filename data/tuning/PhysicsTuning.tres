@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PhysicsTuning" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/gameplay/physics_tuning.gd" id="1_tuning"]
+
+[resource]
+script = ExtResource("1_tuning")
+mass = 1.0
+gravity_scale = 1.0
+friction = 0.2
+bounce = 0.75
+linear_damp = 0.0
+angular_damp = 0.05
+max_speed = 2600.0
+launch_force = 1250.0
