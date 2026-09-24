@@ -2,19 +2,19 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-14 00:00 Europe/Paris (2026-09-13 22:00 UTC)
-- Cycle : T012 — vérification et livraison CI export P0
-- Statut : livré, PR #11 verte et fusionnable ; échéance atteinte
-- Temps restant : 0 heure avant le 13 septembre 2026 à 18:00 Europe/Paris
+- Date : 2026-09-24 13:39 Europe/Paris (2026-09-24 11:39 UTC)
+- Cycle : T024 — support manette
+- Statut : livré sur `origin/main`, CI verte
+- Échéance : 28 septembre 2026 à 13:13 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
-- Dernier commit vérifié avant ce cycle : `3305ec1` (`fix(ci): enable ETC2 Android export`)
-- Dernier commit : `6a5c04b` (`ci: validate Godot P0 exports`, fusionné sur `origin/main`)
-- PR : #11, fusionnée après checks GitHub Actions verts
+- Dernier commit vérifié avant ce cycle : `49718a3` (merge de T023 sur `origin/main`)
+- Dernier commit : `4868f7b` (`feat: add controller input mappings`, vérifié sur `origin/main`)
+- CI : run `35994131378`, Godot P0 validation, verte
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` : `6a5c04b`, vérifiée après fusion
+- Branche `main` : `4868f7b`, vérifiée après push
 
 ## État actuel
 
@@ -40,6 +40,7 @@ T012 complète le premier filet de livraison cross-platform :
 - `ScoreManager` et `ScoreLabel` sont présents dans la scène principale ;
 - la scène contient trois billes, un drain détectant leur entrée, un respawn temporisé, un compteur de vies, un état game over et un restart ;
 - `scripts/app/main.gd` accepte les touchers/drags : flippers en moitié basse, lancement dans la zone haute, sans bouton HUD persistant ;
+- `project.godot` mappe les boutons X/Y/A d'une manette aux actions flippers gauche/droit/lancement ;
 - aucun addon ou asset externe n’a été ajouté ;
 - le projet reste compatible avec l’architecture 2D GL Compatibility documentée.
 
@@ -119,10 +120,18 @@ T012 complète le premier filet de livraison cross-platform :
 - Workflow GitHub Actions ajouté : contrats Python, smoke headless et exports des trois plateformes.
 - Contrats ciblés puis suite complète repassés au vert : `2 passed`, puis `15 passed`.
 
+### T024 — Controller support ✅
+
+- Contrat ajouté dans `tests/test_bootstrap.py` pour les trois boutons de manette.
+- Les boutons X/Y/A sont ajoutés aux actions Godot existantes, sans modifier les contrôles clavier/tactiles.
+- Documentation backlog et matrice plateformes mise à jour.
+- Suite ciblée : `18 passed`.
+- CI GitHub Actions run `35994131378` : contrats Python, smoke headless et exports Web/Android/Windows réussis.
+
 ## Tests
 
 - `cd tests && python3 -m pytest test_bootstrap.py::test_export_presets_cover_p0_platforms_without_secrets test_bootstrap.py::test_ci_validates_contract_and_headless_godot_load -q` → `2 passed`.
-- `cd tests && python3 -m pytest -q` → `15 passed`.
+- `cd tests && pytest -q test_bootstrap.py --rootdir . --confcutdir .` → `18 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
 - La CI du commit `2973cac` passe Web mais échoue à l’export Android car ETC2/ASTC n’est pas activé ; le correctif active `textures/vram_compression/import_etc2_astc=true` dans `project.godot`.
@@ -138,11 +147,11 @@ T012 complète le premier filet de livraison cross-platform :
 - Le dépôt est encore un greybox : le cycle de billes est fonctionnel mais non encore validé par playtest humain.
 - Le smoke test vérifie statiquement le contrat de visibilité et lance le projet headless ; il ne remplace pas un playtest physique.
 - Le mode `--headless --editor --quit` et l’export local crashent sous root/PRoot (signal 11), mais le mode d’exécution headless du projet passe.
-- Le contrôle tactile n’a pas encore été validé sur un appareil réel ; il est couvert par contrat statique et par le chargement Godot headless.
+- Les contrôles tactiles et manette n’ont pas encore été validés sur un appareil réel ; ils sont couverts par contrat statique et par le chargement Godot headless.
 
 ## Blocages
 
-- Aucun blocage sur le chargement/exécution headless du projet.
+- Aucun blocage sur le chargement/exécution headless du projet ni sur la CI T024.
 - Les artefacts exportés n’ont pas été vérifiés localement : le binaire Godot local attendu n’est plus disponible ; la CI doit être observée après push.
 - La dernière CI a validé Web et échoué Android sur la configuration ETC2/ASTC ; Windows n’a pas été exécuté après l’échec Android.
 - Le SDK Android local n’a pas été vérifié pour produire un APK.
@@ -159,4 +168,4 @@ Ces limites sont documentées et ne justifient pas l’arrêt des validations st
 
 ## Prochaine exécution
 
-Échéance atteinte : ne pas démarrer de nouvelle fonctionnalité. Après fusion de la PR #11, vérifier `origin/main`, conserver le playtest humain et traiter uniquement les régressions/builds bloquants. Les fichiers Python/Git non suivis présents dans l’arbre de travail ne proviennent pas de ce cycle et n’ont pas été modifiés.
+Prochaine priorité : T025 — instrumentation locale de playtest. Les fichiers Python/Git non suivis présents dans l’arbre de travail ne proviennent pas de ce cycle et n’ont pas été modifiés.
