@@ -101,6 +101,19 @@ def test_ball_uses_shared_physics_tuning_resource():
     assert 'path="res://data/tuning/PhysicsTuning.tres"' in ball_scene
 
 
+def test_ball_save_safety_is_armed_on_launch_and_consumed_at_drain():
+    ball_script = (ROOT / "scripts" / "gameplay" / "ball.gd").read_text(encoding="utf-8")
+    main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+
+    assert "ball_save_duration" in ball_script
+    assert "ball_save_remaining" in ball_script
+    assert "ball_save_remaining = ball_save_duration" in ball_script
+    assert "func try_ball_save() -> bool" in ball_script
+    assert "body.try_ball_save()" in main_script
+    assert "body.reset_ball(body.spawn_position)" in main_script
+    assert 'status_label.text = "SAFETY"' in main_script
+
+
 def test_main_scene_declares_three_rhythmic_bumpers():
     scene_text = MAIN_SCENE.read_text(encoding="utf-8")
     bumper_scene = ROOT / "scenes" / "gameplay" / "Bumper.tscn"

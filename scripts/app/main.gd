@@ -88,6 +88,10 @@ func _on_score_changed(new_score: int) -> void:
 
 func _on_drain_body_entered(body: Node) -> void:
 	if body in balls:
+		if body.try_ball_save():
+			body.reset_ball(body.spawn_position)
+			status_label.text = "SAFETY"
+			return
 		body.mark_drained()
 
 
