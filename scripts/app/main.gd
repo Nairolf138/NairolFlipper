@@ -5,6 +5,7 @@ extends Node2D
 @onready var balls: Array[Node] = [$BallOne, $BallTwo, $BallThree]
 @onready var drain: Area2D = $Drain
 @onready var status_label: Label = $StatusLabel
+@onready var playtest_recorder: PlaytestRecorder = $PlaytestRecorder
 
 @export var respawn_delay: float = 1.0
 
@@ -36,9 +37,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _launch_or_restart() -> void:
 	if game_over:
+		playtest_recorder.record_restart()
 		restart_game()
 	else:
-		balls[active_ball_index].launch_ball()
+		if balls[active_ball_index].launch_ball():
+			playtest_recorder.record_launch()
 
 
 func _handle_touch(event: InputEventScreenTouch) -> void:
@@ -80,6 +83,7 @@ func _flipper_action_for_position(touch_position: Vector2) -> StringName:
 
 func _on_bumper_hit(points: int, _bumper_name: StringName) -> void:
 	score_manager.add_points(points)
+	playtest_recorder.record_bumper_hit(points)
 
 
 func _on_score_changed(new_score: int) -> void:
@@ -89,9 +93,11 @@ func _on_score_changed(new_score: int) -> void:
 func _on_drain_body_entered(body: Node) -> void:
 	if body in balls:
 		if body.try_ball_save():
+			playtest_recorder.record_ball_save()
 			body.reset_ball(body.spawn_position)
 			status_label.text = "SAFETY"
 			return
+		playtest_recorder.record_drain()
 		body.mark_drained()
 
 

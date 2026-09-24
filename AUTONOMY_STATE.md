@@ -2,19 +2,19 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-24 13:39 Europe/Paris (2026-09-24 11:39 UTC)
-- Cycle : T024 — support manette
-- Statut : livré sur `origin/main`, CI verte
+- Date : 2026-09-24 — fenêtre autonome en cours
+- Cycle : T025 — instrumentation locale de playtest
+- Statut : implémenté localement, livraison distante à vérifier après push
 - Échéance : 28 septembre 2026 à 13:13 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
-- Dernier commit vérifié avant ce cycle : `49718a3` (merge de T023 sur `origin/main`)
-- Dernier commit : `4868f7b` (`feat: add controller input mappings`, vérifié sur `origin/main`)
-- CI : run `35994131378`, Godot P0 validation, verte
+- Dernier commit vérifié avant ce cycle : `4cc0485` (T024 sur `origin/main`)
+- Dernier commit : à créer dans ce cycle
+- CI : à consulter après push
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` : `4868f7b`, vérifiée après push
+- Branche `main` : `4cc0485` avant ce cycle
 
 ## État actuel
 
@@ -41,6 +41,7 @@ T012 complète le premier filet de livraison cross-platform :
 - la scène contient trois billes, un drain détectant leur entrée, un respawn temporisé, un compteur de vies, un état game over et un restart ;
 - `scripts/app/main.gd` accepte les touchers/drags : flippers en moitié basse, lancement dans la zone haute, sans bouton HUD persistant ;
 - `project.godot` mappe les boutons X/Y/A d'une manette aux actions flippers gauche/droit/lancement ;
+- `PlaytestRecorder` enregistre localement la durée et les événements de session dans `user://playtest/latest.json`, sans réseau ;
 - aucun addon ou asset externe n’a été ajouté ;
 - le projet reste compatible avec l’architecture 2D GL Compatibility documentée.
 
@@ -128,12 +129,21 @@ T012 complète le premier filet de livraison cross-platform :
 - Suite ciblée : `18 passed`.
 - CI GitHub Actions run `35994131378` : contrats Python, smoke headless et exports Web/Android/Windows réussis.
 
+### T025 — Instrumentation locale de playtest
+
+- Contrat ajouté dans `tests/test_bootstrap.py` pour le recorder et ses événements.
+- `PlaytestRecorder` ajouté à la scène principale ; il écrit une trace JSON locale après les événements importants et à la fermeture.
+- Aucune télémétrie, requête réseau, compte ou dépendance n'est ajouté.
+- Contrat ciblé et suite de test exécutés avec succès : `19 passed`.
+
 ## Tests
 
 - `cd tests && python3 -m pytest test_bootstrap.py::test_export_presets_cover_p0_platforms_without_secrets test_bootstrap.py::test_ci_validates_contract_and_headless_godot_load -q` → `2 passed`.
 - `cd tests && pytest -q test_bootstrap.py --rootdir . --confcutdir .` → `18 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
+- `cd tests && python3 -m pytest test_bootstrap.py --rootdir . --confcutdir . -q` → `19 passed` pour T025.
+- Smoke Godot local non exécuté : le binaire 4.7.2 n'est pas présent dans cet environnement.
 - La CI du commit `2973cac` passe Web mais échoue à l’export Android car ETC2/ASTC n’est pas activé ; le correctif active `textures/vram_compression/import_etc2_astc=true` dans `project.godot`.
 
 ## Builds
@@ -168,4 +178,4 @@ Ces limites sont documentées et ne justifient pas l’arrêt des validations st
 
 ## Prochaine exécution
 
-Prochaine priorité : T025 — instrumentation locale de playtest. Les fichiers Python/Git non suivis présents dans l’arbre de travail ne proviennent pas de ce cycle et n’ont pas été modifiés.
+Prochaine priorité après livraison : T030 — modèle de rig. Les fichiers Python/Git non suivis présents dans l’arbre de travail ne proviennent pas de ce cycle et n’ont pas été modifiés.

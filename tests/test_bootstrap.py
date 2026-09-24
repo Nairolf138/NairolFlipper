@@ -201,6 +201,26 @@ def test_restart_keeps_only_the_active_ball_visible():
     assert "ball.visible = index == active_ball_index" in main_script
 
 
+def test_local_playtest_recorder_tracks_session_events_without_networking():
+    recorder = ROOT / "scripts" / "app" / "playtest_recorder.gd"
+    main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    recorder_text = recorder.read_text(encoding="utf-8")
+
+    assert recorder.is_file()
+    assert 'SAVE_PATH := "user://playtest/latest.json"' in recorder_text
+    assert "JSON.stringify" in recorder_text
+    assert "record_launch" in recorder_text
+    assert "record_bumper_hit" in recorder_text
+    assert "record_drain" in recorder_text
+    assert "record_ball_save" in recorder_text
+    assert "record_restart" in recorder_text
+    assert "HTTPRequest" not in recorder_text
+    assert 'name="PlaytestRecorder"' in scene_text
+    for event in ("record_launch", "record_bumper_hit", "record_drain", "record_ball_save", "record_restart"):
+        assert event in main_script
+
+
 def test_export_presets_cover_p0_platforms_without_secrets():
     presets = ROOT / "export_presets.cfg"
     assert presets.is_file()
