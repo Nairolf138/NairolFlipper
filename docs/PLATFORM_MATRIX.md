@@ -5,7 +5,7 @@
 | Gameplay complet | Oui | Oui | Oui | Oui | Oui | Oui |
 | Clavier | Oui | partiel | partiel | Oui | Oui | Oui |
 | Tactile | selon appareil | Oui | Oui | selon écran | selon écran | selon écran |
-| Manette | navigateur/API | Oui | Oui | Oui | Oui | Oui |
+| Manette | actions Godot selon navigateur | Oui | Oui | Oui | Oui | Oui |
 | Haptics | fallback | option | option | non requis | non requis | non requis |
 | Sauvegarde locale | Oui | Oui | Oui | Oui | Oui | Oui |
 | Stems musicaux | Oui | Oui | Oui | Oui | Oui | Oui |

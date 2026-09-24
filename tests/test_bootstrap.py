@@ -186,6 +186,15 @@ def test_mobile_touch_controls_cover_flippers_and_launcher():
     assert 'event.is_action_pressed("launch_ball")' in main_script
 
 
+def test_controller_actions_cover_flippers_and_launcher():
+    project_text = PROJECT.read_text(encoding="utf-8")
+
+    assert "InputEventJoypadButton" in project_text
+    assert '"button_index":2' in project_text
+    assert '"button_index":3' in project_text
+    assert '"button_index":0' in project_text
+
+
 def test_restart_keeps_only_the_active_ball_visible():
     main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
 

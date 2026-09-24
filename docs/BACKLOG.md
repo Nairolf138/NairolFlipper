@@ -58,12 +58,13 @@ Presets d’export Web, Android debug et Windows ajoutés avec artefacts nommés
 
 ## P1 — Feel
 
-T020 Physics tuning resource ✅; T021 Ball max speed/anti-tunneling ✅; T022 Feedback hit ✅; T023 Ball save ✅; T024 Controller support; T025 instrumentation locale de playtest.
+T020 Physics tuning resource ✅; T021 Ball max speed/anti-tunneling ✅; T022 Feedback hit ✅; T023 Ball save ✅; T024 Controller support ✅; T025 instrumentation locale de playtest.
 
 T020 centralise les paramètres de bille dans `data/tuning/PhysicsTuning.tres`, appliqués par `Ball`.
 T021 limite la vitesse de la bille via le tuning partagé et active le CCD dans `Ball.tscn`.
 T022 fournit un flash visuel temporisé sur chaque bumper et conserve le signal de hit pour le score.
 T023 ajoute Safety : une bille lancée peut être sauvée une fois pendant la fenêtre configurée, puis replacée au launcher.
+T024 mappe les boutons X/Y d'une manette aux flippers gauche/droit et A au lancement, en conservant les actions clavier et tactiles communes.
 
 ## P1 — Show systems
 
