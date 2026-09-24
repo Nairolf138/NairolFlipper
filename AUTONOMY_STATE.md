@@ -4,17 +4,17 @@
 
 - Date : 2026-09-24 — fenêtre autonome en cours
 - Cycle : T025 — instrumentation locale de playtest
-- Statut : implémenté localement, livraison distante à vérifier après push
+- Statut : livré sur `origin/main`, CI verte
 - Échéance : 28 septembre 2026 à 13:13 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
 - Dernier commit vérifié avant ce cycle : `4cc0485` (T024 sur `origin/main`)
-- Dernier commit : à créer dans ce cycle
-- CI : à consulter après push
+- Dernier commit : `db812db` (`feat: add local playtest instrumentation`), vérifié sur `origin/main`
+- CI : run `36050205761`, Godot P0 validation, verte
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` : `4cc0485` avant ce cycle
+- Branche `main` : `db812db`, vérifiée après push
 
 ## État actuel
 
@@ -143,7 +143,7 @@ T012 complète le premier filet de livraison cross-platform :
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
 - `cd tests && python3 -m pytest test_bootstrap.py --rootdir . --confcutdir . -q` → `19 passed` pour T025.
-- Smoke Godot local non exécuté : le binaire 4.7.2 n'est pas présent dans cet environnement.
+- Smoke Godot local non exécuté : le binaire 4.7.2 n'est pas présent dans cet environnement ; la CI 36050205761 a validé le smoke test et les exports.
 - La CI du commit `2973cac` passe Web mais échoue à l’export Android car ETC2/ASTC n’est pas activé ; le correctif active `textures/vram_compression/import_etc2_astc=true` dans `project.godot`.
 
 ## Builds
