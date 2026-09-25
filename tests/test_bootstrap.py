@@ -221,6 +221,23 @@ def test_local_playtest_recorder_tracks_session_events_without_networking():
         assert event in main_script
 
 
+def test_rig_model_declares_six_data_driven_fixture_families():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    rig_script = ROOT / "scripts" / "show" / "rig_model.gd"
+    definition_script = ROOT / "scripts" / "show" / "rig_definition.gd"
+    rig_data = ROOT / "data" / "rig"
+
+    assert rig_script.is_file()
+    assert definition_script.is_file()
+    assert 'name="RigModel"' in scene_text
+    assert "rig_family_activated" in rig_script.read_text(encoding="utf-8")
+    assert "@export var families: Array[RigDefinition]" in rig_script.read_text(encoding="utf-8")
+    assert "activate_family" in rig_script.read_text(encoding="utf-8")
+    for family_file in ("FrontWash.tres", "BackWash.tres", "Beam.tres", "Pixel.tres", "Blinders.tres", "Practical.tres"):
+        assert (rig_data / family_file).is_file()
+    assert scene_text.count('ExtResource("') >= 13
+
+
 def test_export_presets_cover_p0_platforms_without_secrets():
     presets = ROOT / "export_presets.cfg"
     assert presets.is_file()

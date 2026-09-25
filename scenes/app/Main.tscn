@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Ball.tscn" id="1_ball"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Flipper.tscn" id="2_flipper"]
@@ -6,6 +6,13 @@
 [ext_resource type="Script" path="res://scripts/app/main.gd" id="4_main"]
 [ext_resource type="Script" path="res://scripts/gameplay/score_manager.gd" id="5_score"]
 [ext_resource type="Script" path="res://scripts/app/playtest_recorder.gd" id="6_recorder"]
+[ext_resource type="Script" path="res://scripts/show/rig_model.gd" id="7_rig"]
+[ext_resource type="Resource" path="res://data/rig/FrontWash.tres" id="8_front_wash"]
+[ext_resource type="Resource" path="res://data/rig/BackWash.tres" id="9_back_wash"]
+[ext_resource type="Resource" path="res://data/rig/Beam.tres" id="10_beam"]
+[ext_resource type="Resource" path="res://data/rig/Pixel.tres" id="11_pixel"]
+[ext_resource type="Resource" path="res://data/rig/Blinders.tres" id="12_blinders"]
+[ext_resource type="Resource" path="res://data/rig/Practical.tres" id="13_practical"]
 
 [sub_resource type="RectangleShape2D" id="LeftWallShape"]
 size = Vector2(40, 1600)
@@ -34,6 +41,10 @@ script = ExtResource("5_score")
 
 [node name="PlaytestRecorder" type="Node" parent="."]
 script = ExtResource("6_recorder")
+
+[node name="RigModel" type="Node" parent="."]
+script = ExtResource("7_rig")
+families = Array[ExtResource("7_rig")]([ExtResource("8_front_wash"), ExtResource("9_back_wash"), ExtResource("10_beam"), ExtResource("11_pixel"), ExtResource("12_blinders"), ExtResource("13_practical")])
 
 [node name="ScoreLabel" type="Label" parent="."]
 offset_left = 60.0
