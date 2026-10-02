@@ -238,6 +238,21 @@ def test_rig_model_declares_six_data_driven_fixture_families():
     assert scene_text.count('ExtResource("') >= 13
 
 
+def test_cue_definition_declares_data_driven_show_payload():
+    cue_script = ROOT / "scripts" / "show" / "cue_definition.gd"
+    cue_data = ROOT / "data" / "cues" / "first_hit.tres"
+
+    assert cue_script.is_file()
+    assert cue_data.is_file()
+    cue_text = cue_script.read_text(encoding="utf-8")
+    data_text = cue_data.read_text(encoding="utf-8")
+    assert "class_name CueDefinition" in cue_text
+    for field in ("cue_id", "display_name", "conditions", "light_changes", "audio_changes", "bonus_points", "duration_seconds"):
+        assert f"@export var {field}" in cue_text
+    assert 'script_class="CueDefinition"' in data_text
+    assert 'cue_id = &"first_hit"' in data_text
+
+
 def test_export_presets_cover_p0_platforms_without_secrets():
     presets = ROOT / "export_presets.cfg"
     assert presets.is_file()

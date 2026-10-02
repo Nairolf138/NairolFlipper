@@ -3,16 +3,16 @@
 ## Dernière exécution
 
 - Date : 2026-09-24 — fenêtre autonome en cours
-- Cycle : T025 — instrumentation locale de playtest
+- Cycle : T031 — CueDefinition
 - Statut : livré sur `origin/main`, CI verte
 - Échéance : 28 septembre 2026 à 13:13 Europe/Paris
 
 ## Dépôt
 
 - Branche : `hermes-autonomous`
-- Dernier commit vérifié avant ce cycle : `4cc0485` (T024 sur `origin/main`)
-- Dernier commit : `db812db` (`feat: add local playtest instrumentation`), vérifié sur `origin/main`
-- CI : run `36050205761`, Godot P0 validation, verte
+- Dernier commit vérifié avant ce cycle : `e804c20` (T030 sur `origin/main`)
+- Dernier commit : en cours de livraison T031
+- CI : à consulter après push T031
 - Dépôt distant : `Nairolf138/NairolFlipper`
 - Branche `main` : `db812db`, vérifiée après push
 
@@ -136,13 +136,22 @@ T012 complète le premier filet de livraison cross-platform :
 - Aucune télémétrie, requête réseau, compte ou dépendance n'est ajouté.
 - Contrat ciblé et suite de test exécutés avec succès : `19 passed`.
 
+### T031 — CueDefinition
+
+- Contrat ajouté dans `tests/test_bootstrap.py` pour la Resource et son premier fichier de données.
+- `CueDefinition` ajoute l'identifiant, le nom, les conditions, les changements lumière/audio, le bonus et la durée.
+- `data/cues/first_hit.tres` fournit un cue minimal déclenché par `bumper_hit`.
+- Contrat ciblé et suite complète exécutés avec succès : `1 passed`, puis `21 passed`.
+- Le test lancé depuis la racine du dépôt est pollué par les fichiers Home Assistant non suivis ; la commande documentée depuis `tests/` passe.
+
 ## Tests
 
 - `cd tests && python3 -m pytest test_bootstrap.py::test_export_presets_cover_p0_platforms_without_secrets test_bootstrap.py::test_ci_validates_contract_and_headless_godot_load -q` → `2 passed`.
 - `cd tests && pytest -q test_bootstrap.py --rootdir . --confcutdir .` → `18 passed`.
 - Smoke test Godot 4.7.2 ARM64 : réussi avec `--headless --display-driver headless --audio-driver Dummy --path . --quit-after 5`.
 - `git diff --check` → réussi.
-- `cd tests && python3 -m pytest test_bootstrap.py --rootdir . --confcutdir . -q` → `19 passed` pour T025.
+- `cd tests && python3 -m pytest test_bootstrap.py::test_cue_definition_declares_data_driven_show_payload -q --rootdir . --confcutdir .` → `1 passed`.
+- `cd tests && python3 -m pytest test_bootstrap.py -q --rootdir . --confcutdir .` → `21 passed` pour T031.
 - Smoke Godot local non exécuté : le binaire 4.7.2 n'est pas présent dans cet environnement ; la CI 36050205761 a validé le smoke test et les exports.
 - La CI du commit `2973cac` passe Web mais échoue à l’export Android car ETC2/ASTC n’est pas activé ; le correctif active `textures/vram_compression/import_etc2_astc=true` dans `project.godot`.
 
@@ -161,7 +170,7 @@ T012 complète le premier filet de livraison cross-platform :
 
 ## Blocages
 
-- Aucun blocage sur le chargement/exécution headless du projet ni sur la CI T024.
+- Aucun blocage sur les contrats Python. Godot est indisponible localement dans ce checkout ; le smoke test et les exports restent à vérifier par CI.
 - Les artefacts exportés n’ont pas été vérifiés localement : le binaire Godot local attendu n’est plus disponible ; la CI doit être observée après push.
 - La dernière CI a validé Web et échoué Android sur la configuration ETC2/ASTC ; Windows n’a pas été exécuté après l’échec Android.
 - Le SDK Android local n’a pas été vérifié pour produire un APK.
@@ -178,4 +187,4 @@ Ces limites sont documentées et ne justifient pas l’arrêt des validations st
 
 ## Prochaine exécution
 
-Prochaine priorité après livraison : T030 — modèle de rig. Les fichiers Python/Git non suivis présents dans l’arbre de travail ne proviennent pas de ce cycle et n’ont pas été modifiés.
+Prochaine priorité après livraison : T032 — CueManager. Les fichiers Python/Git non suivis présents dans l’arbre de travail ne proviennent pas de ce cycle et n’ont pas été modifiés.
