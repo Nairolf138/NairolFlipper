@@ -11,10 +11,10 @@
 
 - Branche : `hermes-autonomous`
 - Dernier commit vérifié avant ce cycle : `e804c20` (T030 sur `origin/main`)
-- Dernier commit : en cours de livraison T031
-- CI : à consulter après push T031
+- Dernier commit : `047b21a` (`feat: add cue definition resource`), vérifié sur `origin/main`
+- CI : run `37046551893`, Godot P0 validation, verte
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` : `db812db`, vérifiée après push
+- Branche `main` : `047b21a`, vérifiée après push
 
 ## État actuel
 
@@ -170,9 +170,9 @@ T012 complète le premier filet de livraison cross-platform :
 
 ## Blocages
 
-- Aucun blocage sur les contrats Python. Godot est indisponible localement dans ce checkout ; le smoke test et les exports restent à vérifier par CI.
-- Les artefacts exportés n’ont pas été vérifiés localement : le binaire Godot local attendu n’est plus disponible ; la CI doit être observée après push.
-- La dernière CI a validé Web et échoué Android sur la configuration ETC2/ASTC ; Windows n’a pas été exécuté après l’échec Android.
+- Aucun blocage sur les contrats Python ni la CI. Godot est indisponible localement dans ce checkout ; smoke test et exports ont été validés par la CI 37046551893.
+- Les artefacts exportés n’ont pas été vérifiés localement : le binaire Godot local attendu n’est plus disponible ; les trois exports ont été validés par la CI 37046551893.
+- L’annotation CI indique seulement la dépréciation de Node.js 20 forcée vers Node.js 24 pour `actions/checkout@v4`.
 - Le SDK Android local n’a pas été vérifié pour produire un APK.
 
 Ces limites sont documentées et ne justifient pas l’arrêt des validations statiques.
