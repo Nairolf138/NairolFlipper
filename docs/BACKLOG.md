@@ -69,7 +69,7 @@ T025 enregistre localement les événements et la durée d'une session dans `use
 
 ## P1 — Show systems
 
-### T030 Rig model ✅; T031 CueDefinition ✅; T032 CueManager ✅; T033 Flow ✅; T034 Warm/Cold ramps; T035 Console scoop; T036 First show sequence.
+### T030 Rig model ✅; T031 CueDefinition ✅; T032 CueManager ✅; T033 Flow ✅; T034 Warm/Cold ramps ✅; T035 Console scoop; T036 First show sequence.
 
 T030 ajoute six familles de fixtures data-driven (`RigDefinition`) et un
 `RigModel` de session qui émet `rig_family_activated` sans imposer de rendu.
@@ -84,6 +84,10 @@ avec leur bonus, sans dépendre d'un renderer ou d'un service audio.
 T033 ajoute `FlowManager`, une progression locale et tolérante de `x1` à `x8`
 avec décroissance lente, signaux de changement et affichage HUD. Les impacts de
 bumpers alimentent le Flow sans rendre le score dépendant du système de show.
+
+T034 ajoute deux rampes `Area2D` data-driven : Warm (ambre) et Cold (cyan).
+Chaque passage est signalé une fois, attribue score et Flow, puis réarme le
+capteur après un court délai pour éviter les doubles impacts physiques.
 
 ## P1 — Audio
 

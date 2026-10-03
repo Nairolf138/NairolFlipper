@@ -24,6 +24,8 @@ func _ready() -> void:
 	drain.body_entered.connect(_on_drain_body_entered)
 	for bumper in get_tree().get_nodes_in_group("score_bumpers"):
 		bumper.bumper_hit.connect(_on_bumper_hit)
+	for ramp in get_tree().get_nodes_in_group("show_ramps"):
+		ramp.ramp_completed.connect(_on_ramp_completed)
 	score_manager.score_changed.connect(_on_score_changed)
 	flow_manager.flow_changed.connect(_on_flow_changed)
 	restart_game()
@@ -88,6 +90,12 @@ func _on_bumper_hit(points: int, _bumper_name: StringName) -> void:
 	score_manager.add_points(points)
 	flow_manager.add_flow(points)
 	playtest_recorder.record_bumper_hit(points)
+
+
+func _on_ramp_completed(_ramp_id: StringName, score_value: int, flow_value: int) -> void:
+	score_manager.add_points(score_value)
+	flow_manager.add_flow(flow_value)
+	status_label.text = "RAMP HIT"
 
 
 func _on_score_changed(new_score: int) -> void:

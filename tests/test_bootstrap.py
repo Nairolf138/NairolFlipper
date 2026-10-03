@@ -275,6 +275,32 @@ def test_cue_manager_executes_eligible_cues_and_emits_show_payloads():
     assert "bonus_points" in manager_text
 
 
+def test_warm_and_cold_ramps_are_data_driven_and_feed_flow():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    ramp_scene = ROOT / "scenes" / "gameplay" / "Ramp.tscn"
+    ramp_script = ROOT / "scripts" / "show" / "ramp.gd"
+    definition_script = ROOT / "scripts" / "show" / "ramp_definition.gd"
+    main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+
+    assert ramp_scene.is_file()
+    assert ramp_script.is_file()
+    assert definition_script.is_file()
+    assert 'name="WarmRamp"' in scene_text
+    assert 'name="ColdRamp"' in scene_text
+    assert 'groups = ["show_ramps"]' in ramp_scene.read_text(encoding="utf-8")
+    assert "ramp_completed" in ramp_script.read_text(encoding="utf-8")
+    assert "ramp_id" in definition_script.read_text(encoding="utf-8")
+    assert "_on_ramp_completed" in main_script
+    assert "flow_manager.add_flow(flow_value)" in main_script
+    for ramp_file, ramp_id, color in (
+        ("WarmRamp.tres", "warm_ramp", "1, 0.48, 0.12"),
+        ("ColdRamp.tres", "cold_ramp", "0.12, 0.72, 1"),
+    ):
+        ramp_text = (ROOT / "data" / "ramps" / ramp_file).read_text(encoding="utf-8")
+        assert f'ramp_id = &"{ramp_id}"' in ramp_text
+        assert f"ramp_color = Color({color}, 1)" in ramp_text
+
+
 def test_flow_manager_tracks_forgiving_multiplier_progression():
     flow_script = ROOT / "scripts" / "show" / "flow_manager.gd"
     main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
