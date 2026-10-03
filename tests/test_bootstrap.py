@@ -253,6 +253,28 @@ def test_cue_definition_declares_data_driven_show_payload():
     assert 'cue_id = &"first_hit"' in data_text
 
 
+def test_cue_manager_executes_eligible_cues_and_emits_show_payloads():
+    manager = ROOT / "scripts" / "show" / "cue_manager.gd"
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    manager_text = manager.read_text(encoding="utf-8")
+
+    assert manager.is_file()
+    assert 'name="CueManager"' in scene_text
+    assert "Array[CueDefinition]" in manager_text
+    for signal_name in (
+        "cue_started",
+        "cue_completed",
+        "light_changes_requested",
+        "audio_changes_requested",
+        "bonus_awarded",
+    ):
+        assert f"signal {signal_name}" in manager_text
+    for method_name in ("set_conditions", "start_cue", "complete_current_cue", "_conditions_met"):
+        assert f"func {method_name}" in manager_text
+    assert "duration_seconds" in manager_text
+    assert "bonus_points" in manager_text
+
+
 def test_export_presets_cover_p0_platforms_without_secrets():
     presets = ROOT / "export_presets.cfg"
     assert presets.is_file()

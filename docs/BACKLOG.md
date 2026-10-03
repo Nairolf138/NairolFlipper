@@ -69,13 +69,17 @@ T025 enregistre localement les événements et la durée d'une session dans `use
 
 ## P1 — Show systems
 
-### T030 Rig model ✅; T031 CueDefinition ✅; T032 CueManager; T033 Flow; T034 Warm/Cold ramps; T035 Console scoop; T036 First show sequence.
+### T030 Rig model ✅; T031 CueDefinition ✅; T032 CueManager ✅; T033 Flow; T034 Warm/Cold ramps; T035 Console scoop; T036 First show sequence.
 
 T030 ajoute six familles de fixtures data-driven (`RigDefinition`) et un
 `RigModel` de session qui émet `rig_family_activated` sans imposer de rendu.
 
 T031 ajoute la Resource `CueDefinition` et un premier cue de démonstration,
 avec conditions, changements lumière/audio, bonus et durée configurables.
+
+T032 ajoute l'exécuteur de session `CueManager`, qui vérifie les conditions,
+émet les changements lumière/audio et clôture automatiquement les cues temporisés
+avec leur bonus, sans dépendre d'un renderer ou d'un service audio.
 
 ## P1 — Audio
 
