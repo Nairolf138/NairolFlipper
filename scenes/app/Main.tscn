@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=24 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Ball.tscn" id="1_ball"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Flipper.tscn" id="2_flipper"]
@@ -16,6 +16,7 @@
 [ext_resource type="Script" path="res://scripts/show/cue_manager.gd" id="14_cue"]
 [ext_resource type="Resource" path="res://data/cues/first_hit.tres" id="15_first_hit"]
 [ext_resource type="Script" path="res://scripts/show/cue_definition.gd" id="16_cue_definition"]
+[ext_resource type="Script" path="res://scripts/show/flow_manager.gd" id="17_flow"]
 
 [sub_resource type="RectangleShape2D" id="LeftWallShape"]
 size = Vector2(40, 1600)
@@ -42,6 +43,9 @@ color = Color(0.035, 0.055, 0.09, 1)
 [node name="ScoreManager" type="Node" parent="."]
 script = ExtResource("5_score")
 
+[node name="FlowManager" type="Node" parent="."]
+script = ExtResource("17_flow")
+
 [node name="PlaytestRecorder" type="Node" parent="."]
 script = ExtResource("6_recorder")
 
@@ -61,6 +65,15 @@ offset_bottom = 140.0
 theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
 theme_override_font_sizes/font_size = 36
 text = "SCORE 000000"
+
+[node name="FlowLabel" type="Label" parent="."]
+offset_left = 650.0
+offset_top = 70.0
+offset_right = 1000.0
+offset_bottom = 140.0
+theme_override_colors/font_color = Color(0.95, 0.45, 0.9, 1)
+theme_override_font_sizes/font_size = 30
+text = "FLOW 0000  x1"
 
 [node name="StatusLabel" type="Label" parent="."]
 offset_left = 60.0

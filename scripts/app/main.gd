@@ -1,7 +1,9 @@
 extends Node2D
 
 @onready var score_manager = $ScoreManager
+@onready var flow_manager: FlowManager = $FlowManager
 @onready var score_label: Label = $ScoreLabel
+@onready var flow_label: Label = $FlowLabel
 @onready var balls: Array[Node] = [$BallOne, $BallTwo, $BallThree]
 @onready var drain: Area2D = $Drain
 @onready var status_label: Label = $StatusLabel
@@ -23,6 +25,7 @@ func _ready() -> void:
 	for bumper in get_tree().get_nodes_in_group("score_bumpers"):
 		bumper.bumper_hit.connect(_on_bumper_hit)
 	score_manager.score_changed.connect(_on_score_changed)
+	flow_manager.flow_changed.connect(_on_flow_changed)
 	restart_game()
 
 
@@ -83,11 +86,16 @@ func _flipper_action_for_position(touch_position: Vector2) -> StringName:
 
 func _on_bumper_hit(points: int, _bumper_name: StringName) -> void:
 	score_manager.add_points(points)
+	flow_manager.add_flow(points)
 	playtest_recorder.record_bumper_hit(points)
 
 
 func _on_score_changed(new_score: int) -> void:
 	score_label.text = "SCORE %06d" % new_score
+
+
+func _on_flow_changed(flow_points: int, multiplier: int) -> void:
+	flow_label.text = "FLOW %04d  x%d" % [flow_points, multiplier]
 
 
 func _on_drain_body_entered(body: Node) -> void:
@@ -121,6 +129,7 @@ func restart_game() -> void:
 	active_ball_index = 0
 	game_over = false
 	score_manager.reset_score()
+	flow_manager.reset_flow()
 	status_label.text = "BALL 1 / 3"
 	for index in balls.size():
 		var ball: Node = balls[index]

@@ -275,6 +275,26 @@ def test_cue_manager_executes_eligible_cues_and_emits_show_payloads():
     assert "bonus_points" in manager_text
 
 
+def test_flow_manager_tracks_forgiving_multiplier_progression():
+    flow_script = ROOT / "scripts" / "show" / "flow_manager.gd"
+    main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    flow_text = flow_script.read_text(encoding="utf-8")
+
+    assert flow_script.is_file()
+    assert 'class_name FlowManager' in flow_text
+    assert 'signal flow_changed' in flow_text
+    assert 'signal multiplier_changed' in flow_text
+    assert 'multipliers: Array[int] = [1, 2, 3, 4, 6, 8]' in flow_text
+    assert 'func add_flow' in flow_text
+    assert 'func decay_flow' in flow_text
+    assert 'func reset_flow' in flow_text
+    assert 'name="FlowManager"' in scene_text
+    assert 'name="FlowLabel"' in scene_text
+    assert 'flow_manager.add_flow(points)' in main_script
+    assert 'flow_manager.reset_flow()' in main_script
+
+
 def test_export_presets_cover_p0_platforms_without_secrets():
     presets = ROOT / "export_presets.cfg"
     assert presets.is_file()
