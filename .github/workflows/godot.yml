@@ -37,3 +37,9 @@ jobs:
         run: godot --headless --path . --export-debug "Android" build/android/nairolflipper-debug.apk
       - name: Export Windows
         run: godot --headless --path . --export-release "Windows Desktop" build/windows/NairolFlipper.exe
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: nairolflipper-android-debug
+          path: build/android/nairolflipper-debug.apk
+          if-no-files-found: error
