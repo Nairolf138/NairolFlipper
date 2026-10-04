@@ -361,6 +361,20 @@ def test_audio_service_consumes_cue_changes_without_requiring_audio_assets():
     assert 'audio_changes = {"stems"' in cue_text
 
 
+def test_audio_service_exposes_a_looping_logical_music_transport():
+    audio_text = (ROOT / "scripts" / "audio" / "audio_service.gd").read_text(encoding="utf-8")
+
+    assert "@export_range(20.0, 240.0, 1.0) var bpm" in audio_text
+    assert "@export_range(1.0, 256.0, 1.0) var loop_beats" in audio_text
+    assert "signal transport_changed" in audio_text
+    assert "signal transport_looped" in audio_text
+    assert "func start_transport()" in audio_text
+    assert "func stop_transport(reset_position: bool = false)" in audio_text
+    assert "func seek_transport(position_beats: float)" in audio_text
+    assert "fmod(transport_position_beats, loop_beats)" in audio_text
+    assert "AudioServer" in audio_text
+
+
 def test_export_presets_cover_p0_platforms_without_secrets():
     presets = ROOT / "export_presets.cfg"
     assert presets.is_file()

@@ -10,14 +10,52 @@ signal sfx_requested(sfx_id: StringName)
 @export_range(-60.0, 6.0, 0.5) var master_volume_db: float = 0.0
 @export_range(-60.0, 6.0, 0.5) var music_volume_db: float = 0.0
 @export_range(-60.0, 6.0, 0.5) var sfx_volume_db: float = 0.0
+@export_range(20.0, 240.0, 1.0) var bpm: float = 120.0
+@export_range(1.0, 256.0, 1.0) var loop_beats: float = 16.0
 
 var stem_levels: Dictionary = {}
+var transport_position_beats: float = 0.0
+var transport_playing: bool = false
+
+signal transport_changed(position_beats: float, playing: bool)
+signal transport_looped()
 
 
 func _ready() -> void:
 	_ensure_bus(&"Music")
 	_ensure_bus(&"SFX")
 	_apply_bus_levels()
+
+
+func _process(delta: float) -> void:
+	if not transport_playing or bpm <= 0.0 or loop_beats <= 0.0:
+		return
+	var beats_per_second := bpm / 60.0
+	transport_position_beats += delta * beats_per_second
+	if transport_position_beats >= loop_beats:
+		transport_position_beats = fmod(transport_position_beats, loop_beats)
+		transport_looped.emit()
+	transport_changed.emit(transport_position_beats, transport_playing)
+
+
+func start_transport() -> void:
+	transport_playing = true
+	transport_changed.emit(transport_position_beats, transport_playing)
+
+
+func stop_transport(reset_position: bool = false) -> void:
+	transport_playing = false
+	if reset_position:
+		transport_position_beats = 0.0
+	transport_changed.emit(transport_position_beats, transport_playing)
+
+
+func seek_transport(position_beats: float) -> void:
+	if loop_beats <= 0.0:
+		transport_position_beats = 0.0
+	else:
+		transport_position_beats = fmod(maxf(position_beats, 0.0), loop_beats)
+	transport_changed.emit(transport_position_beats, transport_playing)
 
 
 func set_mix(master_db: float, music_db: float, sfx_db: float) -> void:
