@@ -8,6 +8,7 @@ extends Node2D
 @onready var drain: Area2D = $Drain
 @onready var status_label: Label = $StatusLabel
 @onready var playtest_recorder: PlaytestRecorder = $PlaytestRecorder
+@onready var cue_manager: CueManager = $CueManager
 
 @export var respawn_delay: float = 1.0
 
@@ -26,6 +27,9 @@ func _ready() -> void:
 		bumper.bumper_hit.connect(_on_bumper_hit)
 	for ramp in get_tree().get_nodes_in_group("show_ramps"):
 		ramp.ramp_completed.connect(_on_ramp_completed)
+	for scoop in get_tree().get_nodes_in_group("console_scoops"):
+		scoop.scoop_completed.connect(_on_scoop_completed)
+		scoop.cue_validated.connect(_on_cue_validated)
 	score_manager.score_changed.connect(_on_score_changed)
 	flow_manager.flow_changed.connect(_on_flow_changed)
 	restart_game()
@@ -89,6 +93,7 @@ func _flipper_action_for_position(touch_position: Vector2) -> StringName:
 func _on_bumper_hit(points: int, _bumper_name: StringName) -> void:
 	score_manager.add_points(points)
 	flow_manager.add_flow(points)
+	cue_manager.add_condition(&"bumper_hit")
 	playtest_recorder.record_bumper_hit(points)
 
 
@@ -96,6 +101,17 @@ func _on_ramp_completed(_ramp_id: StringName, score_value: int, flow_value: int)
 	score_manager.add_points(score_value)
 	flow_manager.add_flow(flow_value)
 	status_label.text = "RAMP HIT"
+
+
+func _on_scoop_completed(_scoop_id: StringName, score_value: int, flow_value: int) -> void:
+	score_manager.add_points(score_value)
+	flow_manager.add_flow(flow_value)
+	status_label.text = "CUE VALIDATED"
+
+
+func _on_cue_validated(cue_id: StringName) -> void:
+	cue_manager.add_condition(&"console_validated")
+	cue_manager.start_cue(cue_id)
 
 
 func _on_score_changed(new_score: int) -> void:

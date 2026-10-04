@@ -298,7 +298,29 @@ def test_warm_and_cold_ramps_are_data_driven_and_feed_flow():
     ):
         ramp_text = (ROOT / "data" / "ramps" / ramp_file).read_text(encoding="utf-8")
         assert f'ramp_id = &"{ramp_id}"' in ramp_text
-        assert f"ramp_color = Color({color}, 1)" in ramp_text
+        assert f'ramp_color = Color({color}, 1)' in ramp_text
+
+
+def test_console_scoop_validates_cue_and_awards_show_progression():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    scoop_scene = ROOT / "scenes" / "gameplay" / "ConsoleScoop.tscn"
+    scoop_script = ROOT / "scripts" / "show" / "console_scoop.gd"
+    main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    cue_data = (ROOT / "data" / "cues" / "first_hit.tres").read_text(encoding="utf-8")
+
+    assert scoop_scene.is_file()
+    assert scoop_script.is_file()
+    assert 'name="ConsoleScoop"' in scene_text
+    assert 'groups = ["console_scoops"]' in scoop_scene.read_text(encoding="utf-8")
+    scoop_text = scoop_script.read_text(encoding="utf-8")
+    for signal_name in ("scoop_completed", "cue_validated"):
+        assert f"signal {signal_name}" in scoop_text
+    for field in ("scoop_id", "cue_id", "score_value", "flow_value", "rearm_delay"):
+        assert f"@export var {field}" in scoop_text
+    assert "body.is_in_group(\"balls\")" in scoop_text
+    assert "cue_manager.add_condition" in main_script
+    assert "cue_manager.start_cue" in main_script
+    assert 'conditions = [&"bumper_hit", &"console_validated"]' in cue_data
 
 
 def test_flow_manager_tracks_forgiving_multiplier_progression():

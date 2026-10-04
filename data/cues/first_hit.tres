@@ -6,6 +6,6 @@
 script = ExtResource("1")
 cue_id = &"first_hit"
 display_name = "First Hit"
-conditions = [&"bumper_hit"]
+conditions = [&"bumper_hit", &"console_validated"]
 bonus_points = 250
 duration_seconds = 4.0

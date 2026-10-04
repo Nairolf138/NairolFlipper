@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3]
+[gd_scene load_steps=29 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Ball.tscn" id="1_ball"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Flipper.tscn" id="2_flipper"]
@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Ramp.tscn" id="18_ramp"]
 [ext_resource type="Resource" path="res://data/ramps/WarmRamp.tres" id="19_warm_ramp"]
 [ext_resource type="Resource" path="res://data/ramps/ColdRamp.tres" id="20_cold_ramp"]
+[ext_resource type="PackedScene" path="res://scenes/gameplay/ConsoleScoop.tscn" id="21_console_scoop"]
 
 [sub_resource type="RectangleShape2D" id="LeftWallShape"]
 size = Vector2(40, 1600)
@@ -130,6 +131,9 @@ definition = ExtResource("19_warm_ramp")
 [node name="ColdRamp" parent="." instance=ExtResource("18_ramp")]
 position = Vector2(815, 1050)
 definition = ExtResource("20_cold_ramp")
+
+[node name="ConsoleScoop" parent="." instance=ExtResource("21_console_scoop")]
+position = Vector2(540, 1300)
 
 [node name="BallOne" parent="." instance=ExtResource("1_ball")]
 
