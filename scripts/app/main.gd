@@ -9,6 +9,7 @@ extends Node2D
 @onready var status_label: Label = $StatusLabel
 @onready var playtest_recorder: PlaytestRecorder = $PlaytestRecorder
 @onready var cue_manager: CueManager = $CueManager
+@onready var audio_service: AudioService = $AudioService
 
 @export var respawn_delay: float = 1.0
 
@@ -32,6 +33,7 @@ func _ready() -> void:
 		scoop.cue_validated.connect(_on_cue_validated)
 	score_manager.score_changed.connect(_on_score_changed)
 	flow_manager.flow_changed.connect(_on_flow_changed)
+	cue_manager.audio_changes_requested.connect(audio_service.apply_cue_changes)
 	restart_game()
 
 

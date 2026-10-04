@@ -96,7 +96,11 @@ consommateurs lumière/audio restent découplés par les signaux de `CueManager`
 
 ## P1 — Audio
 
-T040 Audio service; T041 SFX buses; T042 Music transport; T043 Stem set; T044 Sync Bonus.
+T040 Audio service ✅; T041 SFX buses; T042 Music transport; T043 Stem set; T044 Sync Bonus.
+
+T040 ajoute un service audio logique multiplateforme : mix Master/Music/SFX,
+états de stems et demandes de SFX sont consommables par les cues sans rendre le
+gameplay dépendant d'un périphérique audio ou d'assets sonores.
 
 ## P2 — Final
 

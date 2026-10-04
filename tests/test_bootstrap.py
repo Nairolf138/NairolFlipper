@@ -343,6 +343,24 @@ def test_flow_manager_tracks_forgiving_multiplier_progression():
     assert 'flow_manager.reset_flow()' in main_script
 
 
+def test_audio_service_consumes_cue_changes_without_requiring_audio_assets():
+    audio_script = ROOT / "scripts" / "audio" / "audio_service.gd"
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    cue_text = (ROOT / "data" / "cues" / "first_hit.tres").read_text(encoding="utf-8")
+
+    assert audio_script.is_file()
+    audio_text = audio_script.read_text(encoding="utf-8")
+    assert 'class_name AudioService' in audio_text
+    assert 'signal mix_changed' in audio_text
+    assert 'signal stems_changed' in audio_text
+    assert 'func apply_cue_changes' in audio_text
+    assert 'func request_sfx' in audio_text
+    assert 'name="AudioService"' in scene_text
+    assert 'audio_changes_requested.connect(audio_service.apply_cue_changes)' in main_script
+    assert 'audio_changes = {"stems"' in cue_text
+
+
 def test_export_presets_cover_p0_platforms_without_secrets():
     presets = ROOT / "export_presets.cfg"
     assert presets.is_file()

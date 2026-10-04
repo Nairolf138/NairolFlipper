@@ -9,3 +9,4 @@ display_name = "First Hit"
 conditions = [&"bumper_hit", &"console_validated"]
 bonus_points = 250
 duration_seconds = 4.0
+audio_changes = {"stems": {"piano": 1.0, "kick": 0.5}, "sfx": "cue_start"}
