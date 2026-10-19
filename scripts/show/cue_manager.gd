@@ -1,6 +1,8 @@
 class_name CueManager
 extends Node
 
+const CueDefinitionResource = preload("res://scripts/show/cue_definition.gd")
+
 signal cue_started(cue_id: StringName)
 signal cue_completed(cue_id: StringName)
 signal light_changes_requested(changes: Dictionary)
@@ -8,9 +10,9 @@ signal audio_changes_requested(changes: Dictionary)
 signal bonus_awarded(points: int)
 
 ## Session executor for data-driven cues. Rendering and audio remain consumers of signals.
-@export var cues: Array[CueDefinition] = []
+@export var cues: Array[CueDefinitionResource] = []
 
-var active_cue: CueDefinition
+var active_cue: CueDefinitionResource
 var _satisfied_conditions: Array[StringName] = []
 var _elapsed_seconds: float = 0.0
 
@@ -59,14 +61,20 @@ func complete_current_cue() -> bool:
 	return true
 
 
-func _conditions_met(cue: CueDefinition) -> bool:
+func reset_state() -> void:
+	active_cue = null
+	_satisfied_conditions.clear()
+	_elapsed_seconds = 0.0
+
+
+func _conditions_met(cue: CueDefinitionResource) -> bool:
 	for condition in cue.conditions:
 		if not _satisfied_conditions.has(condition):
 			return false
 	return true
 
 
-func _cue_for(cue_id: StringName) -> CueDefinition:
+func _cue_for(cue_id: StringName) -> CueDefinitionResource:
 	for cue in cues:
 		if cue != null and cue.cue_id == cue_id:
 			return cue

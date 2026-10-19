@@ -11,6 +11,22 @@ Harness Godot headless sans dépendance tierce au départ. Tester ScoreRules, Cu
 ## Smoke test
 
 Importer headless, charger scène principale, quitter sans erreur bloquante.
+La CI analyse aussi les logs : un code de sortie `0` de Godot ne suffit pas si
+une erreur de parsing, de chargement de scène/script ou de tableau typé est
+présente.
+
+## Tests comportementaux Godot
+
+Le runner sans addon `tests/godot/test_runner.gd` exécute réellement les règles
+de Flow, le cycle des Cues, le scoring multiplié et le reset complet de session :
+
+```text
+godot --headless --display-driver headless --audio-driver Dummy --path . \
+  --script res://tests/godot/test_runner.gd
+```
+
+Les contrats Python restent utiles pour la structure du dépôt, mais ne remplacent
+pas l'exécution Godot.
 
 ## Builds P0
 
