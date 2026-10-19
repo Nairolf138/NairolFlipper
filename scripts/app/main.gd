@@ -144,13 +144,22 @@ func _on_flow_changed(flow_points: int, multiplier: int) -> void:
 
 func _on_drain_body_entered(body: Node) -> void:
 	if body in balls:
-		if body.try_ball_save():
-			playtest_recorder.record_ball_save()
-			body.reset_ball(body.spawn_position)
-			status_label.text = "SAFETY"
-			return
-		playtest_recorder.record_drain()
-		body.mark_drained()
+		# Area2D emits body_entered while the physics server is flushing its
+		# queries. Changing a RigidBody2D's freeze mode in that callback is not
+		# allowed, so resolve the drain once the physics step has completed.
+		call_deferred("_resolve_ball_drain", body)
+
+
+func _resolve_ball_drain(body: Node) -> void:
+	if not is_instance_valid(body) or body not in balls or body.drain_locked:
+		return
+	if body.try_ball_save():
+		playtest_recorder.record_ball_save()
+		body.reset_ball(body.spawn_position)
+		status_label.text = "SAFETY"
+		return
+	playtest_recorder.record_drain()
+	body.mark_drained()
 
 
 func _on_ball_drained(_ball: RigidBody2D) -> void:

@@ -15,9 +15,10 @@ func _run() -> void:
 	_test_flow_decay_and_multiplier()
 	_test_cue_bonus_and_reset()
 	await _test_main_scene_scoring_and_reset()
+	await _test_physics_drain_lifecycle()
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 3 passed")
+		print("Godot behavioral tests: 4 passed")
 		quit(0)
 		return
 
@@ -98,6 +99,59 @@ func _test_main_scene_scoring_and_reset() -> void:
 	_expect_equal(main.audio_service.transport_position_beats, 0.0, "Restart rewinds music transport")
 	_expect(main.balls[0].visible, "Restart shows the first ball")
 	_expect(not main.balls[1].visible and not main.balls[2].visible, "Restart hides inactive balls")
+
+	main.queue_free()
+	await process_frame
+
+
+func _test_physics_drain_lifecycle() -> void:
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Main scene loads for the drain test")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	main.respawn_delay = 0.01
+	root.add_child(main)
+	await process_frame
+	await physics_frame
+
+	var ball: RigidBody2D = main.balls[0]
+	main._launch_or_restart()
+	ball.global_position = Vector2(540, 1840)
+	ball.linear_velocity = Vector2(0, 600)
+	for frame in 120:
+		if main.playtest_recorder.ball_saves == 1:
+			break
+		await physics_frame
+
+	_expect_equal(main.playtest_recorder.ball_saves, 1, "Early physical drain records one ball save")
+	_expect_equal(main.remaining_balls, 3, "Ball save preserves the ball count")
+	_expect(ball.freeze and ball.launch_ready, "Ball save safely resets the rigid body")
+	_expect_equal(ball.global_position, ball.spawn_position, "Saved ball returns to its spawn position")
+
+	# Let the Area2D register that the reset ball left the drain before entering
+	# it again with an expired safety window.
+	await physics_frame
+	await physics_frame
+	main._launch_or_restart()
+	ball.ball_save_remaining = 0.0
+	ball.global_position = Vector2(540, 1840)
+	ball.linear_velocity = Vector2(0, 600)
+	for frame in 120:
+		if main.playtest_recorder.drains == 1:
+			break
+		await physics_frame
+
+	_expect_equal(main.playtest_recorder.drains, 1, "Expired safety records one physical drain")
+	_expect_equal(main.remaining_balls, 2, "Physical drain consumes one ball")
+	_expect(ball.freeze and not ball.visible, "Drained rigid body is frozen and hidden")
+
+	for frame in 30:
+		if main.balls[1].visible and main.balls[1].launch_ready:
+			break
+		await physics_frame
+	_expect(main.balls[1].visible and main.balls[1].launch_ready, "Next ball respawns after a physical drain")
 
 	main.queue_free()
 	await process_frame
