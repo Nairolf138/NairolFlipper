@@ -4,11 +4,12 @@
 
 [resource]
 script = ExtResource("1_tuning")
-mass = 1.0
-gravity_scale = 1.0
-friction = 0.2
-bounce = 0.75
-linear_damp = 0.0
-angular_damp = 0.05
-max_speed = 2600.0
-launch_force = 1250.0
+mass = 1.25
+gravity_scale = 1.15
+friction = 0.35
+bounce = 0.38
+linear_damp = 0.08
+angular_damp = 0.12
+max_speed = 2200.0
+launch_force = 1900.0
+launch_direction = Vector2(-0.16, -1)

@@ -17,12 +17,19 @@ const RigModelNode = preload("res://scripts/show/rig_model.gd")
 @onready var cue_manager: CueManagerNode = $CueManager
 @onready var audio_service: AudioServiceNode = $AudioService
 @onready var rig_model: RigModelNode = $RigModel
+@onready var start_overlay: Control = $Interface/StartOverlay
+@onready var game_controls: Control = $Interface/GameControls
+@onready var play_button: Button = $Interface/StartOverlay/Menu/PlayButton
+@onready var menu_quit_button: Button = $Interface/StartOverlay/Menu/QuitButton
+@onready var reset_button: Button = $Interface/GameControls/ResetButton
+@onready var game_quit_button: Button = $Interface/GameControls/QuitButton
 
 @export var respawn_delay: float = 1.0
 
 var remaining_balls: int = 3
 var active_ball_index: int = 0
 var game_over: bool = false
+var gameplay_active: bool = false
 var active_touches: Dictionary[int, StringName] = {}
 
 
@@ -30,6 +37,8 @@ func _ready() -> void:
 	for ball in balls:
 		ball.ball_drained.connect(_on_ball_drained)
 		ball.input_enabled = false
+	for flipper in [$LeftFlipper, $RightFlipper]:
+		flipper.activated.connect(_on_flipper_activated)
 	drain.body_entered.connect(_on_drain_body_entered)
 	for bumper in get_tree().get_nodes_in_group("score_bumpers"):
 		bumper.bumper_hit.connect(_on_bumper_hit)
@@ -42,10 +51,17 @@ func _ready() -> void:
 	flow_manager.flow_changed.connect(_on_flow_changed)
 	cue_manager.audio_changes_requested.connect(audio_service.apply_cue_changes)
 	cue_manager.bonus_awarded.connect(_on_cue_bonus_awarded)
+	play_button.pressed.connect(start_game)
+	menu_quit_button.pressed.connect(_on_quit_pressed)
+	reset_button.pressed.connect(_on_reset_pressed)
+	game_quit_button.pressed.connect(_on_quit_pressed)
 	restart_game()
+	_show_start_menu()
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not gameplay_active:
+		return
 	if event.is_action_pressed("launch_ball"):
 		_launch_or_restart()
 	elif event is InputEventScreenTouch:
@@ -61,6 +77,40 @@ func _launch_or_restart() -> void:
 	else:
 		if balls[active_ball_index].launch_ball():
 			playtest_recorder.record_launch()
+			audio_service.request_sfx(&"launcher")
+
+
+func start_game() -> void:
+	gameplay_active = true
+	start_overlay.hide()
+	game_controls.show()
+	restart_game()
+	status_label.text = "TOUCH TOP TO LAUNCH"
+
+
+func _show_start_menu() -> void:
+	gameplay_active = false
+	start_overlay.show()
+	game_controls.hide()
+	_release_all_touches()
+
+
+func _on_reset_pressed() -> void:
+	if not gameplay_active:
+		return
+	playtest_recorder.record_restart()
+	restart_game()
+	status_label.text = "TOUCH TOP TO LAUNCH"
+
+
+func _on_quit_pressed() -> void:
+	playtest_recorder.save_session()
+	get_tree().quit()
+
+
+func _on_flipper_activated(_action_name: StringName) -> void:
+	if gameplay_active:
+		audio_service.request_sfx(&"flipper")
 
 
 func _handle_touch(event: InputEventScreenTouch) -> void:
@@ -105,18 +155,21 @@ func _on_bumper_hit(points: int, _bumper_name: StringName) -> void:
 	flow_manager.add_flow(points)
 	cue_manager.add_condition(&"bumper_hit")
 	playtest_recorder.record_bumper_hit(points)
+	audio_service.request_sfx(StringName(String(_bumper_name).to_snake_case()))
 
 
 func _on_ramp_completed(_ramp_id: StringName, score_value: int, flow_value: int) -> void:
 	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
 	status_label.text = "RAMP HIT"
+	audio_service.request_sfx(&"ramp")
 
 
 func _on_scoop_completed(_scoop_id: StringName, score_value: int, flow_value: int) -> void:
 	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
 	status_label.text = "CUE VALIDATED"
+	audio_service.request_sfx(&"scoop")
 
 
 func _on_cue_validated(cue_id: StringName) -> void:
@@ -126,6 +179,7 @@ func _on_cue_validated(cue_id: StringName) -> void:
 
 func _on_cue_bonus_awarded(points: int) -> void:
 	_add_score_with_flow(points)
+	audio_service.request_sfx(&"cue")
 
 
 func _add_score_with_flow(points: int) -> void:
@@ -155,10 +209,12 @@ func _resolve_ball_drain(body: Node) -> void:
 		return
 	if body.try_ball_save():
 		playtest_recorder.record_ball_save()
+		audio_service.request_sfx(&"safety")
 		body.reset_ball(body.spawn_position)
 		status_label.text = "SAFETY"
 		return
 	playtest_recorder.record_drain()
+	audio_service.request_sfx(&"drain")
 	body.mark_drained()
 
 
@@ -168,7 +224,7 @@ func _on_ball_drained(_ball: RigidBody2D) -> void:
 	remaining_balls -= 1
 	if remaining_balls <= 0:
 		game_over = true
-		status_label.text = "GAME OVER — PRESS SPACE"
+		status_label.text = "GAME OVER — TAP TOP"
 		return
 	active_ball_index = 3 - remaining_balls
 	status_label.text = "BALL %d / 3" % (active_ball_index + 1)

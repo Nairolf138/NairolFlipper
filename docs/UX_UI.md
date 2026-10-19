@@ -16,7 +16,8 @@ Bille → dangers → objectif → mode → score → décoration. Si l'UI gêne
 
 Zones tactiles larges et discrètes : la moitié basse gauche/droite commande
 les flippers, tandis qu'un toucher dans la zone haute lance ou relance la
-bille. Aucun bouton indispensable n'est ajouté sous les pouces.
+bille. Les commandes Reset et Quit restent en haut du plateau, hors des zones
+de flipper sous les pouces.
 
 ## Desktop
 
@@ -36,6 +37,10 @@ Main Menu
 ├── Credits
 └── Quit (desktop only)
 ```
+
+Le premier build de playtest fournit un écran de démarrage avec Play et Quit,
+ainsi que Reset et Quit pendant la partie. How to Play, Settings et Credits
+restent à implémenter dans l'interface finale.
 
 ## Tutoriel
 

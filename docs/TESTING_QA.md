@@ -52,6 +52,14 @@ Bugs:
 Demandes:
 ```
 
+### Android — 19 octobre 2026
+
+Premier test réel sur tablette Android : démarrage et commandes tactiles gauche/
+droite fonctionnels. Défauts observés puis couverts par la branche de correction :
+orientation paysage imposée autour d'un canvas portrait, flipper droit inversé,
+lancement vertical ramenant la bille au drain, rebond trop élevé, absence de menu,
+de Reset/Quit et de retour sonore.
+
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 
 ## Instrumentation locale de playtest
