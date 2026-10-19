@@ -56,6 +56,14 @@ Godot 4.7.2.
 
 Presets d’export Web, Android debug et Windows ajoutés avec artefacts nommés. Une workflow GitHub Actions épinglée sur Godot 4.7.2 exécute les contrats Python, le smoke test headless et les trois exports. Les secrets de signature Android restent hors du dépôt.
 
+### T013 — Consolidation chargement et session ✅
+
+La scène principale charge depuis un checkout propre sans dépendre d'un cache
+`.godot`. La CI importe le projet, exécute des tests comportementaux Godot et
+rejette explicitement les erreurs de parsing/chargement. Le Flow décroît à la
+vitesse configurée, son multiplicateur s'applique au score, les bonus de Cue sont
+comptabilisés et un restart réinitialise les états Cue, Rig et audio.
+
 ## P1 — Feel
 
 T020 Physics tuning resource ✅; T021 Ball max speed/anti-tunneling ✅; T022 Feedback hit ✅; T023 Ball save ✅; T024 Controller support ✅; T025 instrumentation locale de playtest ✅.

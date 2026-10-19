@@ -91,6 +91,12 @@ func request_sfx(sfx_id: StringName) -> void:
 	sfx_requested.emit(sfx_id)
 
 
+func reset_state() -> void:
+	stem_levels.clear()
+	stems_changed.emit(stem_levels.duplicate())
+	stop_transport(true)
+
+
 func _ensure_bus(bus_name: StringName) -> void:
 	if AudioServer.get_bus_index(bus_name) >= 0:
 		return

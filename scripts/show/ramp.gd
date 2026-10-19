@@ -1,9 +1,11 @@
 class_name Ramp
 extends Area2D
 
+const RampDefinitionResource = preload("res://scripts/show/ramp_definition.gd")
+
 signal ramp_completed(ramp_id: StringName, score_value: int, flow_value: int)
 
-@export var definition: RampDefinition
+@export var definition: RampDefinitionResource
 @onready var visual: Polygon2D = $Visual
 
 var _armed := true

@@ -2,21 +2,30 @@
 
 ## Dernière exécution
 
-- Date : 2026-09-24 — fenêtre autonome en cours
-- Cycle : T031 — CueDefinition
-- Statut : livré sur `origin/main`, CI verte
-- Échéance : 28 septembre 2026 à 13:13 Europe/Paris
+- Date : 2026-10-19
+- Cycle : T013 — consolidation chargement et session après T042
+- Statut : validations locales vertes, pull request en préparation
 
 ## Dépôt
 
-- Branche : `hermes-autonomous`
-- Dernier commit vérifié avant ce cycle : `e804c20` (T030 sur `origin/main`)
-- Dernier commit : `047b21a` (`feat: add cue definition resource`), vérifié sur `origin/main`
-- CI : run `37046551893`, Godot P0 validation, verte
+- Branche : `fix/project-consolidation`
+- Base : `6fd37b0c` (`feat: add logical music transport` sur `origin/main`)
+- Validation locale : 29 contrats Python, 3 groupes de tests Godot et smoke test propres
+- CI de la branche : à valider par la pull request
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` : `047b21a`, vérifiée après push
+- Branche `main` auditée : `6fd37b0c`
 
 ## État actuel
+
+T013 consolide l'état livré après T042 :
+
+- références de Resources corrigées dans `Main.tscn` ;
+- types GDScript dépendants préchargés pour fonctionner sans cache local ;
+- import Godot propre et analyse stricte des logs dans la CI ;
+- tests comportementaux Godot pour Flow, Cue, score et restart ;
+- décroissance du Flow indépendante du framerate ;
+- multiplicateur et bonus de Cue reliés au score ;
+- restart complet des états Cue, Rig, audio et tactiles.
 
 T012 complète le premier filet de livraison cross-platform :
 
@@ -157,34 +166,30 @@ T012 complète le premier filet de livraison cross-platform :
 
 ## Builds
 
-- Godot 4.7.2 ARM64 installé localement sous `/root/.local/opt/godot/4.7.2`.
-- Les templates locaux ne sont pas exploitables pour un export : l’export Web a terminé en crash signal 11 sous root/PRoot.
-- Les exports Web/Android/Windows sont donc délégués à la workflow GitHub Actions, qui télécharge les templates 4.7.2.
+- Godot 4.7.2 x86_64 a validé localement l'import propre, les tests comportementaux et le smoke test.
+- Les exports Web/Android/Windows restent délégués à GitHub Actions avec les templates 4.7.2.
 
 ## Problèmes connus
 
 - Le dépôt est encore un greybox : le cycle de billes est fonctionnel mais non encore validé par playtest humain.
-- Le smoke test vérifie statiquement le contrat de visibilité et lance le projet headless ; il ne remplace pas un playtest physique.
-- Le mode `--headless --editor --quit` et l’export local crashent sous root/PRoot (signal 11), mais le mode d’exécution headless du projet passe.
+- Les tests comportementaux et le smoke test ne remplacent pas un playtest physique.
 - Les contrôles tactiles et manette n’ont pas encore été validés sur un appareil réel ; ils sont couverts par contrat statique et par le chargement Godot headless.
 
 ## Blocages
 
-- Aucun blocage sur les contrats Python ni la CI. Godot est indisponible localement dans ce checkout ; smoke test et exports ont été validés par la CI 37046551893.
-- Les artefacts exportés n’ont pas été vérifiés localement : le binaire Godot local attendu n’est plus disponible ; les trois exports ont été validés par la CI 37046551893.
-- L’annotation CI indique seulement la dépréciation de Node.js 20 forcée vers Node.js 24 pour `actions/checkout@v4`.
-- Le SDK Android local n’a pas été vérifié pour produire un APK.
-
-Ces limites sont documentées et ne justifient pas l’arrêt des validations statiques.
+- Aucun blocage local sur l'import, les contrats Python, les tests Godot ou le smoke test.
+- Les exports P0 doivent encore être confirmés par la CI de la pull request.
+- Les artefacts n'ont pas été testés sur un appareil réel.
 
 ## Livrables actuellement disponibles
 
 - `export_presets.cfg` avec presets Web, Android debug et Windows Desktop.
-- `.github/workflows/godot.yml` avec validation et exports P0.
-- `tests/test_bootstrap.py` avec contrats T012 en plus des contrats gameplay.
+- `.github/workflows/godot.yml` avec import propre, tests comportementaux, smoke et exports P0.
+- `tests/test_bootstrap.py` avec 29 contrats de structure.
+- `tests/godot/test_runner.gd` avec trois groupes de validations comportementales.
 - `docs/BACKLOG.md` mis à jour.
 - Ce journal `AUTONOMY_STATE.md`.
 
 ## Prochaine exécution
 
-Prochaine priorité après livraison : T032 — CueManager. Les fichiers Python/Git non suivis présents dans l’arbre de travail ne proviennent pas de ce cycle et n’ont pas été modifiés.
+Après fusion et playtest humain, reprendre le backlog audio à T041/T043/T044 ou corriger les défauts observés sur appareils P0.

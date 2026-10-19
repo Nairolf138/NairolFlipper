@@ -1,15 +1,22 @@
 extends Node2D
 
+const AudioServiceNode = preload("res://scripts/audio/audio_service.gd")
+const CueManagerNode = preload("res://scripts/show/cue_manager.gd")
+const FlowManagerNode = preload("res://scripts/show/flow_manager.gd")
+const PlaytestRecorderNode = preload("res://scripts/app/playtest_recorder.gd")
+const RigModelNode = preload("res://scripts/show/rig_model.gd")
+
 @onready var score_manager = $ScoreManager
-@onready var flow_manager: FlowManager = $FlowManager
+@onready var flow_manager: FlowManagerNode = $FlowManager
 @onready var score_label: Label = $ScoreLabel
 @onready var flow_label: Label = $FlowLabel
 @onready var balls: Array[Node] = [$BallOne, $BallTwo, $BallThree]
 @onready var drain: Area2D = $Drain
 @onready var status_label: Label = $StatusLabel
-@onready var playtest_recorder: PlaytestRecorder = $PlaytestRecorder
-@onready var cue_manager: CueManager = $CueManager
-@onready var audio_service: AudioService = $AudioService
+@onready var playtest_recorder: PlaytestRecorderNode = $PlaytestRecorder
+@onready var cue_manager: CueManagerNode = $CueManager
+@onready var audio_service: AudioServiceNode = $AudioService
+@onready var rig_model: RigModelNode = $RigModel
 
 @export var respawn_delay: float = 1.0
 
@@ -34,6 +41,7 @@ func _ready() -> void:
 	score_manager.score_changed.connect(_on_score_changed)
 	flow_manager.flow_changed.connect(_on_flow_changed)
 	cue_manager.audio_changes_requested.connect(audio_service.apply_cue_changes)
+	cue_manager.bonus_awarded.connect(_on_cue_bonus_awarded)
 	restart_game()
 
 
@@ -93,20 +101,20 @@ func _flipper_action_for_position(touch_position: Vector2) -> StringName:
 
 
 func _on_bumper_hit(points: int, _bumper_name: StringName) -> void:
-	score_manager.add_points(points)
+	_add_score_with_flow(points)
 	flow_manager.add_flow(points)
 	cue_manager.add_condition(&"bumper_hit")
 	playtest_recorder.record_bumper_hit(points)
 
 
 func _on_ramp_completed(_ramp_id: StringName, score_value: int, flow_value: int) -> void:
-	score_manager.add_points(score_value)
+	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
 	status_label.text = "RAMP HIT"
 
 
 func _on_scoop_completed(_scoop_id: StringName, score_value: int, flow_value: int) -> void:
-	score_manager.add_points(score_value)
+	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
 	status_label.text = "CUE VALIDATED"
 
@@ -114,6 +122,16 @@ func _on_scoop_completed(_scoop_id: StringName, score_value: int, flow_value: in
 func _on_cue_validated(cue_id: StringName) -> void:
 	cue_manager.add_condition(&"console_validated")
 	cue_manager.start_cue(cue_id)
+
+
+func _on_cue_bonus_awarded(points: int) -> void:
+	_add_score_with_flow(points)
+
+
+func _add_score_with_flow(points: int) -> void:
+	if points <= 0:
+		return
+	score_manager.add_points(points * flow_manager.multiplier)
 
 
 func _on_score_changed(new_score: int) -> void:
@@ -126,13 +144,22 @@ func _on_flow_changed(flow_points: int, multiplier: int) -> void:
 
 func _on_drain_body_entered(body: Node) -> void:
 	if body in balls:
-		if body.try_ball_save():
-			playtest_recorder.record_ball_save()
-			body.reset_ball(body.spawn_position)
-			status_label.text = "SAFETY"
-			return
-		playtest_recorder.record_drain()
-		body.mark_drained()
+		# Area2D emits body_entered while the physics server is flushing its
+		# queries. Changing a RigidBody2D's freeze mode in that callback is not
+		# allowed, so resolve the drain once the physics step has completed.
+		call_deferred("_resolve_ball_drain", body)
+
+
+func _resolve_ball_drain(body: Node) -> void:
+	if not is_instance_valid(body) or body not in balls or body.drain_locked:
+		return
+	if body.try_ball_save():
+		playtest_recorder.record_ball_save()
+		body.reset_ball(body.spawn_position)
+		status_label.text = "SAFETY"
+		return
+	playtest_recorder.record_drain()
+	body.mark_drained()
 
 
 func _on_ball_drained(_ball: RigidBody2D) -> void:
@@ -151,13 +178,29 @@ func _on_ball_drained(_ball: RigidBody2D) -> void:
 
 
 func restart_game() -> void:
+	_release_all_touches()
 	remaining_balls = 3
 	active_ball_index = 0
 	game_over = false
 	score_manager.reset_score()
 	flow_manager.reset_flow()
+	cue_manager.reset_state()
+	rig_model.reset_state()
+	audio_service.reset_state()
+	for ramp in get_tree().get_nodes_in_group("show_ramps"):
+		if ramp.has_method("reset"):
+			ramp.reset()
+	for scoop in get_tree().get_nodes_in_group("console_scoops"):
+		if scoop.has_method("reset"):
+			scoop.reset()
 	status_label.text = "BALL 1 / 3"
 	for index in balls.size():
 		var ball: Node = balls[index]
 		ball.reset_ball(ball.spawn_position)
 		ball.visible = index == active_ball_index
+
+
+func _release_all_touches() -> void:
+	for action in active_touches.values():
+		Input.action_release(action)
+	active_touches.clear()

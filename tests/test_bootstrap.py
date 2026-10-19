@@ -95,7 +95,8 @@ def test_ball_uses_shared_physics_tuning_resource():
     assert tuning_resource.is_file()
     assert "class_name PhysicsTuning" in tuning_script
     assert "@export var max_speed" in tuning_script
-    assert "@export var tuning: PhysicsTuning" in ball_script
+    assert 'preload("res://scripts/gameplay/physics_tuning.gd")' in ball_script
+    assert "@export var tuning: PhysicsTuningResource" in ball_script
     assert "_apply_tuning()" in ball_script
     assert "limit_length(tuning.max_speed)" in ball_script
     assert 'path="res://data/tuning/PhysicsTuning.tres"' in ball_scene
@@ -231,7 +232,8 @@ def test_rig_model_declares_six_data_driven_fixture_families():
     assert definition_script.is_file()
     assert 'name="RigModel"' in scene_text
     assert "rig_family_activated" in rig_script.read_text(encoding="utf-8")
-    assert "@export var families: Array[RigDefinition]" in rig_script.read_text(encoding="utf-8")
+    assert 'preload("res://scripts/show/rig_definition.gd")' in rig_script.read_text(encoding="utf-8")
+    assert "@export var families: Array[RigDefinitionResource]" in rig_script.read_text(encoding="utf-8")
     assert "activate_family" in rig_script.read_text(encoding="utf-8")
     for family_file in ("FrontWash.tres", "BackWash.tres", "Beam.tres", "Pixel.tres", "Blinders.tres", "Practical.tres"):
         assert (rig_data / family_file).is_file()
@@ -260,7 +262,8 @@ def test_cue_manager_executes_eligible_cues_and_emits_show_payloads():
 
     assert manager.is_file()
     assert 'name="CueManager"' in scene_text
-    assert "Array[CueDefinition]" in manager_text
+    assert 'preload("res://scripts/show/cue_definition.gd")' in manager_text
+    assert "Array[CueDefinitionResource]" in manager_text
     for signal_name in (
         "cue_started",
         "cue_completed",
@@ -395,9 +398,32 @@ def test_ci_validates_contract_and_headless_godot_load():
     workflow_text = workflow.read_text(encoding="utf-8")
 
     assert "pytest" in workflow_text
+    assert "--import" in workflow_text
     assert "--headless" in workflow_text
+    assert "tests/godot/test_runner.gd" in workflow_text
+    assert "assert_clean_godot_log.sh" in workflow_text
     assert "--export-release" in workflow_text
     assert '--export-release "Web"' in workflow_text
     assert '--export-debug "Android"' in workflow_text
     assert '--export-release "Windows Desktop"' in workflow_text
     assert "mkdir -p build/web build/android build/windows" in workflow_text
+
+
+def test_main_scene_references_the_declared_flow_and_rig_types():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+
+    assert 'path="res://scripts/show/flow_manager.gd" id="18_flow"' in scene_text
+    assert 'script = ExtResource("18_flow")' in scene_text
+    assert 'script = ExtResource("17_flow")' not in scene_text
+    assert 'path="res://scripts/show/rig_definition.gd" id="7_rig_definition"' in scene_text
+    assert 'families = Array[ExtResource("7_rig_definition")]' in scene_text
+
+
+def test_godot_behavioral_runner_covers_scoring_and_session_reset():
+    runner = ROOT / "tests" / "godot" / "test_runner.gd"
+    assert runner.is_file()
+    runner_text = runner.read_text(encoding="utf-8")
+
+    assert "_test_flow_decay_and_multiplier" in runner_text
+    assert "_test_cue_bonus_and_reset" in runner_text
+    assert "_test_main_scene_scoring_and_reset" in runner_text

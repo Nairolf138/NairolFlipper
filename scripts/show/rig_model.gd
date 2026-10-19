@@ -1,10 +1,12 @@
 class_name RigModel
 extends Node
 
+const RigDefinitionResource = preload("res://scripts/show/rig_definition.gd")
+
 signal rig_family_activated(family_id: StringName)
 
 ## Session state for the six fixture families. Rendering stays with the scene.
-@export var families: Array[RigDefinition] = []
+@export var families: Array[RigDefinitionResource] = []
 
 var _activation_counts: Dictionary = {}
 
@@ -35,7 +37,15 @@ func is_family_active(family_id: StringName) -> bool:
 	return _activation_counts.get(family_id, 0) >= definition.activation_target
 
 
-func _definition_for(family_id: StringName) -> RigDefinition:
+func reset_state() -> void:
+	_activation_counts.clear()
+	for definition in families:
+		if definition == null or definition.family_id == &"":
+			continue
+		_activation_counts[definition.family_id] = 0
+
+
+func _definition_for(family_id: StringName) -> RigDefinitionResource:
 	for definition in families:
 		if definition != null and definition.family_id == family_id:
 			return definition

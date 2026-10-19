@@ -1,10 +1,12 @@
 extends RigidBody2D
 
+const PhysicsTuningResource = preload("res://scripts/gameplay/physics_tuning.gd")
+
 signal ball_drained(ball: RigidBody2D)
 
 @export var spawn_position: Vector2 = Vector2(960, 1650)
 @export var launch_force: float = 1250.0
-@export var tuning: PhysicsTuning
+@export var tuning: PhysicsTuningResource
 @export var ball_save_duration: float = 4.0
 
 var launch_ready: bool = true

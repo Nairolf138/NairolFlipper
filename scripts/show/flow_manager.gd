@@ -11,6 +11,7 @@ signal multiplier_changed(multiplier: int)
 
 var flow_points: int = 0
 var multiplier: int = 1
+var _decay_accumulator: float = 0.0
 
 
 func add_flow(points: int) -> void:
@@ -23,12 +24,20 @@ func add_flow(points: int) -> void:
 func decay_flow(delta: float) -> void:
 	if delta <= 0.0 or flow_points <= 0:
 		return
-	flow_points = maxi(0, flow_points - ceili(delta * decay_per_second))
+	_decay_accumulator += delta * decay_per_second
+	var points_to_remove := floori(_decay_accumulator)
+	if points_to_remove <= 0:
+		return
+	_decay_accumulator -= points_to_remove
+	flow_points = maxi(0, flow_points - points_to_remove)
+	if flow_points == 0:
+		_decay_accumulator = 0.0
 	_update_multiplier()
 
 
 func reset_flow() -> void:
 	flow_points = 0
+	_decay_accumulator = 0.0
 	_update_multiplier()
 
 
