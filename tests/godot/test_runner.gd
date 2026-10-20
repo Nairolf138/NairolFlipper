@@ -16,9 +16,13 @@ func _run() -> void:
 	_test_cue_bonus_and_reset()
 	await _test_main_scene_scoring_and_reset()
 	await _test_physics_drain_lifecycle()
+	await _test_android_playtest_regressions()
+	# Give the audio server and deferred frees time to release stream references.
+	await process_frame
+	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 4 passed")
+		print("Godot behavioral tests: 5 passed")
 		quit(0)
 		return
 
@@ -100,7 +104,7 @@ func _test_main_scene_scoring_and_reset() -> void:
 	_expect(main.balls[0].visible, "Restart shows the first ball")
 	_expect(not main.balls[1].visible and not main.balls[2].visible, "Restart hides inactive balls")
 
-	main.queue_free()
+	main.free()
 	await process_frame
 
 
@@ -153,7 +157,62 @@ func _test_physics_drain_lifecycle() -> void:
 		await physics_frame
 	_expect(main.balls[1].visible and main.balls[1].launch_ready, "Next ball respawns after a physical drain")
 
-	main.queue_free()
+	main.free()
+	await process_frame
+
+
+func _test_android_playtest_regressions() -> void:
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Main scene loads for Android playtest regressions")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	root.add_child(main)
+	await process_frame
+	await physics_frame
+
+	_expect(main.start_overlay.visible, "Start menu is visible on launch")
+	_expect(not main.gameplay_active, "Gameplay waits for the Play button")
+	main.start_game()
+	_expect(not main.start_overlay.visible and main.game_controls.visible, "Play starts the game and shows session controls")
+
+	var left_flipper: Node2D = main.get_node("LeftFlipper")
+	var right_flipper: Node2D = main.get_node("RightFlipper")
+	_expect(is_equal_approx(rad_to_deg(left_flipper.rotation), 20.0), "Left flipper has the correct resting angle (got %.2f)" % rad_to_deg(left_flipper.rotation))
+	_expect(is_equal_approx(rad_to_deg(right_flipper.rotation), -20.0), "Right flipper mirrors the left resting angle (got %.2f)" % rad_to_deg(right_flipper.rotation))
+
+	Input.action_press(&"flipper_left")
+	for frame in 12:
+		await physics_frame
+	Input.action_release(&"flipper_left")
+	_expect(rad_to_deg(left_flipper.rotation) < 0.0, "Left flipper moves upward when activated")
+	_expect_equal(main.audio_service.last_sfx_id, &"flipper", "Flipper activation requests audible feedback")
+
+	Input.action_press(&"flipper_right")
+	for frame in 12:
+		await physics_frame
+	Input.action_release(&"flipper_right")
+	_expect(rad_to_deg(right_flipper.rotation) > 0.0, "Right flipper moves upward when activated")
+
+	var ball: RigidBody2D = main.balls[0]
+	var start_position := ball.global_position
+	main._launch_or_restart()
+	var minimum_x := start_position.x
+	var minimum_y := start_position.y
+	for frame in 60:
+		await physics_frame
+		minimum_x = minf(minimum_x, ball.global_position.x)
+		minimum_y = minf(minimum_y, ball.global_position.y)
+	_expect(minimum_y < start_position.y - 300.0, "Launcher sends the ball upward")
+	_expect(minimum_x < start_position.x - 60.0, "Launcher feeds the ball left into the playfield")
+	_expect_equal(main.audio_service.last_sfx_id, &"launcher", "Launcher requests audible feedback")
+
+	main.score_manager.add_points(100)
+	main._on_reset_pressed()
+	_expect_equal(main.score_manager.score, 0, "Reset button starts a clean game")
+
+	main.free()
 	await process_frame
 
 

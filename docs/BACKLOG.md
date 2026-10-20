@@ -104,7 +104,7 @@ consommateurs lumière/audio restent découplés par les signaux de `CueManager`
 
 ## P1 — Audio
 
-T040 Audio service ✅; T041 SFX buses; T042 Music transport ✅; T043 Stem set; T044 Sync Bonus.
+T040 Audio service ✅; T041 SFX buses ✅; T042 Music transport ✅; T043 Stem set; T044 Sync Bonus.
 
 T040 ajoute un service audio logique multiplateforme : mix Master/Music/SFX,
 états de stems et demandes de SFX sont consommables par les cues sans rendre le
@@ -113,6 +113,11 @@ gameplay dépendant d'un périphérique audio ou d'assets sonores.
 T042 ajoute une horloge musicale logique configurable (BPM et longueur de boucle),
 avec démarrage, arrêt, seek et signaux de progression/boucle. Elle reste
 indépendante de la présence d'un lecteur audio ou d'un asset.
+
+T041 relie les événements de gameplay à un pool de lecteurs sur le bus SFX.
+Des sons provisoires originaux couvrent flippers, lanceur, bumpers, rampes,
+Console, Cue, Safety et drain afin que les playtests Web/mobile ne soient plus
+silencieux.
 
 ## P2 — Final
 

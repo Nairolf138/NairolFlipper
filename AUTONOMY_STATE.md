@@ -3,17 +3,17 @@
 ## Dernière exécution
 
 - Date : 2026-10-19
-- Cycle : T013 — consolidation chargement et session après T042
-- Statut : validations locales vertes, pull request en préparation
+- Cycle : corrections du premier playtest Android + T041
+- Statut : 30 contrats Python et 5 groupes Godot verts, build CI à valider
 
 ## Dépôt
 
-- Branche : `fix/project-consolidation`
-- Base : `6fd37b0c` (`feat: add logical music transport` sur `origin/main`)
-- Validation locale : 29 contrats Python, 3 groupes de tests Godot et smoke test propres
+- Branche : `fix/android-playtest-p0`
+- Base : `a87e140b` (fusion de la PR #15 sur `origin/main`)
+- Validation locale : 30 contrats Python, 5 groupes de tests Godot et import propre
 - CI de la branche : à valider par la pull request
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` auditée : `6fd37b0c`
+- Branche `main` auditée : `a87e140b`
 
 ## État actuel
 
@@ -26,6 +26,14 @@ T013 consolide l'état livré après T042 :
 - décroissance du Flow indépendante du framerate ;
 - multiplicateur et bonus de Cue reliés au score ;
 - restart complet des états Cue, Rig, audio et tactiles.
+
+Le premier playtest Android ajoute les corrections suivantes :
+
+- orientation portrait imposée sur mobile ;
+- flipper droit correctement positionné, orienté et animé ;
+- bille moins légère et moins rebondissante, avec un lancement diagonal vers le plateau ;
+- écran de démarrage et commandes Reset/Quit ;
+- premiers effets sonores joués sur un pool polyphonique relié au bus SFX.
 
 T012 complète le premier filet de livraison cross-platform :
 
@@ -171,9 +179,9 @@ T012 complète le premier filet de livraison cross-platform :
 
 ## Problèmes connus
 
-- Le dépôt est encore un greybox : le cycle de billes est fonctionnel mais non encore validé par playtest humain.
+- Le dépôt reste un greybox : la nouvelle physique et la nouvelle interface doivent être rejouées sur Android réel.
 - Les tests comportementaux et le smoke test ne remplacent pas un playtest physique.
-- Les contrôles tactiles et manette n’ont pas encore été validés sur un appareil réel ; ils sont couverts par contrat statique et par le chargement Godot headless.
+- Les contrôles tactiles gauche/droite ont été validés sur Android réel ; la nouvelle orientation portrait et le nouveau lancement restent à confirmer dans l'APK corrigé.
 
 ## Blocages
 
@@ -185,11 +193,12 @@ T012 complète le premier filet de livraison cross-platform :
 
 - `export_presets.cfg` avec presets Web, Android debug et Windows Desktop.
 - `.github/workflows/godot.yml` avec import propre, tests comportementaux, smoke et exports P0.
-- `tests/test_bootstrap.py` avec 29 contrats de structure.
-- `tests/godot/test_runner.gd` avec trois groupes de validations comportementales.
+- `tests/test_bootstrap.py` avec 30 contrats de structure.
+- `tests/godot/test_runner.gd` avec cinq groupes de validations comportementales.
 - `docs/BACKLOG.md` mis à jour.
 - Ce journal `AUTONOMY_STATE.md`.
 
 ## Prochaine exécution
 
-Après fusion et playtest humain, reprendre le backlog audio à T041/T043/T044 ou corriger les défauts observés sur appareils P0.
+Faire valider l'APK corrigé sur la même tablette, ajuster le ressenti physique à
+partir de ce second test, puis reprendre T043 (premier set de stems musicaux).

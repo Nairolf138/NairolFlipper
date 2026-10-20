@@ -6,6 +6,7 @@ signal ball_drained(ball: RigidBody2D)
 
 @export var spawn_position: Vector2 = Vector2(960, 1650)
 @export var launch_force: float = 1250.0
+@export var launch_direction: Vector2 = Vector2(-0.16, -1.0)
 @export var tuning: PhysicsTuningResource
 @export var ball_save_duration: float = 4.0
 
@@ -37,6 +38,7 @@ func _apply_tuning() -> void:
 	linear_damp = tuning.linear_damp
 	angular_damp = tuning.angular_damp
 	launch_force = tuning.launch_force
+	launch_direction = tuning.launch_direction
 	var material := PhysicsMaterial.new()
 	material.friction = tuning.friction
 	material.bounce = tuning.bounce
@@ -73,7 +75,10 @@ func launch_ball() -> bool:
 	freeze = false
 	ball_save_remaining = ball_save_duration
 	ball_save_used = false
-	apply_central_impulse(Vector2.UP * launch_force)
+	var direction := launch_direction.normalized()
+	if direction == Vector2.ZERO:
+		direction = Vector2.UP
+	apply_central_impulse(direction * launch_force)
 	return true
 
 

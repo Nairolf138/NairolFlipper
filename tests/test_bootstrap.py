@@ -71,6 +71,12 @@ def test_main_scene_declares_two_pressable_flippers():
     assert "action_name" in script_text
     assert "flipper_left" in scene_text
     assert "flipper_right" in scene_text
+    assert 'rest_angle_degrees = 20.0' in scene_text
+    assert 'active_angle_degrees = -25.0' in scene_text
+    assert "@export var mirrored" in script_text
+    assert "mirrored = true" in scene_text
+    assert 'rest_angle_degrees = -20.0' in scene_text
+    assert 'active_angle_degrees = 25.0' in scene_text
 
 
 def test_ball_has_a_controlled_launcher_contract():
@@ -95,11 +101,25 @@ def test_ball_uses_shared_physics_tuning_resource():
     assert tuning_resource.is_file()
     assert "class_name PhysicsTuning" in tuning_script
     assert "@export var max_speed" in tuning_script
+    assert "@export var launch_direction" in tuning_script
     assert 'preload("res://scripts/gameplay/physics_tuning.gd")' in ball_script
     assert "@export var tuning: PhysicsTuningResource" in ball_script
     assert "_apply_tuning()" in ball_script
     assert "limit_length(tuning.max_speed)" in ball_script
     assert 'path="res://data/tuning/PhysicsTuning.tres"' in ball_scene
+
+
+def test_android_playtest_configuration_is_portrait_and_has_session_controls():
+    project_text = PROJECT.read_text(encoding="utf-8")
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    main_text = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+
+    assert "window/handheld/orientation=1" in project_text
+    for node_name in ("StartOverlay", "PlayButton", "ResetButton", "QuitButton"):
+        assert f'name="{node_name}"' in scene_text
+    assert "func start_game()" in main_text
+    assert "func _on_reset_pressed()" in main_text
+    assert "func _on_quit_pressed()" in main_text
 
 
 def test_ball_save_safety_is_armed_on_launch_and_consumed_at_drain():
@@ -346,7 +366,7 @@ def test_flow_manager_tracks_forgiving_multiplier_progression():
     assert 'flow_manager.reset_flow()' in main_script
 
 
-def test_audio_service_consumes_cue_changes_without_requiring_audio_assets():
+def test_audio_service_plays_original_placeholder_sfx():
     audio_script = ROOT / "scripts" / "audio" / "audio_service.gd"
     scene_text = MAIN_SCENE.read_text(encoding="utf-8")
     main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
@@ -359,9 +379,25 @@ def test_audio_service_consumes_cue_changes_without_requiring_audio_assets():
     assert 'signal stems_changed' in audio_text
     assert 'func apply_cue_changes' in audio_text
     assert 'func request_sfx' in audio_text
+    assert "AudioStreamPlayer.new()" in audio_text
+    assert 'player.bus = &"SFX"' in audio_text
     assert 'name="AudioService"' in scene_text
     assert 'audio_changes_requested.connect(audio_service.apply_cue_changes)' in main_script
     assert 'audio_changes = {"stems"' in cue_text
+    sfx_dir = ROOT / "assets" / "audio" / "sfx"
+    for filename in (
+        "flipper.wav",
+        "launcher.wav",
+        "kick_bumper.wav",
+        "snare_bumper.wav",
+        "tom_bumper.wav",
+        "ramp.wav",
+        "scoop.wav",
+        "cue.wav",
+        "safety.wav",
+        "drain.wav",
+    ):
+        assert (sfx_dir / filename).is_file()
 
 
 def test_audio_service_exposes_a_looping_logical_music_transport():
