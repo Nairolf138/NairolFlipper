@@ -131,7 +131,7 @@ def test_ball_save_safety_is_armed_on_launch_and_consumed_at_drain():
     assert "ball_save_remaining = ball_save_duration" in ball_script
     assert "func try_ball_save() -> bool" in ball_script
     assert "body.try_ball_save()" in main_script
-    assert "body.reset_ball(body.spawn_position)" in main_script
+    assert "body.reset_ball(body.spawn_position, false)" in main_script
     assert 'status_label.text = "SAFETY"' in main_script
 
 
@@ -216,10 +216,11 @@ def test_controller_actions_cover_flippers_and_launcher():
     assert '"button_index":0' in project_text
 
 
-def test_restart_keeps_only_the_active_ball_visible():
+def test_restart_activates_only_one_ball_and_disables_the_rest():
     main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
 
-    assert "ball.visible = index == active_ball_index" in main_script
+    assert "_deactivate_all_balls()" in main_script
+    assert "balls[active_ball_index].reset_ball(" in main_script
 
 
 def test_local_playtest_recorder_tracks_session_events_without_networking():
