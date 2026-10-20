@@ -95,7 +95,7 @@ T025 enregistre localement les événements et la durée d'une session dans `use
 
 ## P1 — Show systems
 
-### T030 Rig model ✅; T031 CueDefinition ✅; T032 CueManager ✅; T033 Flow ✅; T034 Warm/Cold ramps ✅; T035 Console scoop ✅; T036 First show sequence.
+### T030 Rig model ✅; T031 CueDefinition ✅; T032 CueManager ✅; T033 Flow ✅; T034 Warm/Cold ramps ✅; T035 Console scoop ✅; T036 First show sequence ✅.
 
 T030 ajoute six familles de fixtures data-driven (`RigDefinition`) et un
 `RigModel` de session qui émet `rig_family_activated` sans imposer de rendu.
@@ -120,6 +120,11 @@ et Flow, valide le cue courant et réarme le capteur après un court délai. Le
 premier cue exige maintenant un impact bumper puis une validation Console ; les
 consommateurs lumière/audio restent découplés par les signaux de `CueManager`.
 
+T036 ajoute le premier Showflow réellement jouable : Preset au lancement,
+Build pendant la construction du Rig, Flow lorsque les six familles sont
+actives, puis Final Show via la Console et Blackout. L'état courant est toujours
+visible dans le HUD et un restart remet la conduite à Preset.
+
 ## P1 — Audio
 
 T040 Audio service ✅; T041 SFX buses ✅; T042 Music transport ✅; T043 Stem set; T044 Sync Bonus.
@@ -139,7 +144,13 @@ silencieux.
 
 ## P2 — Final
 
-T050 Ball lock; T051 Multiball; T052 Final Show; T053 Blackout; T054 Encore prototype.
+T050 Ball lock; T051 Multiball ✅; T052 Final Show ✅; T053 Blackout ✅; T054 Encore prototype.
+
+T051–T053 livrent un premier climax testable : la Console lance trois billes
+bonus sans consommer les trois billes de la session, double le scoring actif et
+termine le mode lorsqu'une seule bille subsiste ou lorsque le chrono expire. Un
+Blackout bref ramène ensuite la partie en Flow. Le lock physique et l'Encore
+restent volontairement hors de cette étape.
 
 ## Règle
 

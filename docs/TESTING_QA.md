@@ -77,6 +77,16 @@ toucher, les collisions inactives et la récupération hors limites.
 - traverser l'Universe Orbit et confirmer score, Flow et feedback ;
 - noter les tirs trop faciles, impossibles ou masqués par les doigts.
 
+### Final Show — checklist tablette
+
+- confirmer le passage visible de Preset à Build après le lancement ;
+- allumer les six familles puis vérifier `SHOW FLOW` ;
+- toucher la Console et confirmer que trois billes distinctes entrent en jeu ;
+- vérifier que le score reçoit bien le bonus `x2` pendant le Final Show ;
+- perdre deux billes et confirmer le Blackout, puis la reprise avec une bille ;
+- vérifier que le nombre de billes numérotées n'a pas diminué pendant le multiball ;
+- confirmer que la Console ne relance pas un second Final Show dans la même partie.
+
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 
 ## Instrumentation locale de playtest

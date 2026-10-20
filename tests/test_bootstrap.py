@@ -512,3 +512,25 @@ def test_table_2_greybox_adds_playfield_routes_and_rig_objective():
     assert "apply_central_impulse" in slingshot.read_text(encoding="utf-8")
     for handler in ("_on_rig_target_hit", "_on_lane_completed", "_on_slingshot_hit", "_update_rig_progress"):
         assert f"func {handler}" in main_text
+
+
+def test_showflow_final_show_multiball_and_blackout_are_explicit():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    main_text = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    show_flow = ROOT / "scripts" / "show" / "show_flow_manager.gd"
+    runner_text = (ROOT / "tests" / "godot" / "test_runner.gd").read_text(encoding="utf-8")
+
+    assert show_flow.is_file()
+    flow_text = show_flow.read_text(encoding="utf-8")
+    for state in ("STANDBY", "PRESET", "BUILD", "FLOW", "FINAL_SHOW", "BLACKOUT"):
+        assert state in flow_text
+    for method in ("begin_build", "arm_final_show", "start_final_show", "start_blackout", "finish_blackout"):
+        assert f"func {method}" in flow_text
+    for node_name in ("ShowFlowManager", "ShowStateLabel", "FinalShowLabel", "BlackoutOverlay"):
+        assert f'name="{node_name}"' in scene_text
+    assert "multiball_active" in main_text
+    assert "func _start_final_show" in main_text
+    assert "func _finish_final_show" in main_text
+    assert "final_show_score_multiplier" in main_text
+    assert "_test_show_flow_state_machine" in runner_text
+    assert "_test_final_show_multiball_and_blackout" in runner_text

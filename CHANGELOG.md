@@ -15,6 +15,10 @@
 - Plateau Table 2.0 vectoriel avec six cibles Rig, Universe Orbit, slingshots,
   rails physiques, outlanes et objectif de complétion visible.
 - Bonus de Rig complet et guidage explicite vers la Console.
+- Showflow visible Preset → Build → Flow → Final Show → Blackout.
+- Final Show à trois billes bonus, score doublé, durée configurable et fin
+  automatique lorsqu'une seule bille reste.
+- Blackout de transition qui conserve la bille survivante et les vies de session.
 
 ### Fixed
 

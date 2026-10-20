@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3]
+[gd_scene load_steps=36 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Ball.tscn" id="1_ball"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Flipper.tscn" id="2_flipper"]
@@ -27,6 +27,7 @@
 [ext_resource type="PackedScene" path="res://scenes/gameplay/LaneTrigger.tscn" id="24_lane"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Slingshot.tscn" id="25_slingshot"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/GuideRail.tscn" id="26_rail"]
+[ext_resource type="Script" path="res://scripts/show/show_flow_manager.gd" id="27_show_flow"]
 
 [sub_resource type="RectangleShape2D" id="LeftWallShape"]
 size = Vector2(40, 1600)
@@ -108,6 +109,9 @@ cues = Array[ExtResource("17_cue_definition")]([ExtResource("16_first_hit")])
 [node name="AudioService" type="Node" parent="."]
 script = ExtResource("15_audio")
 
+[node name="ShowFlowManager" type="Node" parent="."]
+script = ExtResource("27_show_flow")
+
 [node name="ScoreLabel" type="Label" parent="."]
 offset_left = 60.0
 offset_top = 70.0
@@ -144,6 +148,16 @@ offset_bottom = 190.0
 theme_override_colors/font_color = Color(0.5, 0.85, 1, 1)
 theme_override_font_sizes/font_size = 24
 text = "BALL 1 / 3"
+
+[node name="ShowStateLabel" type="Label" parent="."]
+offset_left = 580.0
+offset_top = 140.0
+offset_right = 1020.0
+offset_bottom = 190.0
+theme_override_colors/font_color = Color(0.78, 0.58, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "SHOW  STANDBY"
+horizontal_alignment = 2
 
 [node name="LeftWall" type="StaticBody2D" parent="."]
 position = Vector2(20, 960)
@@ -355,6 +369,49 @@ offset_bottom = 275.0
 mouse_filter = 0
 theme_override_font_sizes/font_size = 24
 text = "QUITTER"
+
+[node name="FinalShowLabel" type="Label" parent="Interface/GameControls"]
+visible = false
+layout_mode = 0
+offset_left = 145.0
+offset_top = 285.0
+offset_right = 935.0
+offset_bottom = 355.0
+theme_override_colors/font_color = Color(1, 0.82, 0.28, 1)
+theme_override_font_sizes/font_size = 34
+text = "FINAL SHOW  •  3 BALLS  •  SCORE x2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BlackoutOverlay" type="ColorRect" parent="Interface"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.88)
+
+[node name="Label" type="Label" parent="Interface/BlackoutOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -80.0
+offset_right = 360.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.72, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 58
+text = "BLACKOUT"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="StartOverlay" type="ColorRect" parent="Interface"]
 layout_mode = 3
