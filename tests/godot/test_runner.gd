@@ -3,6 +3,7 @@ extends SceneTree
 const CueDefinitionResource = preload("res://scripts/show/cue_definition.gd")
 const CueManagerNode = preload("res://scripts/show/cue_manager.gd")
 const FlowManagerNode = preload("res://scripts/show/flow_manager.gd")
+const ShowFlowManagerNode = preload("res://scripts/show/show_flow_manager.gd")
 
 var _failures: Array[String] = []
 
@@ -14,17 +15,19 @@ func _initialize() -> void:
 func _run() -> void:
 	_test_flow_decay_and_multiplier()
 	_test_cue_bonus_and_reset()
+	_test_show_flow_state_machine()
 	await _test_main_scene_scoring_and_reset()
 	await _test_physics_drain_lifecycle()
 	await _test_android_playtest_regressions()
 	await _test_three_ball_game_over_and_recovery()
 	await _test_table_2_objectives_and_routes()
+	await _test_final_show_multiball_and_blackout()
 	# Give the audio server and deferred frees time to release stream references.
 	await process_frame
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 7 passed")
+		print("Godot behavioral tests: 9 passed")
 		quit(0)
 		return
 
@@ -67,6 +70,24 @@ func _test_cue_bonus_and_reset() -> void:
 	_expect(manager.active_cue == null, "Cue reset clears the active cue")
 	_expect(not manager.start_cue(&"test_cue"), "Cue reset clears satisfied conditions")
 	manager.free()
+
+
+func _test_show_flow_state_machine() -> void:
+	var show := ShowFlowManagerNode.new()
+	_expect_equal(show.state, ShowFlowManagerNode.State.STANDBY, "Show starts in Standby")
+	show.reset_show()
+	_expect_equal(show.state, ShowFlowManagerNode.State.PRESET, "A new session enters Preset")
+	_expect(show.begin_build(), "The first launch enters Build")
+	_expect(not show.start_final_show(), "Final Show cannot start before the Rig is ready")
+	_expect(show.arm_final_show(), "Completing the Rig enters Flow")
+	_expect(show.start_final_show(), "An armed show starts Final Show")
+	_expect(show.start_blackout(), "Final Show ends in Blackout")
+	_expect(show.final_show_completed, "Blackout records Final Show completion")
+	_expect(show.finish_blackout(), "Blackout returns to Flow")
+	_expect(not show.start_final_show(), "Final Show cannot repeat in the same session")
+	show.reset_show()
+	_expect(not show.final_show_completed, "A restart clears Final Show completion")
+	show.free()
 
 
 func _test_main_scene_scoring_and_reset() -> void:
@@ -316,7 +337,7 @@ func _test_table_2_objectives_and_routes() -> void:
 		main._on_rig_target_hit(target, target.family_id, target.display_name, target.score_value, target.flow_value)
 	_expect_equal(main._active_rig_family_count(), 6, "Every Rig family can be activated from the table")
 	_expect_equal(main.rig_progress_label.text, "RIG 6 / 6", "Rig objective reports complete progress")
-	_expect_equal(main.status_label.text, "RIG READY — HIT CONSOLE", "Completing the Rig reveals the next shot")
+	_expect_equal(main.status_label.text, "FINAL SHOW ARMED — HIT CONSOLE", "Completing the Rig reveals the next shot")
 	_expect(main.score_manager.score > starting_score + 1500, "Rig targets and completion award score")
 	for target in rig_targets:
 		_expect(target.lit, "Activated Rig targets remain visibly lit")
@@ -336,6 +357,63 @@ func _test_table_2_objectives_and_routes() -> void:
 	for target in rig_targets:
 		_expect(not target.lit, "Restart clears every Rig target light")
 
+	main.free()
+	await process_frame
+
+
+func _test_final_show_multiball_and_blackout() -> void:
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Main scene loads for Final Show")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	main.blackout_duration = 0.01
+	root.add_child(main)
+	await process_frame
+	await physics_frame
+	main.show_flow.final_show_duration = 0.1
+	main.start_game()
+	main._launch_or_restart()
+	_expect_equal(main.show_flow.state, ShowFlowManagerNode.State.BUILD, "Launching the first ball enters Build")
+
+	var rig_targets := main.get_tree().get_nodes_in_group("rig_targets")
+	for target in rig_targets:
+		main._on_rig_target_hit(target, target.family_id, target.display_name, target.score_value, target.flow_value)
+	_expect(main.show_flow.can_start_final_show(), "A complete Rig arms Final Show")
+
+	var balls_before: int = main.remaining_balls
+	main._on_scoop_completed(&"console_scoop", 500, 80)
+	await process_frame
+	_expect(main.multiball_active, "Console starts Final Show multiball")
+	_expect_equal(main.show_flow.state, ShowFlowManagerNode.State.FINAL_SHOW, "Show state reports Final Show")
+	_expect_equal(main._active_multiball_balls().size(), 3, "Final Show launches exactly three balls")
+	_expect_equal(main.remaining_balls, balls_before, "Bonus multiball does not consume numbered balls")
+	_expect(main.final_show_label.visible, "Final Show exposes its score multiplier")
+
+	var score_before: int = main.score_manager.score
+	var expected_delta: int = 10 * main.flow_manager.multiplier * main.show_flow.final_show_score_multiplier
+	main._add_score_with_flow(10)
+	_expect_equal(main.score_manager.score - score_before, expected_delta, "Final Show doubles the active Flow score")
+
+	main.balls[1].mark_drained()
+	_expect(main.multiball_active, "Final Show continues with two balls")
+	main.balls[2].mark_drained()
+	_expect(not main.multiball_active, "Final Show ends when one ball remains")
+	_expect_equal(main.remaining_balls, balls_before, "Ending Final Show preserves the three-ball session")
+	_expect_equal(main.show_flow.state, ShowFlowManagerNode.State.BLACKOUT, "Multiball resolves into Blackout")
+	_expect(main.blackout_overlay.visible, "Blackout is visible on the playfield")
+	_expect_equal(main._active_multiball_balls().size(), 1, "Blackout keeps one playable survivor")
+
+	for frame in 12:
+		await physics_frame
+	_expect(not main.blackout_overlay.visible, "Blackout clears after its configured duration")
+	_expect_equal(main.show_flow.state, ShowFlowManagerNode.State.FLOW, "Completed show returns to Flow")
+	main._on_scoop_completed(&"console_scoop", 500, 80)
+	_expect(not main.multiball_active, "Console cannot repeat Final Show in one session")
+
+	for frame in 12:
+		await physics_frame
 	main.free()
 	await process_frame
 

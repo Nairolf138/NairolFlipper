@@ -50,6 +50,14 @@ Toucher gauche/droite, lancer, montrer un objectif, laisser jouer.
 
 Combiner son, flash, texte, animation, vibration optionnelle. Ne jamais dépendre uniquement de vibration ou couleur.
 
+## Conduite du show
+
+Le HUD affiche toujours l'état courant sous la forme `SHOW PRESET`, `SHOW BUILD`,
+`SHOW FLOW`, `SHOW FINAL SHOW` ou `SHOW BLACKOUT`. Le Final Show ajoute une
+bannière centrale avec le nombre de billes et le multiplicateur, puis un écran
+Blackout bref. Les informations restent textuelles en plus des changements de
+couleur afin de ne pas dépendre de la perception chromatique.
+
 ## Fin de partie
 
 Après la troisième bille consommée, le plateau n'accepte plus les touchers de

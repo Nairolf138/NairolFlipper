@@ -5,6 +5,7 @@ const CueManagerNode = preload("res://scripts/show/cue_manager.gd")
 const FlowManagerNode = preload("res://scripts/show/flow_manager.gd")
 const PlaytestRecorderNode = preload("res://scripts/app/playtest_recorder.gd")
 const RigModelNode = preload("res://scripts/show/rig_model.gd")
+const ShowFlowManagerNode = preload("res://scripts/show/show_flow_manager.gd")
 
 enum SessionState {
 	MENU,
@@ -22,10 +23,12 @@ enum SessionState {
 @onready var drain: Area2D = $Drain
 @onready var status_label: Label = $StatusLabel
 @onready var rig_progress_label: Label = $RigProgressLabel
+@onready var show_state_label: Label = $ShowStateLabel
 @onready var playtest_recorder: PlaytestRecorderNode = $PlaytestRecorder
 @onready var cue_manager: CueManagerNode = $CueManager
 @onready var audio_service: AudioServiceNode = $AudioService
 @onready var rig_model: RigModelNode = $RigModel
+@onready var show_flow: ShowFlowManagerNode = $ShowFlowManager
 @onready var start_overlay: Control = $Interface/StartOverlay
 @onready var game_controls: Control = $Interface/GameControls
 @onready var play_button: Button = $Interface/StartOverlay/Menu/PlayButton
@@ -36,11 +39,14 @@ enum SessionState {
 @onready var final_score_label: Label = $Interface/GameOverOverlay/Menu/FinalScoreLabel
 @onready var replay_button: Button = $Interface/GameOverOverlay/Menu/ReplayButton
 @onready var game_over_menu_button: Button = $Interface/GameOverOverlay/Menu/MenuButton
+@onready var final_show_label: Label = $Interface/GameControls/FinalShowLabel
+@onready var blackout_overlay: Control = $Interface/BlackoutOverlay
 
 @export var respawn_delay: float = 1.0
 @export var ball_recovery_delay: float = 5.0
 @export var stuck_speed_threshold: float = 18.0
 @export var recovery_margin: float = 100.0
+@export var blackout_duration: float = 1.1
 
 var remaining_balls: int = 3
 var active_ball_index: int = 0
@@ -50,6 +56,8 @@ var session_state: int = SessionState.MENU
 var active_touches: Dictionary[int, StringName] = {}
 var stalled_ball_time: float = 0.0
 var session_generation: int = 0
+var multiball_active: bool = false
+var show_generation: int = 0
 
 
 func _ready() -> void:
@@ -76,6 +84,7 @@ func _ready() -> void:
 	flow_manager.flow_changed.connect(_on_flow_changed)
 	cue_manager.audio_changes_requested.connect(audio_service.apply_cue_changes)
 	cue_manager.bonus_awarded.connect(_on_cue_bonus_awarded)
+	show_flow.state_changed.connect(_on_show_state_changed)
 	play_button.pressed.connect(start_game)
 	menu_quit_button.pressed.connect(_on_quit_pressed)
 	reset_button.pressed.connect(_on_reset_pressed)
@@ -89,6 +98,12 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if session_state != SessionState.PLAYING:
 		stalled_ball_time = 0.0
+		return
+	if multiball_active:
+		for candidate in balls:
+			if candidate.visible and not candidate.freeze and not candidate.drain_locked:
+				if _is_ball_outside_playfield(candidate.global_position):
+					candidate.mark_drained()
 		return
 	if active_ball_index < 0 or active_ball_index >= balls.size():
 		return
@@ -122,6 +137,7 @@ func _launch_or_restart() -> void:
 		return
 	if balls[active_ball_index].launch_ball():
 		session_state = SessionState.PLAYING
+		show_flow.begin_build()
 		stalled_ball_time = 0.0
 		playtest_recorder.record_launch()
 		audio_service.request_sfx(&"launcher")
@@ -141,8 +157,13 @@ func _show_start_menu() -> void:
 	session_state = SessionState.MENU
 	gameplay_active = false
 	game_over = false
+	show_generation += 1
+	multiball_active = false
+	show_flow.enter_standby()
 	start_overlay.show()
 	game_over_overlay.hide()
+	blackout_overlay.hide()
+	final_show_label.hide()
 	game_controls.hide()
 	_release_all_touches()
 	_deactivate_all_balls()
@@ -151,6 +172,9 @@ func _show_start_menu() -> void:
 func _show_game_over() -> void:
 	session_state = SessionState.GAME_OVER
 	game_over = true
+	show_generation += 1
+	multiball_active = false
+	show_flow.enter_standby()
 	gameplay_active = false
 	stalled_ball_time = 0.0
 	_release_all_touches()
@@ -158,6 +182,8 @@ func _show_game_over() -> void:
 	game_controls.hide()
 	final_score_label.text = "SCORE FINAL %06d" % score_manager.score
 	game_over_overlay.show()
+	blackout_overlay.hide()
+	final_show_label.hide()
 	status_label.text = "GAME OVER"
 
 
@@ -248,7 +274,8 @@ func _on_rig_target_hit(
 			_add_score_with_flow(1500)
 			flow_manager.add_flow(200)
 			cue_manager.add_condition(&"rig_ready")
-			status_label.text = "RIG READY — HIT CONSOLE"
+			show_flow.arm_final_show()
+			status_label.text = "FINAL SHOW ARMED — HIT CONSOLE"
 			audio_service.request_sfx(&"cue")
 		else:
 			status_label.text = "%s ONLINE — %d / 6" % [display_name.to_upper(), active_count]
@@ -294,7 +321,10 @@ func _update_rig_progress() -> void:
 func _on_scoop_completed(_scoop_id: StringName, score_value: int, flow_value: int) -> void:
 	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
-	status_label.text = "CUE VALIDATED"
+	if show_flow.can_start_final_show():
+		_start_final_show()
+	else:
+		status_label.text = "CUE VALIDATED"
 	audio_service.request_sfx(&"scoop")
 
 
@@ -311,7 +341,102 @@ func _on_cue_bonus_awarded(points: int) -> void:
 func _add_score_with_flow(points: int) -> void:
 	if points <= 0:
 		return
-	score_manager.add_points(points * flow_manager.multiplier)
+	var show_multiplier := show_flow.final_show_score_multiplier if multiball_active else 1
+	score_manager.add_points(points * flow_manager.multiplier * show_multiplier)
+
+
+func _on_show_state_changed(_state: int, display_name: String) -> void:
+	show_state_label.text = "SHOW  %s" % display_name
+
+
+func _start_final_show() -> void:
+	if multiball_active or not show_flow.start_final_show():
+		return
+	multiball_active = true
+	show_generation += 1
+	var generation := show_generation
+	stalled_ball_time = 0.0
+	final_show_label.text = "FINAL SHOW  •  3 BALLS  •  SCORE x%d" % show_flow.final_show_score_multiplier
+	final_show_label.show()
+	blackout_overlay.hide()
+	_add_score_with_flow(3000)
+	audio_service.request_sfx(&"cue")
+	var spawn_offsets: Array[Vector2] = [Vector2(0, -180), Vector2(0, -90), Vector2.ZERO]
+	var launch_directions: Array[Vector2] = [
+		Vector2(-0.32, -1.0),
+		Vector2(-0.20, -1.0),
+		Vector2(-0.08, -1.0),
+	]
+	for index in balls.size():
+		var ball: RigidBody2D = balls[index]
+		ball.reset_ball(ball.spawn_position + spawn_offsets[index])
+		ball.ball_save_used = true
+		ball.ball_save_remaining = 0.0
+		ball.launch_ready = false
+		ball.freeze = false
+		ball.apply_central_impulse(launch_directions[index].normalized() * ball.launch_force)
+	active_ball_index = 0
+	status_label.text = "FINAL SHOW — KEEP 2+ BALLS ALIVE"
+	_run_final_show_timer(generation)
+
+
+func _run_final_show_timer(generation: int) -> void:
+	await get_tree().create_timer(show_flow.final_show_duration).timeout
+	if generation == show_generation and multiball_active:
+		_finish_final_show("FINAL SHOW COMPLETE")
+
+
+func _active_multiball_balls() -> Array[Node]:
+	var active: Array[Node] = []
+	for ball in balls:
+		if ball.visible and not ball.drain_locked:
+			active.append(ball)
+	return active
+
+
+func _on_multiball_ball_drained(_ball: RigidBody2D) -> void:
+	var active := _active_multiball_balls()
+	if active.size() <= 1:
+		_finish_final_show("FINAL SHOW COMPLETE")
+	else:
+		status_label.text = "FINAL SHOW — %d BALLS" % active.size()
+
+
+func _finish_final_show(message: String) -> void:
+	if not multiball_active:
+		return
+	multiball_active = false
+	show_generation += 1
+	var survivors := _active_multiball_balls()
+	var survivor: Node = survivors[0] if not survivors.is_empty() else null
+	if survivor == null:
+		survivor = balls[active_ball_index]
+		survivor.reset_ball(survivor.spawn_position, false)
+		session_state = SessionState.READY
+	else:
+		active_ball_index = balls.find(survivor)
+		session_state = SessionState.PLAYING
+	for ball in balls:
+		if ball != survivor:
+			ball.deactivate_ball()
+	show_flow.start_blackout()
+	final_show_label.hide()
+	blackout_overlay.show()
+	status_label.text = "BLACKOUT — %s" % message
+	audio_service.request_sfx(&"drain")
+	_run_blackout_timer(show_generation)
+
+
+func _run_blackout_timer(generation: int) -> void:
+	await get_tree().create_timer(blackout_duration).timeout
+	if generation != show_generation or game_over:
+		return
+	blackout_overlay.hide()
+	show_flow.finish_blackout()
+	if session_state == SessionState.READY:
+		status_label.text = "SHOW COMPLETE — TOUCH TOP"
+	else:
+		status_label.text = "SHOW COMPLETE — KEEP PLAYING"
 
 
 func _on_score_changed(new_score: int) -> void:
@@ -325,9 +450,9 @@ func _on_flow_changed(flow_points: int, multiplier: int) -> void:
 func _on_drain_body_entered(body: Node) -> void:
 	if (
 		session_state == SessionState.PLAYING
-		and active_ball_index >= 0
-		and active_ball_index < balls.size()
-		and body == balls[active_ball_index]
+		and body in balls
+		and not body.drain_locked
+		and (multiball_active or body == balls[active_ball_index])
 	):
 		# Area2D emits body_entered while the physics server is flushing its
 		# queries. Resolve the drain once the physics step has completed.
@@ -338,9 +463,8 @@ func _resolve_ball_drain(body: Node) -> void:
 	if (
 		session_state != SessionState.PLAYING
 		or not is_instance_valid(body)
-		or active_ball_index < 0
-		or active_ball_index >= balls.size()
-		or body != balls[active_ball_index]
+		or body not in balls
+		or (not multiball_active and body != balls[active_ball_index])
 		or body.drain_locked
 	):
 		return
@@ -358,6 +482,9 @@ func _resolve_ball_drain(body: Node) -> void:
 
 
 func _on_ball_drained(ball: RigidBody2D) -> void:
+	if multiball_active:
+		_on_multiball_ball_drained(ball)
+		return
 	if (
 		session_state != SessionState.PLAYING
 		or active_ball_index < 0
@@ -383,17 +510,22 @@ func _on_ball_drained(ball: RigidBody2D) -> void:
 
 func restart_game() -> void:
 	session_generation += 1
+	show_generation += 1
 	_release_all_touches()
 	remaining_balls = balls.size()
 	active_ball_index = 0
 	game_over = false
+	multiball_active = false
 	session_state = SessionState.READY
 	stalled_ball_time = 0.0
 	game_over_overlay.hide()
+	blackout_overlay.hide()
+	final_show_label.hide()
 	score_manager.reset_score()
 	flow_manager.reset_flow()
 	cue_manager.reset_state()
 	rig_model.reset_state()
+	show_flow.reset_show()
 	audio_service.reset_state()
 	for ramp in get_tree().get_nodes_in_group("show_ramps"):
 		if ramp.has_method("reset"):
