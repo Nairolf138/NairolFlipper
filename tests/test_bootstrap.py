@@ -132,7 +132,7 @@ def test_ball_save_safety_is_armed_on_launch_and_consumed_at_drain():
     assert "func try_ball_save() -> bool" in ball_script
     assert "body.try_ball_save()" in main_script
     assert "body.reset_ball(body.spawn_position, false)" in main_script
-    assert 'status_label.text = "SAFETY"' in main_script
+    assert 'status_label.text = "SAFETY — SAME BALL — TOUCH TOP"' in main_script
 
 
 def test_main_scene_declares_three_rhythmic_bumpers():
