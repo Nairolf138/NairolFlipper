@@ -74,6 +74,14 @@ affiche un écran Game Over avec score final et n'autorise une nouvelle partie q
 depuis Rejouer. Safety est limité à une fois par bille et une bille coincée ou
 sortie du plateau revient au launcher sans consommer de vie.
 
+### T015 — Table 2.0 greybox ✅
+
+Le plateau quitte la démonstration vide pour proposer une première boucle
+d'objectifs. Six cibles allument les familles du Rig, une Universe Orbit et deux
+slingshots enrichissent les tirs, des rails physiques créent retours et outlanes,
+et le HUD mène explicitement de `RIG 0 / 6` vers la Console. La direction
+artistique finale et le Final Show restent hors de cette tâche.
+
 ## P1 — Feel
 
 T020 Physics tuning resource ✅; T021 Ball max speed/anti-tunneling ✅; T022 Feedback hit ✅; T023 Ball save ✅; T024 Controller support ✅; T025 instrumentation locale de playtest ✅.

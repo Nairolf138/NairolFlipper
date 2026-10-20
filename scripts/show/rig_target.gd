@@ -1,0 +1,67 @@
+class_name RigTarget
+extends Area2D
+
+signal target_hit(
+	target: RigTarget,
+	family_id: StringName,
+	display_name: String,
+	score_value: int,
+	flow_value: int
+)
+
+@export var family_id: StringName = &"front_wash"
+@export var display_name: String = "WASH"
+@export var score_value: int = 250
+@export var flow_value: int = 35
+@export var target_color: Color = Color(1.0, 0.75, 0.3, 1.0)
+@export var rearm_delay: float = 0.3
+
+@onready var visual: Polygon2D = $Visual
+@onready var core: Polygon2D = $Core
+@onready var label: Label = $Label
+
+var lit: bool = false
+var _armed: bool = true
+var _flash_tween: Tween
+
+
+func _ready() -> void:
+	body_entered.connect(_on_body_entered)
+	label.text = display_name
+	_apply_visual_state()
+
+
+func reset() -> void:
+	lit = false
+	_armed = true
+	_apply_visual_state()
+
+
+func set_lit(value: bool) -> void:
+	lit = value
+	_apply_visual_state()
+
+
+func _apply_visual_state() -> void:
+	visual.color = Color(target_color.r, target_color.g, target_color.b, 0.95 if lit else 0.28)
+	core.color = target_color if lit else Color(0.08, 0.12, 0.18, 1.0)
+	label.modulate = Color.WHITE if lit else Color(0.68, 0.72, 0.8, 1.0)
+
+
+func _on_body_entered(body: Node) -> void:
+	if not _armed or not body.is_in_group("balls"):
+		return
+	_armed = false
+	set_lit(true)
+	target_hit.emit(self, family_id, display_name, score_value, flow_value)
+	_flash()
+	await get_tree().create_timer(rearm_delay).timeout
+	_armed = true
+
+
+func _flash() -> void:
+	if is_instance_valid(_flash_tween):
+		_flash_tween.kill()
+	core.modulate = Color(1.8, 1.8, 1.8, 1.0)
+	_flash_tween = create_tween()
+	_flash_tween.tween_property(core, "modulate", Color.WHITE, 0.16)

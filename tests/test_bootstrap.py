@@ -480,3 +480,35 @@ def test_session_lifecycle_blocks_phantom_balls_and_exposes_game_over():
     assert 'collision_shape.set_deferred("disabled", true)' in ball_text
     assert "reset_ball(body.spawn_position, false)" in main_text
 
+
+
+def test_table_2_greybox_adds_playfield_routes_and_rig_objective():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    main_text = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    rig_target = ROOT / "scripts" / "show" / "rig_target.gd"
+    lane_trigger = ROOT / "scripts" / "gameplay" / "lane_trigger.gd"
+    slingshot = ROOT / "scripts" / "gameplay" / "slingshot.gd"
+    guide_rail = ROOT / "scenes" / "gameplay" / "GuideRail.tscn"
+
+    for path in (rig_target, lane_trigger, slingshot, guide_rail):
+        assert path.is_file()
+    assert scene_text.count('parent="." instance=ExtResource("23_rig_target")') == 6
+    for node_name in (
+        "UniverseOrbit",
+        "LeftSlingshot",
+        "RightSlingshot",
+        "LeftOutlaneRail",
+        "RightOutlaneRail",
+        "LauncherDivider",
+        "RigProgressLabel",
+        "TableTitle",
+    ):
+        assert f'name="{node_name}"' in scene_text
+    assert 'groups=["rig_targets"]' in (ROOT / "scenes" / "gameplay" / "RigTarget.tscn").read_text(encoding="utf-8")
+    assert 'groups=["table_lanes"]' in (ROOT / "scenes" / "gameplay" / "LaneTrigger.tscn").read_text(encoding="utf-8")
+    assert 'groups=["slingshots"]' in (ROOT / "scenes" / "gameplay" / "Slingshot.tscn").read_text(encoding="utf-8")
+    assert "signal target_hit" in rig_target.read_text(encoding="utf-8")
+    assert "signal lane_completed" in lane_trigger.read_text(encoding="utf-8")
+    assert "apply_central_impulse" in slingshot.read_text(encoding="utf-8")
+    for handler in ("_on_rig_target_hit", "_on_lane_completed", "_on_slingshot_hit", "_update_rig_progress"):
+        assert f"func {handler}" in main_text

@@ -68,6 +68,15 @@ le coin inférieur gauche ont été observées. La régression est couverte par 
 test de trois drains complets, l'écran Game Over, l'absence de redémarrage au
 toucher, les collisions inactives et la récupération hors limites.
 
+### Table 2.0 — checklist tablette
+
+- vérifier que la bille circule entre les rails sans rester piégée ;
+- confirmer que les deux slingshots renvoient nettement la bille vers le haut ;
+- allumer les six cibles et voir le compteur passer de `RIG 0 / 6` à `RIG 6 / 6` ;
+- vérifier le message `RIG READY — HIT CONSOLE` et le bonus ;
+- traverser l'Universe Orbit et confirmer score, Flow et feedback ;
+- noter les tirs trop faciles, impossibles ou masqués par les doigts.
+
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 
 ## Instrumentation locale de playtest

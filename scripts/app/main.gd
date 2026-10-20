@@ -21,6 +21,7 @@ enum SessionState {
 @onready var balls: Array[Node] = [$BallOne, $BallTwo, $BallThree]
 @onready var drain: Area2D = $Drain
 @onready var status_label: Label = $StatusLabel
+@onready var rig_progress_label: Label = $RigProgressLabel
 @onready var playtest_recorder: PlaytestRecorderNode = $PlaytestRecorder
 @onready var cue_manager: CueManagerNode = $CueManager
 @onready var audio_service: AudioServiceNode = $AudioService
@@ -65,6 +66,12 @@ func _ready() -> void:
 	for scoop in get_tree().get_nodes_in_group("console_scoops"):
 		scoop.scoop_completed.connect(_on_scoop_completed)
 		scoop.cue_validated.connect(_on_cue_validated)
+	for target in get_tree().get_nodes_in_group("rig_targets"):
+		target.target_hit.connect(_on_rig_target_hit)
+	for lane in get_tree().get_nodes_in_group("table_lanes"):
+		lane.lane_completed.connect(_on_lane_completed)
+	for slingshot in get_tree().get_nodes_in_group("slingshots"):
+		slingshot.slingshot_hit.connect(_on_slingshot_hit)
 	score_manager.score_changed.connect(_on_score_changed)
 	flow_manager.flow_changed.connect(_on_flow_changed)
 	cue_manager.audio_changes_requested.connect(audio_service.apply_cue_changes)
@@ -224,6 +231,66 @@ func _on_ramp_completed(_ramp_id: StringName, score_value: int, flow_value: int)
 	audio_service.request_sfx(&"ramp")
 
 
+func _on_rig_target_hit(
+	target: Node,
+	family_id: StringName,
+	display_name: String,
+	score_value: int,
+	flow_value: int
+) -> void:
+	_add_score_with_flow(score_value)
+	flow_manager.add_flow(flow_value)
+	var activated := rig_model.activate_family(family_id)
+	if activated:
+		target.set_lit(true)
+		var active_count := _active_rig_family_count()
+		if active_count >= get_tree().get_nodes_in_group("rig_targets").size():
+			_add_score_with_flow(1500)
+			flow_manager.add_flow(200)
+			cue_manager.add_condition(&"rig_ready")
+			status_label.text = "RIG READY — HIT CONSOLE"
+			audio_service.request_sfx(&"cue")
+		else:
+			status_label.text = "%s ONLINE — %d / 6" % [display_name.to_upper(), active_count]
+	_update_rig_progress()
+
+
+func _on_lane_completed(
+	lane_id: StringName,
+	display_name: String,
+	score_value: int,
+	flow_value: int
+) -> void:
+	_add_score_with_flow(score_value)
+	flow_manager.add_flow(flow_value)
+	cue_manager.add_condition(lane_id)
+	status_label.text = "%s +%d" % [display_name.to_upper(), score_value]
+	audio_service.request_sfx(&"ramp")
+
+
+func _on_slingshot_hit(score_value: int, flow_value: int, _slingshot_name: StringName) -> void:
+	_add_score_with_flow(score_value)
+	flow_manager.add_flow(flow_value)
+	status_label.text = "SLINGSHOT"
+	audio_service.request_sfx(&"flipper")
+
+
+func _active_rig_family_count() -> int:
+	var count := 0
+	for target in get_tree().get_nodes_in_group("rig_targets"):
+		if rig_model.is_family_active(target.family_id):
+			count += 1
+	return count
+
+
+func _update_rig_progress() -> void:
+	var targets := get_tree().get_nodes_in_group("rig_targets")
+	var active_count := _active_rig_family_count()
+	rig_progress_label.text = "RIG %d / %d" % [active_count, targets.size()]
+	for target in targets:
+		target.set_lit(rig_model.is_family_active(target.family_id))
+
+
 func _on_scoop_completed(_scoop_id: StringName, score_value: int, flow_value: int) -> void:
 	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
@@ -334,6 +401,13 @@ func restart_game() -> void:
 	for scoop in get_tree().get_nodes_in_group("console_scoops"):
 		if scoop.has_method("reset"):
 			scoop.reset()
+	for target in get_tree().get_nodes_in_group("rig_targets"):
+		target.reset()
+	for lane in get_tree().get_nodes_in_group("table_lanes"):
+		lane.reset()
+	for slingshot in get_tree().get_nodes_in_group("slingshots"):
+		slingshot.reset()
+	_update_rig_progress()
 	_deactivate_all_balls()
 	balls[active_ball_index].reset_ball(balls[active_ball_index].spawn_position)
 	status_label.text = "BALL 1 / %d" % balls.size()

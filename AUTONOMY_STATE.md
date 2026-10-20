@@ -3,17 +3,17 @@
 ## Dernière exécution
 
 - Date : 2026-10-20
-- Cycle : T014 — cycle de partie robuste après le second playtest Android
-- Statut : 31 contrats Python et 6 groupes Godot préparés, build CI à valider
+- Cycle : T015 — première refonte greybox Table 2.0
+- Statut : 32 contrats Python et 7 groupes Godot préparés, build CI à valider
 
 ## Dépôt
 
-- Branche : `fix/three-ball-session-lifecycle`
-- Base : `6d015570` (fusion de la PR #16 sur `origin/main`)
-- Validation : tests de régression ajoutés ; exécution confiée à la CI GitHub
+- Branche : `feat/table-2-greybox`
+- Base : `a01dfe16` (fusion de la PR #17 sur `origin/main`)
+- Validation : contrats et tests comportementaux Table 2.0 ajoutés ; CI à exécuter
 - CI de la branche : à valider par la pull request
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` auditée : `6d015570`
+- Branche `main` auditée : `a01dfe16`
 
 ## État actuel
 
@@ -193,12 +193,12 @@ T012 complète le premier filet de livraison cross-platform :
 
 - `export_presets.cfg` avec presets Web, Android debug et Windows Desktop.
 - `.github/workflows/godot.yml` avec import propre, tests comportementaux, smoke et exports P0.
-- `tests/test_bootstrap.py` avec 31 contrats de structure.
-- `tests/godot/test_runner.gd` avec six groupes de validations comportementales.
+- `tests/test_bootstrap.py` avec 32 contrats de structure.
+- `tests/godot/test_runner.gd` avec sept groupes de validations comportementales.
 - `docs/BACKLOG.md` mis à jour.
 - Ce journal `AUTONOMY_STATE.md`.
 
 ## Prochaine exécution
 
-Faire valider le cycle strict de trois billes sur la même tablette, puis lancer
-la refonte greybox du plateau Table 2.0 avant la production artistique.
+Faire valider les trajectoires, les slingshots, l'Universe Orbit et la boucle
+RIG 0/6 sur la tablette, puis développer la boucle de spectacle et le Final Show.
