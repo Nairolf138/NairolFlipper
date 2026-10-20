@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3]
+[gd_scene load_steps=35 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Ball.tscn" id="1_ball"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Flipper.tscn" id="2_flipper"]
@@ -23,6 +23,10 @@
 [ext_resource type="Resource" path="res://data/ramps/WarmRamp.tres" id="20_warm_ramp"]
 [ext_resource type="Resource" path="res://data/ramps/ColdRamp.tres" id="21_cold_ramp"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/ConsoleScoop.tscn" id="22_console_scoop"]
+[ext_resource type="PackedScene" path="res://scenes/gameplay/RigTarget.tscn" id="23_rig_target"]
+[ext_resource type="PackedScene" path="res://scenes/gameplay/LaneTrigger.tscn" id="24_lane"]
+[ext_resource type="PackedScene" path="res://scenes/gameplay/Slingshot.tscn" id="25_slingshot"]
+[ext_resource type="PackedScene" path="res://scenes/gameplay/GuideRail.tscn" id="26_rail"]
 
 [sub_resource type="RectangleShape2D" id="LeftWallShape"]
 size = Vector2(40, 1600)
@@ -44,7 +48,45 @@ script = ExtResource("4_main")
 
 [node name="Playfield" type="Polygon2D" parent="."]
 polygon = PackedVector2Array(40, 40, 1040, 40, 1040, 1880, 40, 1880)
-color = Color(0.035, 0.055, 0.09, 1)
+color = Color(0.018, 0.026, 0.052, 1)
+
+[node name="StageDeck" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(76, 190, 1004, 190, 970, 1745, 110, 1745)
+color = Color(0.035, 0.06, 0.11, 1)
+
+[node name="WarmZone" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(85, 520, 515, 740, 515, 1510, 105, 1715)
+color = Color(0.18, 0.055, 0.055, 0.48)
+
+[node name="ColdZone" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(995, 520, 565, 740, 565, 1510, 975, 1715)
+color = Color(0.025, 0.11, 0.2, 0.55)
+
+[node name="CenterRunway" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(475, 260, 605, 260, 680, 1600, 400, 1600)
+color = Color(0.085, 0.045, 0.16, 0.55)
+
+[node name="TopPortal" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(120, 205, 960, 205, 900, 390, 180, 390)
+color = Color(0.07, 0.12, 0.22, 0.85)
+
+[node name="WarmAccent" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(95, 990, 455, 990, 435, 1004, 100, 1004)
+color = Color(1, 0.34, 0.12, 0.78)
+
+[node name="ColdAccent" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(625, 990, 985, 990, 980, 1004, 645, 1004)
+color = Color(0.1, 0.75, 1, 0.78)
+
+[node name="TableTitle" type="Label" parent="."]
+offset_left = 300.0
+offset_top = 198.0
+offset_right = 780.0
+offset_bottom = 246.0
+theme_override_colors/font_color = Color(0.75, 0.84, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "TABLE 2.0  //  BUILD THE LIVE RIG"
+horizontal_alignment = 1
 
 [node name="ScoreManager" type="Node" parent="."]
 script = ExtResource("5_score")
@@ -83,6 +125,16 @@ offset_bottom = 140.0
 theme_override_colors/font_color = Color(0.95, 0.45, 0.9, 1)
 theme_override_font_sizes/font_size = 30
 text = "FLOW 0000  x1"
+
+[node name="RigProgressLabel" type="Label" parent="."]
+offset_left = 430.0
+offset_top = 70.0
+offset_right = 650.0
+offset_bottom = 140.0
+theme_override_colors/font_color = Color(0.36, 1, 0.68, 1)
+theme_override_font_sizes/font_size = 28
+text = "RIG 0 / 6"
+horizontal_alignment = 1
 
 [node name="StatusLabel" type="Label" parent="."]
 offset_left = 60.0
@@ -127,18 +179,113 @@ shape = SubResource("LauncherLaneShape")
 
 [node name="LauncherGuide" type="Polygon2D" parent="LauncherLane"]
 polygon = PackedVector2Array(-60, -350, 60, -350, 60, 350, -60, 350)
-color = Color(0.12, 0.2, 0.3, 1)
+color = Color(0.055, 0.18, 0.3, 1)
+
+[node name="UpperLeftGuide" parent="." instance=ExtResource("26_rail")]
+position = Vector2(180, 430)
+rotation = -0.38
+scale = Vector2(1.25, 1)
+modulate = Color(1, 0.42, 0.2, 1)
+
+[node name="UpperRightGuide" parent="." instance=ExtResource("26_rail")]
+position = Vector2(900, 430)
+rotation = 0.38
+scale = Vector2(1.25, 1)
+
+[node name="LeftOutlaneRail" parent="." instance=ExtResource("26_rail")]
+position = Vector2(145, 1490)
+rotation = 1.05
+scale = Vector2(1.45, 1)
+modulate = Color(1, 0.28, 0.46, 1)
+
+[node name="LeftReturnRail" parent="." instance=ExtResource("26_rail")]
+position = Vector2(340, 1510)
+rotation = 1.22
+scale = Vector2(1.1, 1)
+modulate = Color(1, 0.48, 0.22, 1)
+
+[node name="RightReturnRail" parent="." instance=ExtResource("26_rail")]
+position = Vector2(740, 1510)
+rotation = -1.22
+scale = Vector2(1.1, 1)
+
+[node name="RightOutlaneRail" parent="." instance=ExtResource("26_rail")]
+position = Vector2(720, 1490)
+rotation = -1.05
+scale = Vector2(0.85, 1)
+modulate = Color(0.2, 0.7, 1, 1)
+
+[node name="LauncherDivider" parent="." instance=ExtResource("26_rail")]
+position = Vector2(850, 1475)
+rotation = 1.5708
+scale = Vector2(1.8, 1)
+modulate = Color(0.2, 0.62, 1, 1)
+
+[node name="UniverseOrbit" parent="." instance=ExtResource("24_lane")]
+position = Vector2(540, 310)
+lane_id = &"universe_orbit"
+display_name = "UNIVERSE ORBIT"
+score_value = 600
+flow_value = 90
+lane_color = Color(0.52, 0.4, 1, 1)
 
 [node name="WarmRamp" parent="." instance=ExtResource("19_ramp")]
-position = Vector2(265, 1050)
+position = Vector2(250, 1080)
 definition = ExtResource("20_warm_ramp")
 
 [node name="ColdRamp" parent="." instance=ExtResource("19_ramp")]
-position = Vector2(815, 1050)
+position = Vector2(830, 1080)
 definition = ExtResource("21_cold_ramp")
 
 [node name="ConsoleScoop" parent="." instance=ExtResource("22_console_scoop")]
-position = Vector2(540, 1300)
+position = Vector2(540, 1285)
+
+[node name="FrontWashTarget" parent="." instance=ExtResource("23_rig_target")]
+position = Vector2(135, 840)
+family_id = &"front_wash"
+display_name = "FACE"
+target_color = Color(1, 0.78, 0.42, 1)
+
+[node name="BackWashTarget" parent="." instance=ExtResource("23_rig_target")]
+position = Vector2(295, 840)
+family_id = &"back_wash"
+display_name = "WASH"
+target_color = Color(0.42, 0.68, 1, 1)
+
+[node name="BeamTarget" parent="." instance=ExtResource("23_rig_target")]
+position = Vector2(455, 840)
+family_id = &"beam"
+display_name = "BEAM"
+target_color = Color(0.72, 0.42, 1, 1)
+
+[node name="PixelTarget" parent="." instance=ExtResource("23_rig_target")]
+position = Vector2(625, 840)
+family_id = &"pixel"
+display_name = "PIXEL"
+target_color = Color(0.3, 1, 0.72, 1)
+
+[node name="BlindersTarget" parent="." instance=ExtResource("23_rig_target")]
+position = Vector2(785, 840)
+family_id = &"blinders"
+display_name = "BLIND"
+target_color = Color(1, 0.34, 0.28, 1)
+
+[node name="PracticalTarget" parent="." instance=ExtResource("23_rig_target")]
+position = Vector2(945, 840)
+family_id = &"practical"
+display_name = "PRACT"
+target_color = Color(1, 0.95, 0.72, 1)
+
+[node name="LeftSlingshot" parent="." instance=ExtResource("25_slingshot")]
+position = Vector2(275, 1450)
+kick_direction = Vector2(-0.62, -1)
+flash_color = Color(1, 0.34, 0.22, 1)
+
+[node name="RightSlingshot" parent="." instance=ExtResource("25_slingshot")]
+position = Vector2(805, 1450)
+scale = Vector2(-1, 1)
+kick_direction = Vector2(0.62, -1)
+flash_color = Color(0.2, 0.72, 1, 1)
 
 [node name="BallOne" parent="." instance=ExtResource("1_ball")]
 
@@ -264,7 +411,7 @@ text = "QUITTER"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.72, 0.76, 0.84, 1)
 theme_override_font_sizes/font_size = 22
-text = "Touchez le haut pour lancer\nTouchez le bas gauche ou droit pour jouer"
+text = "Allumez les 6 familles du Rig puis visez la Console\nHaut : lancer • Bas gauche/droite : flippers"
 horizontal_alignment = 1
 
 [node name="GameOverOverlay" type="ColorRect" parent="Interface"]

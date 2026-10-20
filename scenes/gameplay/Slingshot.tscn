@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/gameplay/slingshot.gd" id="1_slingshot"]
+
+[sub_resource type="RectangleShape2D" id="SlingshotShape"]
+size = Vector2(190, 100)
+
+[node name="Slingshot" type="Area2D" groups=["slingshots"]]
+script = ExtResource("1_slingshot")
+collision_layer = 0
+collision_mask = 1
+monitoring = true
+
+[node name="Visual" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-95, 50, -62, -50, 95, 20, 72, 50)
+color = Color(0.95, 0.2, 0.55, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("SlingshotShape")

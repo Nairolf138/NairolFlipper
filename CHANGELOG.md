@@ -12,6 +12,9 @@
 - Import propre et détection explicite des erreurs Godot dans la CI.
 - Premiers SFX originaux de playtest pour les actions principales, lus sur le
   bus SFX avec polyphonie.
+- Plateau Table 2.0 vectoriel avec six cibles Rig, Universe Orbit, slingshots,
+  rails physiques, outlanes et objectif de complétion visible.
+- Bonus de Rig complet et guidage explicite vers la Console.
 
 ### Fixed
 

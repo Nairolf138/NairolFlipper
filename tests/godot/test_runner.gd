@@ -18,12 +18,13 @@ func _run() -> void:
 	await _test_physics_drain_lifecycle()
 	await _test_android_playtest_regressions()
 	await _test_three_ball_game_over_and_recovery()
+	await _test_table_2_objectives_and_routes()
 	# Give the audio server and deferred frees time to release stream references.
 	await process_frame
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 6 passed")
+		print("Godot behavioral tests: 7 passed")
 		quit(0)
 		return
 
@@ -285,6 +286,55 @@ func _test_three_ball_game_over_and_recovery() -> void:
 	_expect(recovered_ball.freeze and recovered_ball.launch_ready, "Out-of-bounds ball returns ready to the launcher")
 	_expect_equal(recovered_ball.global_position, recovered_ball.spawn_position, "Recovered ball returns to the configured launcher")
 	_expect(main.status_label.text.begins_with("BALL RECOVERED"), "Recovery explains how to relaunch")
+
+	main.free()
+	await process_frame
+
+
+func _test_table_2_objectives_and_routes() -> void:
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Table 2.0 main scene loads")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	root.add_child(main)
+	await process_frame
+	await physics_frame
+	main.start_game()
+	await process_frame
+
+	var rig_targets := main.get_tree().get_nodes_in_group("rig_targets")
+	_expect_equal(rig_targets.size(), 6, "Table 2.0 exposes six readable Rig targets")
+	_expect(main.get_node("UniverseOrbit") != null, "Table 2.0 exposes the Universe Orbit")
+	_expect(main.get_node("LeftSlingshot") != null and main.get_node("RightSlingshot") != null, "Table 2.0 exposes two active slingshots")
+	_expect(main.get_node("LeftOutlaneRail") is StaticBody2D, "Table 2.0 left outlane has physical guidance")
+	_expect(main.get_node("LauncherDivider") is StaticBody2D, "Table 2.0 launcher is physically separated")
+
+	var starting_score: int = main.score_manager.score
+	for target in rig_targets:
+		main._on_rig_target_hit(target, target.family_id, target.display_name, target.score_value, target.flow_value)
+	_expect_equal(main._active_rig_family_count(), 6, "Every Rig family can be activated from the table")
+	_expect_equal(main.rig_progress_label.text, "RIG 6 / 6", "Rig objective reports complete progress")
+	_expect_equal(main.status_label.text, "RIG READY — HIT CONSOLE", "Completing the Rig reveals the next shot")
+	_expect(main.score_manager.score > starting_score + 1500, "Rig targets and completion award score")
+	for target in rig_targets:
+		_expect(target.lit, "Activated Rig targets remain visibly lit")
+
+	var route_score: int = main.score_manager.score
+	main._on_lane_completed(&"universe_orbit", "UNIVERSE ORBIT", 600, 90)
+	_expect(main.score_manager.score > route_score, "Universe Orbit awards score")
+	_expect(main.status_label.text.begins_with("UNIVERSE ORBIT"), "Universe Orbit reports readable feedback")
+
+	var sling_score: int = main.score_manager.score
+	main._on_slingshot_hit(75, 15, &"LeftSlingshot")
+	_expect(main.score_manager.score > sling_score, "Slingshots contribute to the active play loop")
+
+	main.restart_game()
+	await process_frame
+	_expect_equal(main.rig_progress_label.text, "RIG 0 / 6", "Restart resets Rig progress")
+	for target in rig_targets:
+		_expect(not target.lit, "Restart clears every Rig target light")
 
 	main.free()
 	await process_frame
