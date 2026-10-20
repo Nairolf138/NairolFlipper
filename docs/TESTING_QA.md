@@ -87,6 +87,16 @@ toucher, les collisions inactives et la récupération hors limites.
 - vérifier que le nombre de billes numérotées n'a pas diminué pendant le multiball ;
 - confirmer que la Console ne relance pas un second Final Show dans la même partie.
 
+### Identité audiovisuelle — checklist tablette
+
+- vérifier qu'une atmosphère musicale démarre après `JOUER`, jamais avant ;
+- confirmer que de nouvelles couches entrent vers Rig 2/6, 3/6, 4/6 et 5/6 ;
+- vérifier que chaque cible allume une fixture durable sur le truss supérieur ;
+- confirmer que Flow anime davantage le runway sans masquer la bille ;
+- vérifier que Final Show ajoute lead, impact et chase de faisceaux ;
+- confirmer que Blackout coupe simultanément musique et faisceaux ;
+- signaler toute saturation, craquement, ralentissement ou musique trop forte.
+
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 
 ## Instrumentation locale de playtest

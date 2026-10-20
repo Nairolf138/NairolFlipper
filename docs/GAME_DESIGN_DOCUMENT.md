@@ -74,7 +74,7 @@ est doublé en plus du multiplicateur de Flow, et le mode se termine lorsqu'une
 seule bille reste ou après le chrono configuré. Ces billes bonus ne consomment
 jamais les trois billes numérotées de la partie.
 
-Break, lock physique, musique full stems et Encore restent des extensions
+Break, lock physique, Sync Bonus et Encore restent des extensions
 ultérieures ; leur absence ne doit pas bloquer cette boucle courte.
 
 ## Encore

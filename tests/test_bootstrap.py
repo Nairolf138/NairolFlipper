@@ -534,3 +534,37 @@ def test_showflow_final_show_multiball_and_blackout_are_explicit():
     assert "final_show_score_multiplier" in main_text
     assert "_test_show_flow_state_machine" in runner_text
     assert "_test_final_show_multiball_and_blackout" in runner_text
+
+
+def test_stage_identity_uses_original_synchronized_music_stems():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    main_text = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    audio_text = (ROOT / "scripts" / "audio" / "audio_service.gd").read_text(encoding="utf-8")
+    stem_set = ROOT / "scripts" / "audio" / "audio_stem_set.gd"
+    stage_visuals = ROOT / "scripts" / "show" / "stage_visual_controller.gd"
+    stage_loop = ROOT / "data" / "audio" / "StageLoop.tres"
+    runner_text = (ROOT / "tests" / "godot" / "test_runner.gd").read_text(encoding="utf-8")
+
+    assert stem_set.is_file()
+    assert stage_visuals.is_file()
+    assert stage_loop.is_file()
+    assert 'name="StageVisuals"' in scene_text
+    assert 'stem_set = ExtResource("29_stage_loop")' in scene_text
+    assert "func set_stem_mix" in audio_text
+    assert "AudioStreamPlayer.new()" in audio_text
+    assert "func _update_stage_identity" in main_text
+    assert "stage_visuals.set_show_state" in main_text
+    assert "_test_stage_identity_and_music_stems" in runner_text
+
+    music_dir = ROOT / "assets" / "audio" / "music"
+    for filename in (
+        "atmosphere.ogg",
+        "piano.ogg",
+        "kick.ogg",
+        "percussion.ogg",
+        "bass.ogg",
+        "arp.ogg",
+        "lead.ogg",
+        "impact.ogg",
+    ):
+        assert (music_dir / filename).is_file()

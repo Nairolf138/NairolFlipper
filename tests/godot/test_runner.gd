@@ -22,12 +22,13 @@ func _run() -> void:
 	await _test_three_ball_game_over_and_recovery()
 	await _test_table_2_objectives_and_routes()
 	await _test_final_show_multiball_and_blackout()
+	await _test_stage_identity_and_music_stems()
 	# Give the audio server and deferred frees time to release stream references.
 	await process_frame
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 9 passed")
+		print("Godot behavioral tests: 10 passed")
 		quit(0)
 		return
 
@@ -414,6 +415,47 @@ func _test_final_show_multiball_and_blackout() -> void:
 
 	for frame in 12:
 		await physics_frame
+	main.free()
+	await process_frame
+
+
+func _test_stage_identity_and_music_stems() -> void:
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Main scene loads for stage identity")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	root.add_child(main)
+	await process_frame
+	main.start_game()
+	_expect(main.audio_service.transport_playing, "Starting a game starts the music transport")
+	_expect_equal(main.audio_service.stem_set.streams().size(), 8, "The stage loop exposes eight synchronized stems")
+	_expect(main.audio_service.stem_levels[&"atmosphere"] > 0.0, "Preset opens with atmosphere")
+	_expect_equal(main.stage_visuals.show_state, ShowFlowManagerNode.State.PRESET, "Stage visuals follow Preset")
+
+	main._launch_or_restart()
+	var rig_targets := main.get_tree().get_nodes_in_group("rig_targets")
+	for index in 5:
+		var target: Node = rig_targets[index]
+		main._on_rig_target_hit(target, target.family_id, target.display_name, target.score_value, target.flow_value)
+	_expect(main.audio_service.stem_levels[&"kick"] > 0.0, "Two Rig families introduce the kick")
+	_expect(main.audio_service.stem_levels[&"bass"] > 0.0, "Three Rig families introduce the bass")
+	_expect(main.audio_service.stem_levels[&"percussion"] > 0.0, "Four Rig families introduce percussion")
+	_expect(main.audio_service.stem_levels[&"arp"] > 0.0, "Five Rig families introduce the arpeggiator")
+	_expect_equal(main.stage_visuals.rig_count, 5, "Five lit fixtures are reflected by the stage rig")
+
+	var final_target: Node = rig_targets[5]
+	main._on_rig_target_hit(final_target, final_target.family_id, final_target.display_name, final_target.score_value, final_target.flow_value)
+	_expect_equal(main.stage_visuals.show_state, ShowFlowManagerNode.State.FLOW, "Completed Rig moves the visual stage to Flow")
+	_expect(main.show_flow.start_final_show(), "Armed Showflow can enter Final Show for presentation testing")
+	_expect(main.audio_service.stem_levels[&"lead"] > 0.0, "Final Show introduces the lead")
+	_expect(main.audio_service.stem_levels[&"impact"] > 0.0, "Final Show introduces the impact stem")
+	_expect_equal(main.stage_visuals.show_state, ShowFlowManagerNode.State.FINAL_SHOW, "Stage visuals follow Final Show")
+
+	main.show_flow.start_blackout()
+	_expect_equal(main.audio_service.stem_levels[&"atmosphere"], 0.0, "Blackout mutes the stem mix")
+	_expect_equal(main.stage_visuals.show_state, ShowFlowManagerNode.State.BLACKOUT, "Stage visuals follow Blackout")
 	main.free()
 	await process_frame
 

@@ -44,3 +44,11 @@ Sans serif lisible, chiffres distincts, style technique original, licence libre.
 ## Logo
 
 Casse canonique : **NairolFlipper**. Peut évoquer trajectoire de bille, faisceau, fader, cue ou onde musicale.
+
+## Première implémentation scénique
+
+Le plateau affiche un truss de six fixtures, des faisceaux géométriques, une
+grille technique et un runway animé. Chaque famille active durablement sa
+fixture ; Flow augmente l'énergie et Final Show lance une chase plus rapide.
+Blackout coupe les faisceaux. Le renderer reste vectoriel, sans texture ni shader
+plein écran, pour préserver la lisibilité et les performances mobiles.

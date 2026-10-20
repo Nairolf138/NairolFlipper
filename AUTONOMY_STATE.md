@@ -3,17 +3,17 @@
 ## Dernière exécution
 
 - Date : 2026-10-20
-- Cycle : T036 + T051–T053 — boucle Showflow et premier Final Show
-- Statut : 33 contrats Python et 9 groupes Godot préparés, build CI à valider
+- Cycle : T043 — identité scénique et premier set de stems
+- Statut : 34 contrats Python et 10 groupes Godot préparés, build CI à valider
 
 ## Dépôt
 
-- Branche : `feat/showflow-final-show`
-- Base : `52b9b577` (fusion de la PR #18 sur `origin/main`)
-- Validation : tests d'états, multiball, scoring x2, Blackout et vies ajoutés ; CI à exécuter
+- Branche : `feat/stage-identity-audio`
+- Base : `a3d4258` (fusion de la PR #19 sur `origin/main`)
+- Validation : stems, mix Showflow, renderer scénique et Blackout ajoutés ; CI à exécuter
 - CI de la branche : à valider par la pull request
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` auditée : `52b9b577`
+- Branche `main` auditée : `a3d4258`
 
 ## État actuel
 
@@ -193,13 +193,13 @@ T012 complète le premier filet de livraison cross-platform :
 
 - `export_presets.cfg` avec presets Web, Android debug et Windows Desktop.
 - `.github/workflows/godot.yml` avec import propre, tests comportementaux, smoke et exports P0.
-- `tests/test_bootstrap.py` avec 33 contrats de structure.
-- `tests/godot/test_runner.gd` avec neuf groupes de validations comportementales.
+- `tests/test_bootstrap.py` avec 34 contrats de structure.
+- `tests/godot/test_runner.gd` avec dix groupes de validations comportementales.
 - `docs/BACKLOG.md` mis à jour.
 - Ce journal `AUTONOMY_STATE.md`.
 
 ## Prochaine exécution
 
-Faire valider sur tablette le passage Preset → Build → Flow, le lancement des
-trois billes du Final Show, le scoring x2 et la reprise après Blackout. Ensuite,
-engager l'identité visuelle/sonore et les stems musicaux.
+Faire valider sur tablette la lisibilité des faisceaux, l'équilibre des huit
+stems et les performances pendant le Final Show. Ensuite, implémenter Sync Bonus
+et les réglages de volume accessibles depuis le menu.

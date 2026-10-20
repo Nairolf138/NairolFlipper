@@ -45,3 +45,10 @@ Ne pas dépendre d'audio procédural ou DSP lourd. Fallback pour tout effet nati
 ## Formats
 
 OGG Vorbis préféré lorsque pertinent. Musique finale originale et droits documentés.
+
+## Première implémentation
+
+Le set `StageLoop` superpose huit fichiers OGG originaux de même durée :
+Atmosphere, Piano, Kick, Percussion, Bass, Arp, Lead et Impact. Le transport les
+démarre au même point ; seuls leurs niveaux changent avec Preset, Build, Flow,
+Final Show et Blackout. Les placeholders sont régénérables localement et CC0.

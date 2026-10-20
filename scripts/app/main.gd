@@ -6,6 +6,7 @@ const FlowManagerNode = preload("res://scripts/show/flow_manager.gd")
 const PlaytestRecorderNode = preload("res://scripts/app/playtest_recorder.gd")
 const RigModelNode = preload("res://scripts/show/rig_model.gd")
 const ShowFlowManagerNode = preload("res://scripts/show/show_flow_manager.gd")
+const StageVisualControllerNode = preload("res://scripts/show/stage_visual_controller.gd")
 
 enum SessionState {
 	MENU,
@@ -24,6 +25,7 @@ enum SessionState {
 @onready var status_label: Label = $StatusLabel
 @onready var rig_progress_label: Label = $RigProgressLabel
 @onready var show_state_label: Label = $ShowStateLabel
+@onready var stage_visuals: StageVisualControllerNode = $StageVisuals
 @onready var playtest_recorder: PlaytestRecorderNode = $PlaytestRecorder
 @onready var cue_manager: CueManagerNode = $CueManager
 @onready var audio_service: AudioServiceNode = $AudioService
@@ -160,6 +162,7 @@ func _show_start_menu() -> void:
 	show_generation += 1
 	multiball_active = false
 	show_flow.enter_standby()
+	audio_service.stop_transport(true)
 	start_overlay.show()
 	game_over_overlay.hide()
 	blackout_overlay.hide()
@@ -175,6 +178,7 @@ func _show_game_over() -> void:
 	show_generation += 1
 	multiball_active = false
 	show_flow.enter_standby()
+	audio_service.stop_transport(true)
 	gameplay_active = false
 	stalled_ball_time = 0.0
 	_release_all_touches()
@@ -248,13 +252,15 @@ func _on_bumper_hit(points: int, _bumper_name: StringName) -> void:
 	cue_manager.add_condition(&"bumper_hit")
 	playtest_recorder.record_bumper_hit(points)
 	audio_service.request_sfx(StringName(String(_bumper_name).to_snake_case()))
+	stage_visuals.trigger_hit(Color("ff2bd6"))
 
 
-func _on_ramp_completed(_ramp_id: StringName, score_value: int, flow_value: int) -> void:
+func _on_ramp_completed(ramp_id: StringName, score_value: int, flow_value: int) -> void:
 	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
 	status_label.text = "RAMP HIT"
 	audio_service.request_sfx(&"ramp")
+	stage_visuals.trigger_hit(Color("ffb14a") if ramp_id == &"warm_ramp" else Color("00e5ff"))
 
 
 func _on_rig_target_hit(
@@ -269,6 +275,7 @@ func _on_rig_target_hit(
 	var activated := rig_model.activate_family(family_id)
 	if activated:
 		target.set_lit(true)
+		stage_visuals.trigger_hit(target.target_color)
 		var active_count := _active_rig_family_count()
 		if active_count >= get_tree().get_nodes_in_group("rig_targets").size():
 			_add_score_with_flow(1500)
@@ -293,6 +300,7 @@ func _on_lane_completed(
 	cue_manager.add_condition(lane_id)
 	status_label.text = "%s +%d" % [display_name.to_upper(), score_value]
 	audio_service.request_sfx(&"ramp")
+	stage_visuals.trigger_hit(Color("7c4dff"))
 
 
 func _on_slingshot_hit(score_value: int, flow_value: int, _slingshot_name: StringName) -> void:
@@ -300,6 +308,7 @@ func _on_slingshot_hit(score_value: int, flow_value: int, _slingshot_name: Strin
 	flow_manager.add_flow(flow_value)
 	status_label.text = "SLINGSHOT"
 	audio_service.request_sfx(&"flipper")
+	stage_visuals.trigger_hit(Color("ff2bd6"))
 
 
 func _active_rig_family_count() -> int:
@@ -314,8 +323,10 @@ func _update_rig_progress() -> void:
 	var targets := get_tree().get_nodes_in_group("rig_targets")
 	var active_count := _active_rig_family_count()
 	rig_progress_label.text = "RIG %d / %d" % [active_count, targets.size()]
+	stage_visuals.set_rig_progress(active_count)
 	for target in targets:
 		target.set_lit(rig_model.is_family_active(target.family_id))
+	_update_stage_identity()
 
 
 func _on_scoop_completed(_scoop_id: StringName, score_value: int, flow_value: int) -> void:
@@ -326,6 +337,7 @@ func _on_scoop_completed(_scoop_id: StringName, score_value: int, flow_value: in
 	else:
 		status_label.text = "CUE VALIDATED"
 	audio_service.request_sfx(&"scoop")
+	stage_visuals.trigger_hit(Color("eaf6ff"))
 
 
 func _on_cue_validated(cue_id: StringName) -> void:
@@ -345,8 +357,57 @@ func _add_score_with_flow(points: int) -> void:
 	score_manager.add_points(points * flow_manager.multiplier * show_multiplier)
 
 
-func _on_show_state_changed(_state: int, display_name: String) -> void:
+func _on_show_state_changed(state: int, display_name: String) -> void:
 	show_state_label.text = "SHOW  %s" % display_name
+	stage_visuals.set_show_state(state)
+	_update_stage_identity()
+
+
+func _update_stage_identity() -> void:
+	if not is_node_ready() or not gameplay_active:
+		return
+	var levels: Dictionary = {
+		&"atmosphere": 0.0,
+		&"piano": 0.0,
+		&"kick": 0.0,
+		&"percussion": 0.0,
+		&"bass": 0.0,
+		&"arp": 0.0,
+		&"lead": 0.0,
+		&"impact": 0.0,
+	}
+	var active_count := _active_rig_family_count()
+	match show_flow.state:
+		ShowFlowManagerNode.State.PRESET:
+			levels[&"atmosphere"] = 0.5
+			levels[&"piano"] = 0.16
+		ShowFlowManagerNode.State.BUILD:
+			levels[&"atmosphere"] = 0.58
+			levels[&"piano"] = 0.34
+			levels[&"kick"] = 0.42 if active_count >= 2 else 0.0
+			levels[&"bass"] = 0.38 if active_count >= 3 else 0.0
+			levels[&"percussion"] = 0.34 if active_count >= 4 else 0.0
+			levels[&"arp"] = 0.32 if active_count >= 5 else 0.0
+		ShowFlowManagerNode.State.FLOW:
+			levels[&"atmosphere"] = 0.62
+			levels[&"piano"] = 0.42
+			levels[&"kick"] = 0.5
+			levels[&"percussion"] = 0.42
+			levels[&"bass"] = 0.45
+			levels[&"arp"] = 0.38
+			levels[&"lead"] = 0.16 if flow_manager.multiplier >= 3 else 0.0
+		ShowFlowManagerNode.State.FINAL_SHOW:
+			levels = {
+				&"atmosphere": 0.68,
+				&"piano": 0.5,
+				&"kick": 0.65,
+				&"percussion": 0.58,
+				&"bass": 0.58,
+				&"arp": 0.52,
+				&"lead": 0.46,
+				&"impact": 0.65,
+			}
+	audio_service.set_stem_mix(levels)
 
 
 func _start_final_show() -> void:
@@ -445,6 +506,8 @@ func _on_score_changed(new_score: int) -> void:
 
 func _on_flow_changed(flow_points: int, multiplier: int) -> void:
 	flow_label.text = "FLOW %04d  x%d" % [flow_points, multiplier]
+	stage_visuals.set_flow(flow_points)
+	_update_stage_identity()
 
 
 func _on_drain_body_entered(body: Node) -> void:
@@ -525,8 +588,8 @@ func restart_game() -> void:
 	flow_manager.reset_flow()
 	cue_manager.reset_state()
 	rig_model.reset_state()
-	show_flow.reset_show()
 	audio_service.reset_state()
+	show_flow.reset_show()
 	for ramp in get_tree().get_nodes_in_group("show_ramps"):
 		if ramp.has_method("reset"):
 			ramp.reset()
@@ -543,6 +606,9 @@ func restart_game() -> void:
 	_deactivate_all_balls()
 	balls[active_ball_index].reset_ball(balls[active_ball_index].spawn_position)
 	status_label.text = "BALL 1 / %d" % balls.size()
+	if gameplay_active:
+		audio_service.start_transport()
+		_update_stage_identity()
 
 
 func _recover_active_ball(message: String) -> void:
