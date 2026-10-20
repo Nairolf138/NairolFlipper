@@ -210,9 +210,9 @@ rotation = -1.22
 scale = Vector2(1.1, 1)
 
 [node name="RightOutlaneRail" parent="." instance=ExtResource("26_rail")]
-position = Vector2(805, 1490)
+position = Vector2(820, 1490)
 rotation = -1.05
-scale = Vector2(1.45, 1)
+scale = Vector2(0.85, 1)
 modulate = Color(0.2, 0.7, 1, 1)
 
 [node name="LauncherDivider" parent="." instance=ExtResource("26_rail")]
