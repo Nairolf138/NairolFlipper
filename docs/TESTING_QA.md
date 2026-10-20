@@ -60,6 +60,14 @@ orientation paysage imposée autour d'un canvas portrait, flipper droit inversé
 lancement vertical ramenant la bille au drain, rebond trop élevé, absence de menu,
 de Reset/Quit et de retour sonore.
 
+### Android — 20 octobre 2026
+
+Second test réel : orientation, flippers, lancement, sons, score et menu validés.
+Après les trois billes, une reprise implicite et une bille non récupérable dans
+le coin inférieur gauche ont été observées. La régression est couverte par un
+test de trois drains complets, l'écran Game Over, l'absence de redémarrage au
+toucher, les collisions inactives et la récupération hors limites.
+
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 
 ## Instrumentation locale de playtest

@@ -10,6 +10,8 @@ signal ball_drained(ball: RigidBody2D)
 @export var tuning: PhysicsTuningResource
 @export var ball_save_duration: float = 4.0
 
+@onready var collision_shape: CollisionShape2D = $CollisionShape2D
+
 var launch_ready: bool = true
 var input_enabled: bool = true
 var drain_locked: bool = false
@@ -45,7 +47,7 @@ func _apply_tuning() -> void:
 	physics_material_override = material
 
 
-func reset_ball(target_position: Vector2) -> void:
+func reset_ball(target_position: Vector2, reset_ball_save: bool = true) -> void:
 	global_position = target_position
 	linear_velocity = Vector2.ZERO
 	angular_velocity = 0.0
@@ -53,8 +55,21 @@ func reset_ball(target_position: Vector2) -> void:
 	launch_ready = true
 	drain_locked = false
 	ball_save_remaining = 0.0
-	ball_save_used = false
+	if reset_ball_save:
+		ball_save_used = false
 	visible = true
+	collision_shape.set_deferred("disabled", false)
+
+
+func deactivate_ball() -> void:
+	freeze = true
+	linear_velocity = Vector2.ZERO
+	angular_velocity = 0.0
+	launch_ready = false
+	drain_locked = true
+	ball_save_remaining = 0.0
+	visible = false
+	collision_shape.set_deferred("disabled", true)
 
 
 func mark_drained() -> void:
@@ -64,17 +79,17 @@ func mark_drained() -> void:
 	freeze = true
 	linear_velocity = Vector2.ZERO
 	visible = false
+	collision_shape.set_deferred("disabled", true)
 	ball_drained.emit(self)
 
 
 func launch_ball() -> bool:
-	if not launch_ready:
+	if not launch_ready or not visible or drain_locked:
 		return false
 
 	launch_ready = false
 	freeze = false
-	ball_save_remaining = ball_save_duration
-	ball_save_used = false
+	ball_save_remaining = ball_save_duration if not ball_save_used else 0.0
 	var direction := launch_direction.normalized()
 	if direction == Vector2.ZERO:
 		direction = Vector2.UP

@@ -6,6 +6,14 @@ const FlowManagerNode = preload("res://scripts/show/flow_manager.gd")
 const PlaytestRecorderNode = preload("res://scripts/app/playtest_recorder.gd")
 const RigModelNode = preload("res://scripts/show/rig_model.gd")
 
+enum SessionState {
+	MENU,
+	READY,
+	PLAYING,
+	RESPAWNING,
+	GAME_OVER,
+}
+
 @onready var score_manager = $ScoreManager
 @onready var flow_manager: FlowManagerNode = $FlowManager
 @onready var score_label: Label = $ScoreLabel
@@ -23,14 +31,24 @@ const RigModelNode = preload("res://scripts/show/rig_model.gd")
 @onready var menu_quit_button: Button = $Interface/StartOverlay/Menu/QuitButton
 @onready var reset_button: Button = $Interface/GameControls/ResetButton
 @onready var game_quit_button: Button = $Interface/GameControls/QuitButton
+@onready var game_over_overlay: Control = $Interface/GameOverOverlay
+@onready var final_score_label: Label = $Interface/GameOverOverlay/Menu/FinalScoreLabel
+@onready var replay_button: Button = $Interface/GameOverOverlay/Menu/ReplayButton
+@onready var game_over_menu_button: Button = $Interface/GameOverOverlay/Menu/MenuButton
 
 @export var respawn_delay: float = 1.0
+@export var ball_recovery_delay: float = 5.0
+@export var stuck_speed_threshold: float = 18.0
+@export var recovery_margin: float = 100.0
 
 var remaining_balls: int = 3
 var active_ball_index: int = 0
 var game_over: bool = false
 var gameplay_active: bool = false
+var session_state: int = SessionState.MENU
 var active_touches: Dictionary[int, StringName] = {}
+var stalled_ball_time: float = 0.0
+var session_generation: int = 0
 
 
 func _ready() -> void:
@@ -55,8 +73,30 @@ func _ready() -> void:
 	menu_quit_button.pressed.connect(_on_quit_pressed)
 	reset_button.pressed.connect(_on_reset_pressed)
 	game_quit_button.pressed.connect(_on_quit_pressed)
+	replay_button.pressed.connect(start_game)
+	game_over_menu_button.pressed.connect(_show_start_menu)
 	restart_game()
 	_show_start_menu()
+
+
+func _physics_process(delta: float) -> void:
+	if session_state != SessionState.PLAYING:
+		stalled_ball_time = 0.0
+		return
+	if active_ball_index < 0 or active_ball_index >= balls.size():
+		return
+	var ball: RigidBody2D = balls[active_ball_index]
+	if ball.freeze or ball.drain_locked:
+		return
+	if _is_ball_outside_playfield(ball.global_position):
+		_recover_active_ball("BALL RECOVERED — TOUCH TOP")
+		return
+	if ball.linear_velocity.length() <= stuck_speed_threshold:
+		stalled_ball_time += delta
+	else:
+		stalled_ball_time = 0.0
+	if stalled_ball_time >= ball_recovery_delay:
+		_recover_active_ball("BALL RECOVERED — TOUCH TOP")
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -71,28 +111,47 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _launch_or_restart() -> void:
-	if game_over:
-		playtest_recorder.record_restart()
-		restart_game()
-	else:
-		if balls[active_ball_index].launch_ball():
-			playtest_recorder.record_launch()
-			audio_service.request_sfx(&"launcher")
+	if not gameplay_active or session_state != SessionState.READY:
+		return
+	if balls[active_ball_index].launch_ball():
+		session_state = SessionState.PLAYING
+		stalled_ball_time = 0.0
+		playtest_recorder.record_launch()
+		audio_service.request_sfx(&"launcher")
 
 
 func start_game() -> void:
 	gameplay_active = true
 	start_overlay.hide()
+	game_over_overlay.hide()
 	game_controls.show()
 	restart_game()
-	status_label.text = "TOUCH TOP TO LAUNCH"
+	status_label.text = "BALL 1 / %d — TOUCH TOP TO LAUNCH" % balls.size()
 
 
 func _show_start_menu() -> void:
+	session_generation += 1
+	session_state = SessionState.MENU
 	gameplay_active = false
+	game_over = false
 	start_overlay.show()
+	game_over_overlay.hide()
 	game_controls.hide()
 	_release_all_touches()
+	_deactivate_all_balls()
+
+
+func _show_game_over() -> void:
+	session_state = SessionState.GAME_OVER
+	game_over = true
+	gameplay_active = false
+	stalled_ball_time = 0.0
+	_release_all_touches()
+	_deactivate_all_balls()
+	game_controls.hide()
+	final_score_label.text = "SCORE FINAL %06d" % score_manager.score
+	game_over_overlay.show()
+	status_label.text = "GAME OVER"
 
 
 func _on_reset_pressed() -> void:
@@ -100,7 +159,7 @@ func _on_reset_pressed() -> void:
 		return
 	playtest_recorder.record_restart()
 	restart_game()
-	status_label.text = "TOUCH TOP TO LAUNCH"
+	status_label.text = "BALL 1 / %d — TOUCH TOP TO LAUNCH" % balls.size()
 
 
 func _on_quit_pressed() -> void:
@@ -109,7 +168,7 @@ func _on_quit_pressed() -> void:
 
 
 func _on_flipper_activated(_action_name: StringName) -> void:
-	if gameplay_active:
+	if gameplay_active and session_state in [SessionState.READY, SessionState.PLAYING]:
 		audio_service.request_sfx(&"flipper")
 
 
@@ -197,47 +256,73 @@ func _on_flow_changed(flow_points: int, multiplier: int) -> void:
 
 
 func _on_drain_body_entered(body: Node) -> void:
-	if body in balls:
+	if (
+		session_state == SessionState.PLAYING
+		and active_ball_index >= 0
+		and active_ball_index < balls.size()
+		and body == balls[active_ball_index]
+	):
 		# Area2D emits body_entered while the physics server is flushing its
-		# queries. Changing a RigidBody2D's freeze mode in that callback is not
-		# allowed, so resolve the drain once the physics step has completed.
+		# queries. Resolve the drain once the physics step has completed.
 		call_deferred("_resolve_ball_drain", body)
 
 
 func _resolve_ball_drain(body: Node) -> void:
-	if not is_instance_valid(body) or body not in balls or body.drain_locked:
+	if (
+		session_state != SessionState.PLAYING
+		or not is_instance_valid(body)
+		or active_ball_index < 0
+		or active_ball_index >= balls.size()
+		or body != balls[active_ball_index]
+		or body.drain_locked
+	):
 		return
 	if body.try_ball_save():
 		playtest_recorder.record_ball_save()
 		audio_service.request_sfx(&"safety")
-		body.reset_ball(body.spawn_position)
-		status_label.text = "SAFETY"
+		body.reset_ball(body.spawn_position, false)
+		session_state = SessionState.READY
+		stalled_ball_time = 0.0
+		status_label.text = "SAFETY — SAME BALL — TOUCH TOP"
 		return
 	playtest_recorder.record_drain()
 	audio_service.request_sfx(&"drain")
 	body.mark_drained()
 
 
-func _on_ball_drained(_ball: RigidBody2D) -> void:
-	if game_over:
+func _on_ball_drained(ball: RigidBody2D) -> void:
+	if (
+		session_state != SessionState.PLAYING
+		or active_ball_index < 0
+		or active_ball_index >= balls.size()
+		or ball != balls[active_ball_index]
+	):
 		return
+	session_state = SessionState.RESPAWNING
+	stalled_ball_time = 0.0
 	remaining_balls -= 1
 	if remaining_balls <= 0:
-		game_over = true
-		status_label.text = "GAME OVER — TAP TOP"
+		_show_game_over()
 		return
-	active_ball_index = 3 - remaining_balls
-	status_label.text = "BALL %d / 3" % (active_ball_index + 1)
+	active_ball_index = balls.size() - remaining_balls
+	status_label.text = "BALL %d / %d" % [active_ball_index + 1, balls.size()]
+	var generation := session_generation
 	await get_tree().create_timer(respawn_delay).timeout
-	if not game_over:
+	if generation == session_generation and session_state == SessionState.RESPAWNING:
 		balls[active_ball_index].reset_ball(balls[active_ball_index].spawn_position)
+		session_state = SessionState.READY
+		status_label.text = "BALL %d / %d — TOUCH TOP" % [active_ball_index + 1, balls.size()]
 
 
 func restart_game() -> void:
+	session_generation += 1
 	_release_all_touches()
-	remaining_balls = 3
+	remaining_balls = balls.size()
 	active_ball_index = 0
 	game_over = false
+	session_state = SessionState.READY
+	stalled_ball_time = 0.0
+	game_over_overlay.hide()
 	score_manager.reset_score()
 	flow_manager.reset_flow()
 	cue_manager.reset_state()
@@ -249,11 +334,35 @@ func restart_game() -> void:
 	for scoop in get_tree().get_nodes_in_group("console_scoops"):
 		if scoop.has_method("reset"):
 			scoop.reset()
-	status_label.text = "BALL 1 / 3"
-	for index in balls.size():
-		var ball: Node = balls[index]
-		ball.reset_ball(ball.spawn_position)
-		ball.visible = index == active_ball_index
+	_deactivate_all_balls()
+	balls[active_ball_index].reset_ball(balls[active_ball_index].spawn_position)
+	status_label.text = "BALL 1 / %d" % balls.size()
+
+
+func _recover_active_ball(message: String) -> void:
+	if session_state != SessionState.PLAYING:
+		return
+	var ball: Node = balls[active_ball_index]
+	ball.reset_ball(ball.spawn_position, false)
+	session_state = SessionState.READY
+	stalled_ball_time = 0.0
+	status_label.text = message
+	audio_service.request_sfx(&"safety")
+
+
+func _is_ball_outside_playfield(ball_position: Vector2) -> bool:
+	var viewport_size := get_viewport_rect().size
+	return (
+		ball_position.x < -recovery_margin
+		or ball_position.x > viewport_size.x + recovery_margin
+		or ball_position.y < -recovery_margin
+		or ball_position.y > viewport_size.y + recovery_margin
+	)
+
+
+func _deactivate_all_balls() -> void:
+	for ball in balls:
+		ball.deactivate_ball()
 
 
 func _release_all_touches() -> void:

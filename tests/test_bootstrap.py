@@ -131,8 +131,8 @@ def test_ball_save_safety_is_armed_on_launch_and_consumed_at_drain():
     assert "ball_save_remaining = ball_save_duration" in ball_script
     assert "func try_ball_save() -> bool" in ball_script
     assert "body.try_ball_save()" in main_script
-    assert "body.reset_ball(body.spawn_position)" in main_script
-    assert 'status_label.text = "SAFETY"' in main_script
+    assert "body.reset_ball(body.spawn_position, false)" in main_script
+    assert 'status_label.text = "SAFETY — SAME BALL — TOUCH TOP"' in main_script
 
 
 def test_main_scene_declares_three_rhythmic_bumpers():
@@ -216,10 +216,11 @@ def test_controller_actions_cover_flippers_and_launcher():
     assert '"button_index":0' in project_text
 
 
-def test_restart_keeps_only_the_active_ball_visible():
+def test_restart_activates_only_one_ball_and_disables_the_rest():
     main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
 
-    assert "ball.visible = index == active_ball_index" in main_script
+    assert "_deactivate_all_balls()" in main_script
+    assert "balls[active_ball_index].reset_ball(" in main_script
 
 
 def test_local_playtest_recorder_tracks_session_events_without_networking():
@@ -463,3 +464,19 @@ def test_godot_behavioral_runner_covers_scoring_and_session_reset():
     assert "_test_flow_decay_and_multiplier" in runner_text
     assert "_test_cue_bonus_and_reset" in runner_text
     assert "_test_main_scene_scoring_and_reset" in runner_text
+
+def test_session_lifecycle_blocks_phantom_balls_and_exposes_game_over():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    main_text = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    ball_text = (ROOT / "scripts" / "gameplay" / "ball.gd").read_text(encoding="utf-8")
+
+    for node_name in ("GameOverOverlay", "FinalScoreLabel", "ReplayButton", "MenuButton"):
+        assert f'name="{node_name}"' in scene_text
+    assert "enum SessionState" in main_text
+    assert "func _show_game_over()" in main_text
+    assert "func _recover_active_ball" in main_text
+    assert "body != balls[active_ball_index]" in main_text
+    assert "func deactivate_ball()" in ball_text
+    assert 'collision_shape.set_deferred("disabled", true)' in ball_text
+    assert "reset_ball(body.spawn_position, false)" in main_text
+

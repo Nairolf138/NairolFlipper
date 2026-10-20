@@ -24,3 +24,6 @@
 - Géométrie, angles de repos et activation du flipper droit corrigés.
 - Physique de bille alourdie, rebond réduit et lancement dirigé vers le plateau.
 - Menu de démarrage et commandes Reset/Quit ajoutés au build de playtest.
+- Cycle de partie verrouillé à trois billes avec écran Game Over explicite.
+- Collisions des billes inactives désactivées pour supprimer les apparitions fantômes.
+- Safety limité à une utilisation par bille et récupération des billes coincées ou hors plateau.
