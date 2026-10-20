@@ -49,3 +49,11 @@ Toucher gauche/droite, lancer, montrer un objectif, laisser jouer.
 ## Feedback
 
 Combiner son, flash, texte, animation, vibration optionnelle. Ne jamais dépendre uniquement de vibration ou couleur.
+
+## Fin de partie
+
+Après la troisième bille consommée, le plateau n'accepte plus les touchers de
+jeu. Un écran dédié affiche le score final et propose uniquement Rejouer ou Menu.
+Safety annonce explicitement qu'il s'agit de la même bille et demande une
+relance depuis le launcher.
+

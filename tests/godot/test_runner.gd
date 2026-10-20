@@ -17,12 +17,13 @@ func _run() -> void:
 	await _test_main_scene_scoring_and_reset()
 	await _test_physics_drain_lifecycle()
 	await _test_android_playtest_regressions()
+	await _test_three_ball_game_over_and_recovery()
 	# Give the audio server and deferred frees time to release stream references.
 	await process_frame
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 5 passed")
+		print("Godot behavioral tests: 6 passed")
 		quit(0)
 		return
 
@@ -119,6 +120,8 @@ func _test_physics_drain_lifecycle() -> void:
 	root.add_child(main)
 	await process_frame
 	await physics_frame
+	main.start_game()
+	await process_frame
 
 	var ball: RigidBody2D = main.balls[0]
 	main._launch_or_restart()
@@ -139,6 +142,7 @@ func _test_physics_drain_lifecycle() -> void:
 	await physics_frame
 	await physics_frame
 	main._launch_or_restart()
+	_expect_equal(ball.ball_save_remaining, 0.0, "Safety is only armed once per numbered ball")
 	ball.ball_save_remaining = 0.0
 	ball.global_position = Vector2(540, 1840)
 	ball.linear_velocity = Vector2(0, 600)
@@ -211,6 +215,76 @@ func _test_android_playtest_regressions() -> void:
 	main.score_manager.add_points(100)
 	main._on_reset_pressed()
 	_expect_equal(main.score_manager.score, 0, "Reset button starts a clean game")
+
+	main.free()
+	await process_frame
+
+
+func _test_three_ball_game_over_and_recovery() -> void:
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Main scene loads for session lifecycle regressions")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	main.respawn_delay = 0.01
+	root.add_child(main)
+	await process_frame
+	await physics_frame
+	main.start_game()
+	main.score_manager.add_points(321)
+	await process_frame
+
+	for drain_index in 3:
+		var ball: RigidBody2D = main.balls[main.active_ball_index]
+		ball.ball_save_used = true
+		main._launch_or_restart()
+		main._resolve_ball_drain(ball)
+		await process_frame
+		if drain_index < 2:
+			for frame in 20:
+				if main.balls[main.active_ball_index].visible and main.balls[main.active_ball_index].launch_ready:
+					break
+				await physics_frame
+
+	_expect_equal(main.remaining_balls, 0, "Exactly three consumed balls end the game")
+	_expect(main.game_over, "Third drain marks the session as game over")
+	_expect(not main.gameplay_active, "Game over blocks table input")
+	_expect(main.game_over_overlay.visible, "Game over displays a dedicated overlay")
+	_expect(not main.game_controls.visible, "Session controls hide behind the game over overlay")
+	_expect_equal(main.final_score_label.text, "SCORE FINAL 000321", "Game over preserves and displays the final score")
+	for ball in main.balls:
+		_expect(not ball.visible, "Game over hides every ball")
+		_expect(ball.get_node("CollisionShape2D").disabled, "Game over disables every ball collision")
+
+	var ended_ball_index: int = main.active_ball_index
+	main._launch_or_restart()
+	_expect_equal(main.remaining_balls, 0, "Table touches cannot silently restart after game over")
+	_expect_equal(main.active_ball_index, ended_ball_index, "Game over cannot create a phantom fourth ball")
+
+	main.start_game()
+	await process_frame
+	await physics_frame
+	_expect_equal(main.remaining_balls, 3, "Replay starts a fresh three-ball session")
+	_expect(not main.game_over_overlay.visible, "Replay closes the game over overlay")
+	_expect(main.balls[0].visible, "Replay activates the first ball")
+	_expect(not main.balls[1].visible and not main.balls[2].visible, "Replay keeps inactive balls hidden")
+	_expect(
+		main.balls[1].get_node("CollisionShape2D").disabled
+		and main.balls[2].get_node("CollisionShape2D").disabled,
+		"Inactive balls cannot collide or escape into a corner"
+	)
+
+	var recovered_ball: RigidBody2D = main.balls[0]
+	recovered_ball.ball_save_used = true
+	main._launch_or_restart()
+	recovered_ball.global_position = Vector2(-200, 1000)
+	main._physics_process(0.1)
+	await process_frame
+	_expect_equal(main.remaining_balls, 3, "Out-of-bounds recovery does not consume a ball")
+	_expect(recovered_ball.freeze and recovered_ball.launch_ready, "Out-of-bounds ball returns ready to the launcher")
+	_expect_equal(recovered_ball.global_position, recovered_ball.spawn_position, "Recovered ball returns to the configured launcher")
+	_expect(main.status_label.text.begins_with("BALL RECOVERED"), "Recovery explains how to relaunch")
 
 	main.free()
 	await process_frame

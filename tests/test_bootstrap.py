@@ -463,3 +463,19 @@ def test_godot_behavioral_runner_covers_scoring_and_session_reset():
     assert "_test_flow_decay_and_multiplier" in runner_text
     assert "_test_cue_bonus_and_reset" in runner_text
     assert "_test_main_scene_scoring_and_reset" in runner_text
+
+def test_session_lifecycle_blocks_phantom_balls_and_exposes_game_over():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    main_text = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    ball_text = (ROOT / "scripts" / "gameplay" / "ball.gd").read_text(encoding="utf-8")
+
+    for node_name in ("GameOverOverlay", "FinalScoreLabel", "ReplayButton", "MenuButton"):
+        assert f'name="{node_name}"' in scene_text
+    assert "enum SessionState" in main_text
+    assert "func _show_game_over()" in main_text
+    assert "func _recover_active_ball" in main_text
+    assert "body != balls[active_ball_index]" in main_text
+    assert "func deactivate_ball()" in ball_text
+    assert 'collision_shape.set_deferred("disabled", true)' in ball_text
+    assert "reset_ball(body.spawn_position, false)" in main_text
+

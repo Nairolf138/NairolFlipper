@@ -64,6 +64,16 @@ rejette explicitement les erreurs de parsing/chargement. Le Flow décroît à la
 vitesse configurée, son multiplicateur s'applique au score, les bonus de Cue sont
 comptabilisés et un restart réinitialise les états Cue, Rig et audio.
 
+
+### T014 — Cycle de partie robuste ✅
+
+Le second playtest Android a révélé une reprise silencieuse après la troisième
+bille et une bille fantôme dans le coin inférieur gauche. La session utilise
+désormais des états explicites, désactive les collisions des billes inactives,
+affiche un écran Game Over avec score final et n'autorise une nouvelle partie que
+depuis Rejouer. Safety est limité à une fois par bille et une bille coincée ou
+sortie du plateau revient au launcher sans consommer de vie.
+
 ## P1 — Feel
 
 T020 Physics tuning resource ✅; T021 Ball max speed/anti-tunneling ✅; T022 Feedback hit ✅; T023 Ball save ✅; T024 Controller support ✅; T025 instrumentation locale de playtest ✅.
