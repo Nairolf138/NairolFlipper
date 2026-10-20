@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3]
+[gd_scene load_steps=38 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Ball.tscn" id="1_ball"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Flipper.tscn" id="2_flipper"]
@@ -28,6 +28,8 @@
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Slingshot.tscn" id="25_slingshot"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/GuideRail.tscn" id="26_rail"]
 [ext_resource type="Script" path="res://scripts/show/show_flow_manager.gd" id="27_show_flow"]
+[ext_resource type="Script" path="res://scripts/show/stage_visual_controller.gd" id="28_stage_visuals"]
+[ext_resource type="Resource" path="res://data/audio/StageLoop.tres" id="29_stage_loop"]
 
 [sub_resource type="RectangleShape2D" id="LeftWallShape"]
 size = Vector2(40, 1600)
@@ -54,6 +56,9 @@ color = Color(0.018, 0.026, 0.052, 1)
 [node name="StageDeck" type="Polygon2D" parent="."]
 polygon = PackedVector2Array(76, 190, 1004, 190, 970, 1745, 110, 1745)
 color = Color(0.035, 0.06, 0.11, 1)
+
+[node name="StageVisuals" type="Node2D" parent="."]
+script = ExtResource("28_stage_visuals")
 
 [node name="WarmZone" type="Polygon2D" parent="."]
 polygon = PackedVector2Array(85, 520, 515, 740, 515, 1510, 105, 1715)
@@ -108,6 +113,7 @@ cues = Array[ExtResource("17_cue_definition")]([ExtResource("16_first_hit")])
 
 [node name="AudioService" type="Node" parent="."]
 script = ExtResource("15_audio")
+stem_set = ExtResource("29_stage_loop")
 
 [node name="ShowFlowManager" type="Node" parent="."]
 script = ExtResource("27_show_flow")

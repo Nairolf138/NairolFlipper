@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AudioStemSet" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/audio/audio_stem_set.gd" id="1_stem_set"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/atmosphere.ogg" id="2_atmosphere"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/piano.ogg" id="3_piano"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/kick.ogg" id="4_kick"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/percussion.ogg" id="5_percussion"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/bass.ogg" id="6_bass"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/arp.ogg" id="7_arp"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/lead.ogg" id="8_lead"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/impact.ogg" id="9_impact"]
+
+[resource]
+script = ExtResource("1_stem_set")
+atmosphere = ExtResource("2_atmosphere")
+piano = ExtResource("3_piano")
+kick = ExtResource("4_kick")
+percussion = ExtResource("5_percussion")
+bass = ExtResource("6_bass")
+arp = ExtResource("7_arp")
+lead = ExtResource("8_lead")
+impact = ExtResource("9_impact")

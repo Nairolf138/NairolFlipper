@@ -19,6 +19,10 @@
 - Final Show à trois billes bonus, score doublé, durée configurable et fin
   automatique lorsqu'une seule bille reste.
 - Blackout de transition qui conserve la bille survivante et les vies de session.
+- Huit stems musicaux originaux synchronisés, mixés progressivement par le Rig
+  et le Showflow.
+- Identité scénique vectorielle avec truss, fixtures, faisceaux, grille et runway
+  réactifs, sans shader lourd ni asset tiers.
 
 ### Fixed
 
