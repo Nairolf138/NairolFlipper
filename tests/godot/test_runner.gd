@@ -22,6 +22,7 @@ func _run() -> void:
 	await _test_three_ball_game_over_and_recovery()
 	await _test_table_2_objectives_and_routes()
 	await _test_playfield_safe_trajectories()
+	await _test_weighted_pinball_feel()
 	await _test_final_show_multiball_and_blackout()
 	await _test_stage_identity_and_music_stems()
 	# Give the audio server and deferred frees time to release stream references.
@@ -29,7 +30,7 @@ func _run() -> void:
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 11 passed")
+		print("Godot behavioral tests: 12 passed")
 		quit(0)
 		return
 
@@ -426,6 +427,44 @@ func _sample_return_exit(start_position: Vector2) -> Vector2:
 	main.free()
 	await process_frame
 	return exit_position
+
+
+func _test_weighted_pinball_feel() -> void:
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Weighted feel table loads")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	root.add_child(main)
+	await process_frame
+	main.start_game()
+	var ball: RigidBody2D = main.balls[0]
+	var ball_material := ball.physics_material_override
+	_expect(ball.mass >= 1.35, "Ball keeps deliberate collision mass")
+	_expect(ball.gravity_scale >= 1.5, "Ball uses a decisive table slope")
+	_expect(ball_material != null and ball_material.bounce <= 0.15, "Ball no longer rebounds like rubber")
+	_expect(ball_material != null and ball_material.friction >= 0.45, "Ball keeps traction on contacts")
+	_expect(ball.has_node("ContactShadow") and ball.has_node("Highlight"), "Ball has readable table contact and volume")
+
+	var guide := main.get_node("UpperLeftGuide") as StaticBody2D
+	var flipper := main.get_node("LeftFlipper") as AnimatableBody2D
+	_expect(guide.physics_material_override != null and guide.physics_material_override.bounce <= 0.05, "Passive guides absorb excess rebound")
+	_expect(flipper.physics_material_override != null and flipper.physics_material_override.bounce >= 0.3, "Flippers keep a lively striking surface")
+	_expect(flipper.rotation_speed_degrees >= 900.0, "Flippers respond quickly enough for the heavier ball")
+
+	ball.input_enabled = false
+	ball.reset_ball(Vector2(540, 900))
+	ball.freeze = false
+	var fall_frames := 0
+	while ball.global_position.y < 1300.0 and fall_frames < 140:
+		await physics_frame
+		fall_frames += 1
+	_expect(fall_frames <= 96, "Ball crosses the middle table without floating (got %d frames)" % fall_frames)
+	_expect(ball.linear_velocity.y >= 950.0, "Ball carries visible weight after a free descent")
+
+	main.free()
+	await process_frame
 
 
 func _test_final_show_multiball_and_blackout() -> void:

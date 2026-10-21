@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3]
+[gd_scene load_steps=39 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Ball.tscn" id="1_ball"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Flipper.tscn" id="2_flipper"]
@@ -30,6 +30,7 @@
 [ext_resource type="Script" path="res://scripts/show/show_flow_manager.gd" id="27_show_flow"]
 [ext_resource type="Script" path="res://scripts/show/stage_visual_controller.gd" id="28_stage_visuals"]
 [ext_resource type="Resource" path="res://data/audio/StageLoop.tres" id="29_stage_loop"]
+[ext_resource type="PhysicsMaterial" path="res://data/tuning/PassiveSurfaceMaterial.tres" id="30_surface"]
 
 [sub_resource type="RectangleShape2D" id="LeftWallShape"]
 size = Vector2(40, 1840)
@@ -167,18 +168,21 @@ horizontal_alignment = 2
 
 [node name="LeftWall" type="StaticBody2D" parent="."]
 position = Vector2(20, 960)
+physics_material_override = ExtResource("30_surface")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
 shape = SubResource("LeftWallShape")
 
 [node name="RightWall" type="StaticBody2D" parent="."]
 position = Vector2(1060, 960)
+physics_material_override = ExtResource("30_surface")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
 shape = SubResource("RightWallShape")
 
 [node name="TopWall" type="StaticBody2D" parent="."]
 position = Vector2(540, 20)
+physics_material_override = ExtResource("30_surface")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TopWall"]
 shape = SubResource("TopWallShape")
@@ -336,17 +340,17 @@ mirrored = true
 
 [node name="KickBumper" parent="." instance=ExtResource("3_bumper")]
 position = Vector2(300, 650)
-bumper_impulse = 700.0
+bumper_impulse = 780.0
 score_value = 100
 
 [node name="SnareBumper" parent="." instance=ExtResource("3_bumper")]
 position = Vector2(540, 520)
-bumper_impulse = 760.0
+bumper_impulse = 850.0
 score_value = 150
 
 [node name="TomBumper" parent="." instance=ExtResource("3_bumper")]
 position = Vector2(780, 650)
-bumper_impulse = 700.0
+bumper_impulse = 780.0
 score_value = 100
 
 [node name="Interface" type="CanvasLayer" parent="."]

@@ -97,6 +97,18 @@ toucher, les collisions inactives et la récupération hors limites.
 - confirmer que Blackout coupe simultanément musique et faisceaux ;
 - signaler toute saturation, craquement, ralentissement ou musique trop forte.
 
+### Table 2.2 — checklist sensation physique
+
+- comparer la vitesse de chute à la build précédente et confirmer la disparition
+  de l'impression d'apesanteur ;
+- laisser la bille toucher plusieurs rails et vérifier qu'elle ne rebondit plus
+  de façon excessive ;
+- vérifier que les flippers restent assez rapides pour viser malgré la masse ;
+- confirmer que lanceur, bumpers et slingshots renvoient toujours la bille avec
+  une portée utile ;
+- observer une partie complète et signaler toute zone devenue trop rapide ou
+  impossible à contrôler.
+
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 
 ## Instrumentation locale de playtest

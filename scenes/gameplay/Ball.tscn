@@ -9,10 +9,10 @@ radius = 22.0
 [node name="Ball" type="RigidBody2D"]
 script = ExtResource("1_ball")
 spawn_position = Vector2(960, 1650)
-launch_force = 1250.0
+launch_force = 2500.0
 tuning = ExtResource("2_tuning")
-mass = 1.0
-gravity_scale = 1.0
+mass = 1.4
+gravity_scale = 1.55
 continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 4
@@ -20,6 +20,20 @@ max_contacts_reported = 4
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("BallShape")
 
-[node name="Visual" type="Polygon2D" parent="."]
+[node name="ContactShadow" type="Polygon2D" parent="."]
+position = Vector2(5, 7)
+polygon = PackedVector2Array(-23, 0, -16.26, -16.26, 0, -23, 16.26, -16.26, 23, 0, 16.26, 16.26, 0, 23, -16.26, 16.26)
+color = Color(0, 0, 0, 0.52)
+
+[node name="Rim" type="Polygon2D" parent="."]
 polygon = PackedVector2Array(-22, 0, -15.56, -15.56, 0, -22, 15.56, -15.56, 22, 0, 15.56, 15.56, 0, 22, -15.56, 15.56)
-color = Color(0.9, 0.92, 0.98, 1)
+color = Color(0.34, 0.4, 0.5, 1)
+
+[node name="Visual" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-19, 0, -13.43, -13.43, 0, -19, 13.43, -13.43, 19, 0, 13.43, 13.43, 0, 19, -13.43, 13.43)
+color = Color(0.82, 0.87, 0.95, 1)
+
+[node name="Highlight" type="Polygon2D" parent="."]
+position = Vector2(-7, -8)
+polygon = PackedVector2Array(-5, 0, -3.54, -3.54, 0, -5, 3.54, -3.54, 5, 0, 3.54, 3.54, 0, 5, -3.54, 3.54)
+color = Color(1, 1, 1, 0.88)

@@ -41,3 +41,9 @@
 - Parois latérales prolongées jusqu'au drain pour fermer les sorties involontaires.
 - Guides supérieurs réorientés vers le centre et retours bas séparés des outlanes
   et du couloir du lanceur.
+- Gravité, friction et restitution recalibrées pour une bille plus lourde et une
+  descente plus franche, avec forces de jeu compensées.
+- Matériaux distincts pour les surfaces passives et les flippers afin d'éviter
+  les rebonds uniformes tout en conservant des tirs réactifs.
+- Ombre de contact, bord métallique et reflet ajoutés à la bille pour mieux la
+  poser visuellement sur le plateau.

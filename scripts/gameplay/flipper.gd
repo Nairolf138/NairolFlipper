@@ -5,7 +5,7 @@ signal activated(action_name: StringName)
 @export var action_name: StringName = &"flipper_left"
 @export var rest_angle_degrees: float = -20.0
 @export var active_angle_degrees: float = 25.0
-@export var rotation_speed_degrees: float = 720.0
+@export var rotation_speed_degrees: float = 900.0
 @export var mirrored := false
 
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D

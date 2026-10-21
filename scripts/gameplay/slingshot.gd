@@ -4,7 +4,7 @@ extends Area2D
 signal slingshot_hit(score_value: int, flow_value: int, slingshot_name: StringName)
 
 @export var kick_direction: Vector2 = Vector2(-0.65, -1.0)
-@export var kick_impulse: float = 520.0
+@export var kick_impulse: float = 585.0
 @export var score_value: int = 75
 @export var flow_value: int = 15
 @export var flash_color: Color = Color(1.0, 0.28, 0.65, 1.0)

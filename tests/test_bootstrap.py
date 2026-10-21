@@ -109,6 +109,25 @@ def test_ball_uses_shared_physics_tuning_resource():
     assert 'path="res://data/tuning/PhysicsTuning.tres"' in ball_scene
 
 
+def test_weighted_feel_uses_distinct_passive_and_flipper_surfaces():
+    tuning_text = (ROOT / "data" / "tuning" / "PhysicsTuning.tres").read_text(encoding="utf-8")
+    ball_scene = (ROOT / "scenes" / "gameplay" / "Ball.tscn").read_text(encoding="utf-8")
+    guide_scene = (ROOT / "scenes" / "gameplay" / "GuideRail.tscn").read_text(encoding="utf-8")
+    flipper_scene = (ROOT / "scenes" / "gameplay" / "Flipper.tscn").read_text(encoding="utf-8")
+    runner_text = (ROOT / "tests" / "godot" / "test_runner.gd").read_text(encoding="utf-8")
+
+    for material_name in ("PassiveSurfaceMaterial.tres", "FlipperMaterial.tres"):
+        assert (ROOT / "data" / "tuning" / material_name).is_file()
+    assert "gravity_scale = 1.55" in tuning_text
+    assert "bounce = 0.14" in tuning_text
+    assert "launch_force = 2500.0" in tuning_text
+    for node_name in ("ContactShadow", "Rim", "Highlight"):
+        assert f'name="{node_name}"' in ball_scene
+    assert "PassiveSurfaceMaterial.tres" in guide_scene
+    assert "FlipperMaterial.tres" in flipper_scene
+    assert "_test_weighted_pinball_feel" in runner_text
+
+
 def test_android_playtest_configuration_is_portrait_and_has_session_controls():
     project_text = PROJECT.read_text(encoding="utf-8")
     scene_text = MAIN_SCENE.read_text(encoding="utf-8")
