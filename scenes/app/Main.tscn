@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=3]
+[gd_scene load_steps=45 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Ball.tscn" id="1_ball"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Flipper.tscn" id="2_flipper"]
@@ -36,6 +36,7 @@
 [ext_resource type="Script" path="res://scripts/show/playfield_visual_controller.gd" id="33_playfield_art"]
 [ext_resource type="Theme" path="res://data/ui/StageTheme.tres" id="34_stage_theme"]
 [ext_resource type="Script" path="res://scripts/show/sync_bonus_manager.gd" id="35_sync_bonus"]
+[ext_resource type="Script" path="res://scripts/app/settings_store.gd" id="36_settings"]
 
 [sub_resource type="RectangleShape2D" id="LeftWallShape"]
 size = Vector2(40, 1840)
@@ -122,6 +123,9 @@ script = ExtResource("18_flow")
 
 [node name="PlaytestRecorder" type="Node" parent="."]
 script = ExtResource("6_recorder")
+
+[node name="SettingsStore" type="Node" parent="."]
+script = ExtResource("36_settings")
 
 [node name="RigModel" type="Node" parent="."]
 script = ExtResource("7_rig")
@@ -501,12 +505,12 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -340.0
-offset_top = -300.0
+offset_top = -370.0
 offset_right = 340.0
-offset_bottom = 300.0
+offset_bottom = 370.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 34
+theme_override_constants/separation = 24
 alignment = 1
 
 [node name="Eyebrow" type="Label" parent="Interface/StartOverlay/Menu"]
@@ -539,8 +543,14 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 34
 text = "JOUER"
 
+[node name="SettingsButton" type="Button" parent="Interface/StartOverlay/Menu"]
+custom_minimum_size = Vector2(0, 82)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "RÉGLAGES AUDIO"
+
 [node name="QuitButton" type="Button" parent="Interface/StartOverlay/Menu"]
-custom_minimum_size = Vector2(0, 90)
+custom_minimum_size = Vector2(0, 82)
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "QUITTER"
@@ -551,6 +561,108 @@ theme_override_colors/font_color = Color(0.72, 0.76, 0.84, 1)
 theme_override_font_sizes/font_size = 22
 text = "Jouez la Cue Stack, allumez le Rig, puis lancez le Final Show\nHaut : lancer • Bas gauche/droite : flippers"
 horizontal_alignment = 1
+
+[node name="SettingsPanel" type="ColorRect" parent="Interface/StartOverlay"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.008, 0.015, 0.03, 0.98)
+
+[node name="Menu" type="VBoxContainer" parent="Interface/StartOverlay/SettingsPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -420.0
+offset_right = 340.0
+offset_bottom = 420.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Title" type="Label" parent="Interface/StartOverlay/SettingsPanel/Menu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 48
+text = "RÉGLAGES AUDIO"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="Interface/StartOverlay/SettingsPanel/Menu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "Les changements sont appliqués immédiatement"
+horizontal_alignment = 1
+
+[node name="MasterValue" type="Label" parent="Interface/StartOverlay/SettingsPanel/Menu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.965, 1, 1)
+theme_override_font_sizes/font_size = 27
+text = "MASTER  100%"
+
+[node name="MasterSlider" type="HSlider" parent="Interface/StartOverlay/SettingsPanel/Menu"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+focus_neighbor_bottom = NodePath("../MusicSlider")
+max_value = 100.0
+step = 5.0
+value = 100.0
+tick_count = 11
+ticks_on_borders = true
+
+[node name="MusicValue" type="Label" parent="Interface/StartOverlay/SettingsPanel/Menu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.965, 1, 1)
+theme_override_font_sizes/font_size = 27
+text = "MUSIQUE  100%"
+
+[node name="MusicSlider" type="HSlider" parent="Interface/StartOverlay/SettingsPanel/Menu"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+focus_neighbor_top = NodePath("../MasterSlider")
+focus_neighbor_bottom = NodePath("../SFXSlider")
+max_value = 100.0
+step = 5.0
+value = 100.0
+tick_count = 11
+ticks_on_borders = true
+
+[node name="SFXValue" type="Label" parent="Interface/StartOverlay/SettingsPanel/Menu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.965, 1, 1)
+theme_override_font_sizes/font_size = 27
+text = "EFFETS  100%"
+
+[node name="SFXSlider" type="HSlider" parent="Interface/StartOverlay/SettingsPanel/Menu"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+focus_neighbor_top = NodePath("../MusicSlider")
+focus_neighbor_bottom = NodePath("../DefaultsButton")
+max_value = 100.0
+step = 5.0
+value = 100.0
+tick_count = 11
+ticks_on_borders = true
+
+[node name="DefaultsButton" type="Button" parent="Interface/StartOverlay/SettingsPanel/Menu"]
+custom_minimum_size = Vector2(0, 82)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "VALEURS PAR DÉFAUT"
+
+[node name="BackButton" type="Button" parent="Interface/StartOverlay/SettingsPanel/Menu"]
+custom_minimum_size = Vector2(0, 82)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "RETOUR"
 
 [node name="GameOverOverlay" type="ColorRect" parent="Interface"]
 visible = false

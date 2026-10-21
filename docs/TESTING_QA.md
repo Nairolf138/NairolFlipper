@@ -148,6 +148,18 @@ toucher, les collisions inactives et la récupération hors limites.
 - vérifier le comportement pendant le Final Show multiball et après un Blackout ;
 - refaire le test avec le volume coupé : le marqueur visuel doit suffire.
 
+### Réglages audio — checklist tablette
+
+- ouvrir `RÉGLAGES AUDIO` depuis le menu et vérifier que les trois sliders sont
+  lisibles et manipulables au doigt en portrait ;
+- régler séparément Master, Musique et Effets, puis confirmer que le changement
+  est audible immédiatement ;
+- mettre Musique à 0 % et vérifier que les SFX restent audibles ;
+- mettre Effets à 0 % et vérifier que la musique reste audible ;
+- revenir au menu, relancer l'application et confirmer que les trois valeurs
+  sont conservées ;
+- utiliser `VALEURS PAR DÉFAUT` et confirmer le retour des trois niveaux à 100 %.
+
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 
 ## Instrumentation locale de playtest

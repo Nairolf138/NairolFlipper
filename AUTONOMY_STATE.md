@@ -3,17 +3,17 @@
 ## Dernière exécution
 
 - Date : 2026-10-21
-- Cycle : T044 — Sync Bonus
-- Statut : 38 contrats Python validés localement, 15 groupes Godot préparés, build CI à valider
+- Cycle : T045 — Réglages audio persistants
+- Statut : 39 contrats Python et 17 groupes Godot préparés, build CI à valider
 
 ## Dépôt
 
-- Branche : `feat/sync-bonus`
-- Base : `bef870c` (fusion de la PR #24 sur `origin/main`)
-- Validation : fenêtres Perfect/Sync, anti-farm par pulse, feedback audiovisuel et instrumentation locale ajoutés ; CI à exécuter
+- Branche : `feat/audio-settings`
+- Base : `f9a1c35` (fusion de la PR #25 sur `origin/main`)
+- Validation : réglages Master/Musique/Effets, application immédiate et persistance locale ajoutés ; CI à exécuter
 - CI de la branche : à valider par la pull request
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` auditée : `bef870c`
+- Branche `main` auditée : `f9a1c35`
 
 ## État actuel
 
@@ -193,13 +193,22 @@ T012 complète le premier filet de livraison cross-platform :
 
 - `export_presets.cfg` avec presets Web, Android debug et Windows Desktop.
 - `.github/workflows/godot.yml` avec import propre, tests comportementaux, smoke et exports P0.
-- `tests/test_bootstrap.py` avec 34 contrats de structure.
-- `tests/godot/test_runner.gd` avec dix groupes de validations comportementales.
+- `tests/test_bootstrap.py` avec 39 contrats de structure.
+- `tests/godot/test_runner.gd` avec 17 groupes de validations comportementales.
 - `docs/BACKLOG.md` mis à jour.
 - Ce journal `AUTONOMY_STATE.md`.
 
 ## Prochaine exécution
 
-Faire valider sur tablette la lisibilité de l'horloge à quatre temps, les deux
-fenêtres de Sync et l'absence de gêne pendant le multiball. Ensuite, ajouter les
-réglages Master/Music/SFX accessibles depuis le menu et persistés localement.
+Faire valider sur tablette les sliders tactiles, la séparation Musique/Effets et
+la restauration des valeurs après relance de l'APK. Ensuite, ajouter un écran
+How to Play court et visuel pour expliquer lancement, flippers, Cue Stack, Rig
+et Final Show avant le gel de l'alpha 1.0.
+
+### T045 — Réglages audio persistants
+
+- sliders Master, Musique et Effets accessibles depuis le menu et appliqués en direct ;
+- conversion perceptuelle des pourcentages vers les bus audio, avec mute à 0 % ;
+- fichier local `user://settings.json` versionné, borné et tolérant aux données absentes ou invalides ;
+- retour aux valeurs par défaut et persistance au relâchement ou à la fermeture du panneau ;
+- 39 contrats validés par le runner direct ; tests Godot et exports délégués à la CI.

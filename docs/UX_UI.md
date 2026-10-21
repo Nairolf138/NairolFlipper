@@ -38,9 +38,11 @@ Main Menu
 └── Quit (desktop only)
 ```
 
-Le premier build de playtest fournit un écran de démarrage avec Play et Quit,
-ainsi que Reset et Quit pendant la partie. How to Play, Settings et Credits
-restent à implémenter dans l'interface finale.
+Le menu de playtest fournit Play, Quit et un premier écran Settings dédié à
+l'audio. Trois sliders tactiles règlent Master, Musique et Effets de 0 à 100 %,
+avec application immédiate, retour aux valeurs par défaut et sauvegarde locale.
+How to Play, Graphics, Controls, Accessibility et Credits restent à compléter
+dans l'interface finale.
 
 ## Tutoriel
 

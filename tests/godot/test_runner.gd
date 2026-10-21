@@ -3,6 +3,7 @@ extends SceneTree
 const CueDefinitionResource = preload("res://scripts/show/cue_definition.gd")
 const CueManagerNode = preload("res://scripts/show/cue_manager.gd")
 const FlowManagerNode = preload("res://scripts/show/flow_manager.gd")
+const SettingsStoreNode = preload("res://scripts/app/settings_store.gd")
 const ShowFlowManagerNode = preload("res://scripts/show/show_flow_manager.gd")
 const SyncBonusManagerNode = preload("res://scripts/show/sync_bonus_manager.gd")
 
@@ -18,6 +19,7 @@ func _run() -> void:
 	_test_cue_stack_progression()
 	_test_show_flow_state_machine()
 	_test_sync_bonus_timing()
+	_test_audio_settings_persistence()
 	await _test_main_scene_scoring_and_reset()
 	await _test_physics_drain_lifecycle()
 	await _test_android_playtest_regressions()
@@ -29,12 +31,13 @@ func _run() -> void:
 	await _test_stage_identity_and_music_stems()
 	await _test_stagecraft_visual_language()
 	await _test_sync_bonus_integration()
+	await _test_audio_settings_menu()
 	# Give the audio server and deferred frees time to release stream references.
 	await process_frame
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 15 passed")
+		print("Godot behavioral tests: 17 passed")
 		quit(0)
 		return
 
@@ -131,6 +134,31 @@ func _test_sync_bonus_timing() -> void:
 	_expect_equal(sync.awards, 0, "Reset clears the session Sync counter")
 	_expect(sync.register_hit(6.02), "Reset re-opens the timing window")
 	sync.free()
+
+
+func _test_audio_settings_persistence() -> void:
+	var save_path := "user://tests/audio_settings_store.json"
+	_remove_test_file(save_path)
+	var settings := SettingsStoreNode.new()
+	settings.save_path = save_path
+	_expect(not settings.load_settings(), "Missing audio settings use safe defaults")
+	_expect_equal(settings.master_percent, 100.0, "Master defaults to 100 percent")
+	_expect(settings.set_audio_levels(65.0, 40.0, 0.0), "Audio settings can be persisted locally")
+
+	var reloaded := SettingsStoreNode.new()
+	reloaded.save_path = save_path
+	_expect(reloaded.load_settings(), "Persisted audio settings can be loaded")
+	_expect_equal(reloaded.master_percent, 65.0, "Master volume survives a reload")
+	_expect_equal(reloaded.music_percent, 40.0, "Music volume survives a reload")
+	_expect_equal(reloaded.sfx_percent, 0.0, "Muted SFX survive a reload")
+	_expect(is_equal_approx(SettingsStoreNode.percent_to_db(0.0), -60.0), "Zero percent maps to silence")
+	_expect(
+		is_equal_approx(SettingsStoreNode.percent_to_db(50.0), linear_to_db(0.5)),
+		"Percent levels use a perceptual audio conversion"
+	)
+	settings.free()
+	reloaded.free()
+	_remove_test_file(save_path)
 
 
 func _test_main_scene_scoring_and_reset() -> void:
@@ -709,6 +737,51 @@ func _test_sync_bonus_integration() -> void:
 	await process_frame
 
 
+func _test_audio_settings_menu() -> void:
+	var save_path := "user://tests/audio_settings_menu.json"
+	_remove_test_file(save_path)
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Main scene loads for audio settings")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	main.get_node("SettingsStore").save_path = save_path
+	root.add_child(main)
+	await process_frame
+
+	_expect(main.settings_button.visible, "Audio settings are available from the main menu")
+	main._open_audio_settings()
+	_expect(main.settings_panel.visible and not main.start_menu.visible, "Audio settings open without leaving the menu")
+	main.master_slider.value = 65.0
+	main.music_slider.value = 40.0
+	main.sfx_slider.value = 20.0
+	_expect(
+		is_equal_approx(main.audio_service.master_volume_db, SettingsStoreNode.percent_to_db(65.0)),
+		"Master slider applies its mix immediately"
+	)
+	main._close_audio_settings()
+	_expect(main.start_menu.visible and not main.settings_panel.visible, "Back returns to the main menu")
+	_expect(FileAccess.file_exists(save_path), "Leaving audio settings writes a local save")
+
+	var reloaded := SettingsStoreNode.new()
+	reloaded.save_path = save_path
+	_expect(reloaded.load_settings(), "Menu audio settings reload from local storage")
+	_expect_equal(reloaded.master_percent, 65.0, "Menu persists Master volume")
+	_expect_equal(reloaded.music_percent, 40.0, "Menu persists Music volume")
+	_expect_equal(reloaded.sfx_percent, 20.0, "Menu persists SFX volume")
+	main.restart_game()
+	_expect(
+		is_equal_approx(main.audio_service.sfx_volume_db, SettingsStoreNode.percent_to_db(20.0)),
+		"Restart keeps the player's audio mix"
+	)
+
+	reloaded.free()
+	main.free()
+	await process_frame
+	_remove_test_file(save_path)
+
+
 func _complete_cue_stack(main: Node) -> void:
 	while not main.cue_manager.is_stack_completed():
 		var cue = main.cue_manager.current_cue()
@@ -718,6 +791,11 @@ func _complete_cue_stack(main: Node) -> void:
 		_expect(main.cue_manager.current_cue_ready(), "Configured cue can be armed by its required shots")
 		_expect(main.cue_manager.start_current_cue(), "Console can execute each armed cue")
 		_expect(main.cue_manager.complete_current_cue(), "Executed cue advances the Cue Stack")
+
+
+func _remove_test_file(path: String) -> void:
+	if FileAccess.file_exists(path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 
 func _expect(condition: bool, message: String) -> void:
