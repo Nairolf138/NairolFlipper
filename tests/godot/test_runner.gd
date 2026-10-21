@@ -21,6 +21,7 @@ func _run() -> void:
 	await _test_android_playtest_regressions()
 	await _test_three_ball_game_over_and_recovery()
 	await _test_table_2_objectives_and_routes()
+	await _test_playfield_safe_trajectories()
 	await _test_final_show_multiball_and_blackout()
 	await _test_stage_identity_and_music_stems()
 	# Give the audio server and deferred frees time to release stream references.
@@ -28,7 +29,7 @@ func _run() -> void:
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 10 passed")
+		print("Godot behavioral tests: 11 passed")
 		quit(0)
 		return
 
@@ -360,6 +361,71 @@ func _test_table_2_objectives_and_routes() -> void:
 
 	main.free()
 	await process_frame
+
+
+func _test_playfield_safe_trajectories() -> void:
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Safe trajectory table loads")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	root.add_child(main)
+	await process_frame
+
+	var left_wall_shape := main.get_node("LeftWall/CollisionShape2D") as CollisionShape2D
+	var right_wall_shape := main.get_node("RightWall/CollisionShape2D") as CollisionShape2D
+	_expect(left_wall_shape.shape is RectangleShape2D, "Left boundary exposes a rectangle collision")
+	_expect(right_wall_shape.shape is RectangleShape2D, "Right boundary exposes a rectangle collision")
+	if left_wall_shape.shape is RectangleShape2D and right_wall_shape.shape is RectangleShape2D:
+		_expect((left_wall_shape.shape as RectangleShape2D).size.y >= 1840.0, "Left boundary reaches the drain")
+		_expect((right_wall_shape.shape as RectangleShape2D).size.y >= 1840.0, "Right boundary reaches the drain")
+
+	var upper_left := main.get_node("UpperLeftGuide") as StaticBody2D
+	var upper_right := main.get_node("UpperRightGuide") as StaticBody2D
+	_expect(upper_left.rotation > 0.0 and upper_right.rotation < 0.0, "Upper guides slope back toward the playfield")
+
+	var left_outlane := main.get_node("LeftOutlaneRail") as StaticBody2D
+	var left_return := main.get_node("LeftReturnRail") as StaticBody2D
+	var right_return := main.get_node("RightReturnRail") as StaticBody2D
+	var right_outlane := main.get_node("RightOutlaneRail") as StaticBody2D
+	var launcher_divider := main.get_node("LauncherDivider") as StaticBody2D
+	var launcher_lower_divider := main.get_node("LauncherLowerDivider") as StaticBody2D
+	_expect(left_outlane.position.x < left_return.position.x, "Left outlane remains outside its playable return")
+	_expect(right_return.position.x < right_outlane.position.x, "Right playable return remains inside its outlane")
+	_expect(right_outlane.position.x < launcher_divider.position.x, "Right outlane remains separate from the launcher")
+	_expect(launcher_divider.position.x < launcher_lower_divider.position.x, "Launcher exit opens toward the playfield")
+	_expect(left_return.position.x < 540.0 and right_return.position.x > 540.0, "Both returns feed their matching flipper")
+
+	main.free()
+	await process_frame
+
+	var left_exit := await _sample_return_exit(Vector2(240, 1330))
+	var right_exit := await _sample_return_exit(Vector2(770, 1330))
+	_expect(left_exit.x >= 300.0 and left_exit.x <= 480.0, "Left inlane delivers the ball over the left flipper (got %.1f)" % left_exit.x)
+	_expect(right_exit.x >= 600.0 and right_exit.x <= 780.0, "Right inlane delivers the ball over the right flipper (got %.1f)" % right_exit.x)
+
+
+func _sample_return_exit(start_position: Vector2) -> Vector2:
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	var main := packed_scene.instantiate()
+	root.add_child(main)
+	await process_frame
+	main.start_game()
+	var ball: RigidBody2D = main.balls[0]
+	ball.input_enabled = false
+	ball.reset_ball(start_position)
+	ball.freeze = false
+	ball.linear_velocity = Vector2(0, 120)
+	var exit_position := Vector2(-1, -1)
+	for frame in 200:
+		await physics_frame
+		if ball.global_position.y >= 1620.0:
+			exit_position = ball.global_position
+			break
+	main.free()
+	await process_frame
+	return exit_position
 
 
 func _test_final_show_multiball_and_blackout() -> void:
