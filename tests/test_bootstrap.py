@@ -282,17 +282,30 @@ def test_rig_model_declares_six_data_driven_fixture_families():
 
 def test_cue_definition_declares_data_driven_show_payload():
     cue_script = ROOT / "scripts" / "show" / "cue_definition.gd"
-    cue_data = ROOT / "data" / "cues" / "first_hit.tres"
 
     assert cue_script.is_file()
-    assert cue_data.is_file()
     cue_text = cue_script.read_text(encoding="utf-8")
-    data_text = cue_data.read_text(encoding="utf-8")
     assert "class_name CueDefinition" in cue_text
-    for field in ("cue_id", "display_name", "conditions", "light_changes", "audio_changes", "bonus_points", "duration_seconds"):
+    for field in (
+        "cue_id",
+        "display_name",
+        "objective_text",
+        "conditions",
+        "light_changes",
+        "audio_changes",
+        "bonus_points",
+        "duration_seconds",
+    ):
         assert f"@export var {field}" in cue_text
-    assert 'script_class="CueDefinition"' in data_text
-    assert 'cue_id = &"first_hit"' in data_text
+    assert "var condition_repetitions" in cue_text
+    for filename, cue_id in (
+        ("color_wash.tres", "color_wash"),
+        ("universe_chase.tres", "universe_chase"),
+        ("rhythm_drop.tres", "rhythm_drop"),
+    ):
+        data_text = (ROOT / "data" / "cues" / filename).read_text(encoding="utf-8")
+        assert 'script_class="CueDefinition"' in data_text
+        assert f'cue_id = &"{cue_id}"' in data_text
 
 
 def test_cue_manager_executes_eligible_cues_and_emits_show_payloads():
@@ -307,12 +320,21 @@ def test_cue_manager_executes_eligible_cues_and_emits_show_payloads():
     for signal_name in (
         "cue_started",
         "cue_completed",
+        "stack_progress_changed",
+        "stack_completed",
         "light_changes_requested",
         "audio_changes_requested",
         "bonus_awarded",
     ):
         assert f"signal {signal_name}" in manager_text
-    for method_name in ("set_conditions", "start_cue", "complete_current_cue", "_conditions_met"):
+    for method_name in (
+        "set_conditions",
+        "start_current_cue",
+        "current_cue_ready",
+        "is_stack_completed",
+        "complete_current_cue",
+        "_conditions_met",
+    ):
         assert f"func {method_name}" in manager_text
     assert "duration_seconds" in manager_text
     assert "bonus_points" in manager_text
@@ -330,7 +352,7 @@ def test_warm_and_cold_ramps_are_data_driven_and_feed_flow():
     assert definition_script.is_file()
     assert 'name="WarmRamp"' in scene_text
     assert 'name="ColdRamp"' in scene_text
-    assert 'groups = ["show_ramps"]' in ramp_scene.read_text(encoding="utf-8")
+    assert 'groups=["show_ramps"]' in ramp_scene.read_text(encoding="utf-8")
     assert "ramp_completed" in ramp_script.read_text(encoding="utf-8")
     assert "ramp_id" in definition_script.read_text(encoding="utf-8")
     assert "_on_ramp_completed" in main_script
@@ -349,21 +371,31 @@ def test_console_scoop_validates_cue_and_awards_show_progression():
     scoop_scene = ROOT / "scenes" / "gameplay" / "ConsoleScoop.tscn"
     scoop_script = ROOT / "scripts" / "show" / "console_scoop.gd"
     main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
-    cue_data = (ROOT / "data" / "cues" / "first_hit.tres").read_text(encoding="utf-8")
+    color_cue = (ROOT / "data" / "cues" / "color_wash.tres").read_text(encoding="utf-8")
+    orbit_cue = (ROOT / "data" / "cues" / "universe_chase.tres").read_text(encoding="utf-8")
+    rhythm_cue = (ROOT / "data" / "cues" / "rhythm_drop.tres").read_text(encoding="utf-8")
 
     assert scoop_scene.is_file()
     assert scoop_script.is_file()
     assert 'name="ConsoleScoop"' in scene_text
-    assert 'groups = ["console_scoops"]' in scoop_scene.read_text(encoding="utf-8")
+    assert 'groups=["console_scoops"]' in scoop_scene.read_text(encoding="utf-8")
     scoop_text = scoop_script.read_text(encoding="utf-8")
-    for signal_name in ("scoop_completed", "cue_validated"):
+    for signal_name in ("scoop_completed",):
         assert f"signal {signal_name}" in scoop_text
-    for field in ("scoop_id", "cue_id", "score_value", "flow_value", "rearm_delay"):
+    for field in ("scoop_id", "score_value", "flow_value", "rearm_delay"):
         assert f"@export var {field}" in scoop_text
     assert "body.is_in_group(\"balls\")" in scoop_text
     assert "cue_manager.add_condition" in main_script
-    assert "cue_manager.start_cue" in main_script
-    assert 'conditions = [&"bumper_hit", &"console_validated"]' in cue_data
+    assert "cue_manager.start_current_cue" in main_script
+    assert 'conditions = [&"warm_ramp", &"cold_ramp"]' in color_cue
+    assert 'conditions = [&"universe_orbit"]' in orbit_cue
+    assert "condition_repetitions = 2" in orbit_cue
+    assert 'conditions = [&"bumper_hit"]' in rhythm_cue
+    assert "condition_repetitions = 4" in rhythm_cue
+    for node_name in ("CueProgressLabel", "ConsoleScoop"):
+        assert f'name="{node_name}"' in scene_text
+    assert "func _try_arm_final_show" in main_script
+    assert "not cue_manager.is_stack_completed()" in main_script
 
 
 def test_flow_manager_tracks_forgiving_multiplier_progression():
@@ -390,7 +422,7 @@ def test_audio_service_plays_original_placeholder_sfx():
     audio_script = ROOT / "scripts" / "audio" / "audio_service.gd"
     scene_text = MAIN_SCENE.read_text(encoding="utf-8")
     main_script = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
-    cue_text = (ROOT / "data" / "cues" / "first_hit.tres").read_text(encoding="utf-8")
+    cue_text = (ROOT / "data" / "cues" / "color_wash.tres").read_text(encoding="utf-8")
 
     assert audio_script.is_file()
     audio_text = audio_script.read_text(encoding="utf-8")
@@ -481,7 +513,7 @@ def test_godot_behavioral_runner_covers_scoring_and_session_reset():
     runner_text = runner.read_text(encoding="utf-8")
 
     assert "_test_flow_decay_and_multiplier" in runner_text
-    assert "_test_cue_bonus_and_reset" in runner_text
+    assert "_test_cue_stack_progression" in runner_text
     assert "_test_main_scene_scoring_and_reset" in runner_text
 
 def test_session_lifecycle_blocks_phantom_balls_and_exposes_game_over():

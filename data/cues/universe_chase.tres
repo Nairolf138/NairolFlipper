@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CueDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/show/cue_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+cue_id = &"universe_chase"
+display_name = "UNIVERSE CHASE"
+objective_text = "UNIVERSE ORBIT x2"
+conditions = [&"universe_orbit"]
+condition_repetitions = 2
+bonus_points = 1500
+duration_seconds = 1.2
+light_changes = {"chase": "universe"}
+audio_changes = {"stems": {"percussion": 0.55, "bass": 0.45}, "sfx": "cue_start"}

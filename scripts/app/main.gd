@@ -25,6 +25,7 @@ enum SessionState {
 @onready var status_label: Label = $StatusLabel
 @onready var rig_progress_label: Label = $RigProgressLabel
 @onready var show_state_label: Label = $ShowStateLabel
+@onready var cue_progress_label: Label = $Interface/GameControls/CueProgressLabel
 @onready var stage_visuals: StageVisualControllerNode = $StageVisuals
 @onready var playtest_recorder: PlaytestRecorderNode = $PlaytestRecorder
 @onready var cue_manager: CueManagerNode = $CueManager
@@ -75,7 +76,6 @@ func _ready() -> void:
 		ramp.ramp_completed.connect(_on_ramp_completed)
 	for scoop in get_tree().get_nodes_in_group("console_scoops"):
 		scoop.scoop_completed.connect(_on_scoop_completed)
-		scoop.cue_validated.connect(_on_cue_validated)
 	for target in get_tree().get_nodes_in_group("rig_targets"):
 		target.target_hit.connect(_on_rig_target_hit)
 	for lane in get_tree().get_nodes_in_group("table_lanes"):
@@ -85,7 +85,11 @@ func _ready() -> void:
 	score_manager.score_changed.connect(_on_score_changed)
 	flow_manager.flow_changed.connect(_on_flow_changed)
 	cue_manager.audio_changes_requested.connect(audio_service.apply_cue_changes)
+	cue_manager.cue_started.connect(_on_cue_started)
+	cue_manager.cue_completed.connect(_on_cue_completed)
 	cue_manager.bonus_awarded.connect(_on_cue_bonus_awarded)
+	cue_manager.stack_progress_changed.connect(_on_cue_stack_progress_changed)
+	cue_manager.stack_completed.connect(_on_cue_stack_completed)
 	show_flow.state_changed.connect(_on_show_state_changed)
 	play_button.pressed.connect(start_game)
 	menu_quit_button.pressed.connect(_on_quit_pressed)
@@ -150,6 +154,7 @@ func start_game() -> void:
 	start_overlay.hide()
 	game_over_overlay.hide()
 	game_controls.show()
+	cue_progress_label.show()
 	restart_game()
 	status_label.text = "BALL 1 / %d — TOUCH TOP TO LAUNCH" % balls.size()
 
@@ -258,7 +263,8 @@ func _on_bumper_hit(points: int, _bumper_name: StringName) -> void:
 func _on_ramp_completed(ramp_id: StringName, score_value: int, flow_value: int) -> void:
 	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
-	status_label.text = "RAMP HIT"
+	cue_manager.add_condition(ramp_id)
+	status_label.text = "CUE READY — HIT CONSOLE" if cue_manager.current_cue_ready() else "RAMP HIT"
 	audio_service.request_sfx(&"ramp")
 	stage_visuals.trigger_hit(Color("ffb14a") if ramp_id == &"warm_ramp" else Color("00e5ff"))
 
@@ -280,9 +286,8 @@ func _on_rig_target_hit(
 		if active_count >= get_tree().get_nodes_in_group("rig_targets").size():
 			_add_score_with_flow(1500)
 			flow_manager.add_flow(200)
-			cue_manager.add_condition(&"rig_ready")
-			show_flow.arm_final_show()
-			status_label.text = "FINAL SHOW ARMED — HIT CONSOLE"
+			if not _try_arm_final_show():
+				status_label.text = "RIG READY — COMPLETE CUE STACK"
 			audio_service.request_sfx(&"cue")
 		else:
 			status_label.text = "%s ONLINE — %d / 6" % [display_name.to_upper(), active_count]
@@ -298,7 +303,11 @@ func _on_lane_completed(
 	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
 	cue_manager.add_condition(lane_id)
-	status_label.text = "%s +%d" % [display_name.to_upper(), score_value]
+	status_label.text = (
+		"CUE READY — HIT CONSOLE"
+		if cue_manager.current_cue_ready()
+		else "%s +%d" % [display_name.to_upper(), score_value]
+	)
 	audio_service.request_sfx(&"ramp")
 	stage_visuals.trigger_hit(Color("7c4dff"))
 
@@ -332,17 +341,92 @@ func _update_rig_progress() -> void:
 func _on_scoop_completed(_scoop_id: StringName, score_value: int, flow_value: int) -> void:
 	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
+	audio_service.request_sfx(&"scoop")
+	stage_visuals.trigger_hit(Color("eaf6ff"))
 	if show_flow.can_start_final_show():
 		_start_final_show()
+		return
+	if cue_manager.start_current_cue():
+		return
+	if cue_manager.active_cue != null:
+		status_label.text = "CUE RUNNING"
+	elif cue_manager.is_stack_completed():
+		status_label.text = "CUE STACK READY — COMPLETE RIG"
 	else:
-		status_label.text = "CUE VALIDATED"
-	audio_service.request_sfx(&"scoop")
+		var cue = cue_manager.current_cue()
+		status_label.text = "CUE INCOMPLETE — %s" % cue.objective_text
+
+
+func _on_cue_started(_cue_id: StringName) -> void:
+	var cue = cue_manager.active_cue
+	if cue == null:
+		return
+	cue_progress_label.text = "GO  •  %s" % cue.display_name
+	status_label.text = "GO — %s" % cue.display_name
+	_update_cue_shot_highlights()
 	stage_visuals.trigger_hit(Color("eaf6ff"))
 
 
-func _on_cue_validated(cue_id: StringName) -> void:
-	cue_manager.add_condition(&"console_validated")
-	cue_manager.start_cue(cue_id)
+func _on_cue_completed(_cue_id: StringName) -> void:
+	status_label.text = "CUE COMPLETE"
+	stage_visuals.trigger_hit(Color("7c4dff"))
+
+
+func _on_cue_stack_progress_changed(
+	cue_number: int,
+	total_cues: int,
+	display_name: String,
+	objective_text: String,
+	completed_shots: int,
+	required_shots: int,
+	ready: bool
+) -> void:
+	var instruction := "HIT CONSOLE" if ready else objective_text
+	cue_progress_label.text = "CUE %d / %d  •  %s\n%s  %d / %d" % [
+		cue_number,
+		total_cues,
+		display_name,
+		instruction,
+		completed_shots,
+		required_shots,
+	]
+	if ready:
+		status_label.text = "CUE READY — HIT CONSOLE"
+	_update_cue_shot_highlights()
+
+
+func _on_cue_stack_completed() -> void:
+	var cue_count := cue_manager.cues.size()
+	cue_progress_label.text = "CUE STACK  %d / %d  •  COMPLETE" % [cue_count, cue_count]
+	_update_cue_shot_highlights()
+	if not _try_arm_final_show():
+		status_label.text = "CUE STACK READY — COMPLETE RIG"
+
+
+func _try_arm_final_show() -> bool:
+	var rig_complete := _active_rig_family_count() >= get_tree().get_nodes_in_group("rig_targets").size()
+	if not rig_complete or not cue_manager.is_stack_completed():
+		return false
+	if show_flow.can_start_final_show():
+		return true
+	if not show_flow.arm_final_show():
+		return false
+	status_label.text = "FINAL SHOW ARMED — HIT CONSOLE"
+	audio_service.request_sfx(&"cue")
+	return true
+
+
+func _update_cue_shot_highlights() -> void:
+	for ramp in get_tree().get_nodes_in_group("show_ramps"):
+		if ramp.has_method("set_objective_highlight"):
+			ramp.set_objective_highlight(cue_manager.condition_is_pending(ramp.definition.ramp_id))
+	for lane in get_tree().get_nodes_in_group("table_lanes"):
+		if lane.has_method("set_objective_highlight"):
+			lane.set_objective_highlight(cue_manager.condition_is_pending(lane.lane_id))
+	var bumpers_are_objective := cue_manager.condition_is_pending(&"bumper_hit")
+	for bumper in get_tree().get_nodes_in_group("score_bumpers"):
+		if bumper.has_method("set_objective_highlight"):
+			bumper.set_objective_highlight(bumpers_are_objective)
 
 
 func _on_cue_bonus_awarded(points: int) -> void:
@@ -418,6 +502,7 @@ func _start_final_show() -> void:
 	var generation := show_generation
 	stalled_ball_time = 0.0
 	final_show_label.text = "FINAL SHOW  •  3 BALLS  •  SCORE x%d" % show_flow.final_show_score_multiplier
+	cue_progress_label.hide()
 	final_show_label.show()
 	blackout_overlay.hide()
 	_add_score_with_flow(3000)
@@ -482,6 +567,7 @@ func _finish_final_show(message: String) -> void:
 			ball.deactivate_ball()
 	show_flow.start_blackout()
 	final_show_label.hide()
+	cue_progress_label.show()
 	blackout_overlay.show()
 	status_label.text = "BLACKOUT — %s" % message
 	audio_service.request_sfx(&"drain")
@@ -584,6 +670,7 @@ func restart_game() -> void:
 	game_over_overlay.hide()
 	blackout_overlay.hide()
 	final_show_label.hide()
+	cue_progress_label.show()
 	score_manager.reset_score()
 	flow_manager.reset_flow()
 	cue_manager.reset_state()
@@ -602,6 +689,7 @@ func restart_game() -> void:
 		lane.reset()
 	for slingshot in get_tree().get_nodes_in_group("slingshots"):
 		slingshot.reset()
+	cue_manager.refresh_progress()
 	_update_rig_progress()
 	_deactivate_all_balls()
 	balls[active_ball_index].reset_ball(balls[active_ball_index].spawn_position)

@@ -17,9 +17,8 @@ corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
-[node name="ConsoleScoop" type="Area2D"]
+[node name="ConsoleScoop" type="Area2D" groups=["console_scoops"]]
 script = ExtResource("1_scoop")
-groups = ["console_scoops"]
 collision_layer = 0
 collision_mask = 1
 monitoring = true

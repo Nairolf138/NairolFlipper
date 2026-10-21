@@ -6,7 +6,8 @@
 
 - Documentation initiale de cadrage du projet.
 - Instrumentation locale de session pour les playtests, sans télémétrie réseau.
-- Resource data-driven `CueDefinition` et premier cue de démonstration.
+- Resource data-driven `CueDefinition` avec conditions répétables et exécution
+  séquentielle.
 - Rampes Warm/Cold data-driven, avec score et Flow sur passage.
 - Tests comportementaux Godot pour Flow, Cue, score et réinitialisation de partie.
 - Import propre et détection explicite des erreurs Godot dans la CI.
@@ -23,6 +24,10 @@
   et le Showflow.
 - Identité scénique vectorielle avec truss, fixtures, faisceaux, grille et runway
   réactifs, sans shader lourd ni asset tiers.
+- Cue Stack en trois étapes : Color Wash, Universe Chase et Rhythm Drop, chacune
+  préparée par des tirs dédiés puis exécutée via la Console.
+- Objectif courant permanent et mise en évidence des rampes, de l'orbite ou des
+  bumpers encore attendus.
 
 ### Fixed
 
@@ -47,3 +52,7 @@
   les rebonds uniformes tout en conservant des tirs réactifs.
 - Ombre de contact, bord métallique et reflet ajoutés à la bille pour mieux la
   poser visuellement sur le plateau.
+- Final Show désormais conditionné par la Cue Stack complète et les six familles
+  du Rig, afin que les routes du plateau participent toutes à la progression.
+- Groupes Godot des rampes et de la Console corrigés afin que leurs collisions
+  atteignent réellement la logique de partie.

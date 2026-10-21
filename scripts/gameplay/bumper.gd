@@ -9,10 +9,24 @@ signal bumper_hit(points: int, bumper_name: StringName)
 @onready var visual: Polygon2D = $Visual
 
 var _flash_tween: Tween
+var _pulse_time: float = 0.0
 
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
+	set_process(false)
+
+
+func _process(delta: float) -> void:
+	_pulse_time += delta
+	var energy := 1.05 + (sin(_pulse_time * 6.0) + 1.0) * 0.14
+	visual.scale = Vector2.ONE * energy
+
+
+func set_objective_highlight(enabled: bool) -> void:
+	_pulse_time = 0.0
+	set_process(enabled)
+	visual.scale = Vector2.ONE
 
 
 func _on_body_entered(body: Node2D) -> void:

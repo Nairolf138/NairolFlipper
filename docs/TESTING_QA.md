@@ -109,6 +109,20 @@ toucher, les collisions inactives et la récupération hors limites.
 - observer une partie complète et signaler toute zone devenue trop rapide ou
   impossible à contrôler.
 
+### Table 2.3 — checklist Cue Stack
+
+- vérifier que seules les rampes Warm et Cold sont mises en évidence au début ;
+- toucher chaque rampe une fois, puis confirmer `CUE READY — HIT CONSOLE` ;
+- toucher la Console et vérifier le passage à Universe Chase ;
+- traverser l'Universe Orbit deux fois, exécuter la cue, puis toucher quatre
+  bumpers pour préparer Rhythm Drop ;
+- confirmer que le HUD progresse de `CUE 1 / 3` à `CUE STACK 3 / 3` ;
+- compléter uniquement le Rig et vérifier que le Final Show reste verrouillé ;
+- compléter le Rig et la Cue Stack, puis confirmer que la Console déclenche le
+  Final Show ;
+- vérifier que la progression des cues survit à la perte d'une bille et revient
+  à zéro après Reset ou Rejouer.
+
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 
 ## Instrumentation locale de playtest

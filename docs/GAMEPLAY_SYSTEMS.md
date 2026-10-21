@@ -44,6 +44,16 @@ Six familles de Rig. Une famille complétée change visuellement le plateau, dé
 
 Chaque cue possède identifiant, nom localisé, conditions, changements lumière/audio, bonus et durée éventuelle. Data-driven.
 
+### Cue Stack Alpha
+
+La conduite active est ordonnée et lisible : Color Wash, Universe Chase, puis
+Rhythm Drop. Une étape comptabilise uniquement ses tirs demandés, peut exiger
+plusieurs répétitions, puis attend un passage sur la Console. L'exécution donne
+son bonus, applique ses changements audiovisuels et avance vers la cue suivante.
+
+Le Final Show exige à la fois les trois cues exécutées et les six familles du
+Rig actives.
+
 ## Flow
 
 Proposition : `1x → 2x → 3x → 4x → 6x → 8x`. Monte par variété, rampes, orbites, cues, sync. Décroissance généreuse.
