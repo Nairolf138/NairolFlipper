@@ -34,6 +34,11 @@ Flippers, bumpers Kick/Snare/Tom, métal, launcher, target, cue, lock, multiball
 
 Priorité : signaux critiques → impacts → musique → ambience. Sliders Master/Music/SFX.
 
+Le menu expose ces trois niveaux de 0 à 100 %. Ils sont convertis vers les dB
+des bus avec une courbe perceptuelle, appliqués sans redémarrer la partie et
+persistés uniquement sur l'appareil dans `user://settings.json`. Un niveau à
+0 % correspond à -60 dB et coupe effectivement le bus concerné.
+
 ## Sync
 
 Horloge musicale logique indépendante du rendu. Le jeu reste jouable son coupé.

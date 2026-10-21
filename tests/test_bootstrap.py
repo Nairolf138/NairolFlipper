@@ -704,3 +704,35 @@ def test_sync_bonus_rewards_timing_without_punishing_normal_shots():
     assert "_test_sync_bonus_timing" in runner_text
     assert "_test_sync_bonus_integration" in runner_text
     assert "Off-beat shots keep all normal gameplay points" in runner_text
+
+
+def test_audio_settings_are_accessible_persistent_and_platform_local():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    main_text = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    settings_script = ROOT / "scripts" / "app" / "settings_store.gd"
+    runner_text = (ROOT / "tests" / "godot" / "test_runner.gd").read_text(encoding="utf-8")
+
+    assert settings_script.is_file()
+    settings_text = settings_script.read_text(encoding="utf-8")
+    assert "class_name SettingsStore" in settings_text
+    assert 'DEFAULT_SAVE_PATH := "user://settings.json"' in settings_text
+    assert "func load_settings()" in settings_text
+    assert "func save_settings()" in settings_text
+    assert "func percent_to_db" in settings_text
+    assert "AudioServer.set_bus_mute" in (ROOT / "scripts" / "audio" / "audio_service.gd").read_text(encoding="utf-8")
+    for node_name in (
+        "SettingsStore",
+        "SettingsButton",
+        "SettingsPanel",
+        "MasterSlider",
+        "MusicSlider",
+        "SFXSlider",
+        "DefaultsButton",
+        "BackButton",
+    ):
+        assert f'name="{node_name}"' in scene_text
+    assert "func _open_audio_settings" in main_text
+    assert "func _close_audio_settings" in main_text
+    assert "audio_service.set_mix" in main_text
+    assert "_test_audio_settings_persistence" in runner_text
+    assert "_test_audio_settings_menu" in runner_text

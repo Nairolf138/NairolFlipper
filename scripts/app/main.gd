@@ -5,6 +5,7 @@ const CueManagerNode = preload("res://scripts/show/cue_manager.gd")
 const FlowManagerNode = preload("res://scripts/show/flow_manager.gd")
 const PlaytestRecorderNode = preload("res://scripts/app/playtest_recorder.gd")
 const RigModelNode = preload("res://scripts/show/rig_model.gd")
+const SettingsStoreNode = preload("res://scripts/app/settings_store.gd")
 const ShowFlowManagerNode = preload("res://scripts/show/show_flow_manager.gd")
 const StageVisualControllerNode = preload("res://scripts/show/stage_visual_controller.gd")
 const SyncBonusManagerNode = preload("res://scripts/show/sync_bonus_manager.gd")
@@ -31,13 +32,25 @@ enum SessionState {
 @onready var playtest_recorder: PlaytestRecorderNode = $PlaytestRecorder
 @onready var cue_manager: CueManagerNode = $CueManager
 @onready var audio_service: AudioServiceNode = $AudioService
+@onready var settings_store: SettingsStoreNode = $SettingsStore
 @onready var rig_model: RigModelNode = $RigModel
 @onready var show_flow: ShowFlowManagerNode = $ShowFlowManager
 @onready var sync_bonus_manager: SyncBonusManagerNode = $SyncBonusManager
 @onready var start_overlay: Control = $Interface/StartOverlay
 @onready var game_controls: Control = $Interface/GameControls
 @onready var play_button: Button = $Interface/StartOverlay/Menu/PlayButton
+@onready var settings_button: Button = $Interface/StartOverlay/Menu/SettingsButton
 @onready var menu_quit_button: Button = $Interface/StartOverlay/Menu/QuitButton
+@onready var start_menu: VBoxContainer = $Interface/StartOverlay/Menu
+@onready var settings_panel: Control = $Interface/StartOverlay/SettingsPanel
+@onready var master_slider: HSlider = $Interface/StartOverlay/SettingsPanel/Menu/MasterSlider
+@onready var music_slider: HSlider = $Interface/StartOverlay/SettingsPanel/Menu/MusicSlider
+@onready var sfx_slider: HSlider = $Interface/StartOverlay/SettingsPanel/Menu/SFXSlider
+@onready var master_value_label: Label = $Interface/StartOverlay/SettingsPanel/Menu/MasterValue
+@onready var music_value_label: Label = $Interface/StartOverlay/SettingsPanel/Menu/MusicValue
+@onready var sfx_value_label: Label = $Interface/StartOverlay/SettingsPanel/Menu/SFXValue
+@onready var audio_defaults_button: Button = $Interface/StartOverlay/SettingsPanel/Menu/DefaultsButton
+@onready var audio_back_button: Button = $Interface/StartOverlay/SettingsPanel/Menu/BackButton
 @onready var reset_button: Button = $Interface/GameControls/ResetButton
 @onready var game_quit_button: Button = $Interface/GameControls/QuitButton
 @onready var game_over_overlay: Control = $Interface/GameOverOverlay
@@ -98,11 +111,22 @@ func _ready() -> void:
 	sync_bonus_manager.sync_awarded.connect(_on_sync_awarded)
 	audio_service.transport_changed.connect(_on_transport_changed)
 	play_button.pressed.connect(start_game)
+	settings_button.pressed.connect(_open_audio_settings)
 	menu_quit_button.pressed.connect(_on_quit_pressed)
+	master_slider.value_changed.connect(_on_audio_slider_changed)
+	music_slider.value_changed.connect(_on_audio_slider_changed)
+	sfx_slider.value_changed.connect(_on_audio_slider_changed)
+	master_slider.drag_ended.connect(_on_audio_slider_drag_ended)
+	music_slider.drag_ended.connect(_on_audio_slider_drag_ended)
+	sfx_slider.drag_ended.connect(_on_audio_slider_drag_ended)
+	audio_defaults_button.pressed.connect(_on_audio_defaults_pressed)
+	audio_back_button.pressed.connect(_close_audio_settings)
 	reset_button.pressed.connect(_on_reset_pressed)
 	game_quit_button.pressed.connect(_on_quit_pressed)
 	replay_button.pressed.connect(start_game)
 	game_over_menu_button.pressed.connect(_show_start_menu)
+	_sync_audio_sliders_from_store()
+	_apply_audio_settings()
 	restart_game()
 	_show_start_menu()
 
@@ -175,6 +199,8 @@ func _show_start_menu() -> void:
 	show_flow.enter_standby()
 	audio_service.stop_transport(true)
 	start_overlay.show()
+	start_menu.show()
+	settings_panel.hide()
 	game_over_overlay.hide()
 	blackout_overlay.hide()
 	final_show_label.hide()
@@ -213,8 +239,79 @@ func _on_reset_pressed() -> void:
 
 
 func _on_quit_pressed() -> void:
+	settings_store.save_settings()
 	playtest_recorder.save_session()
 	get_tree().quit()
+
+
+func _open_audio_settings() -> void:
+	_sync_audio_sliders_from_store()
+	start_menu.hide()
+	settings_panel.show()
+	master_slider.grab_focus()
+
+
+func _close_audio_settings() -> void:
+	_store_audio_settings()
+	settings_panel.hide()
+	start_menu.show()
+	settings_button.grab_focus()
+
+
+func _on_audio_slider_changed(_value: float) -> void:
+	_update_audio_value_labels()
+	_apply_audio_settings_from_sliders()
+
+
+func _on_audio_slider_drag_ended(value_changed: bool) -> void:
+	if value_changed:
+		_store_audio_settings()
+
+
+func _on_audio_defaults_pressed() -> void:
+	master_slider.set_value_no_signal(SettingsStoreNode.DEFAULT_MASTER_PERCENT)
+	music_slider.set_value_no_signal(SettingsStoreNode.DEFAULT_MUSIC_PERCENT)
+	sfx_slider.set_value_no_signal(SettingsStoreNode.DEFAULT_SFX_PERCENT)
+	_update_audio_value_labels()
+	_apply_audio_settings_from_sliders()
+	_store_audio_settings()
+
+
+func _sync_audio_sliders_from_store() -> void:
+	master_slider.set_value_no_signal(settings_store.master_percent)
+	music_slider.set_value_no_signal(settings_store.music_percent)
+	sfx_slider.set_value_no_signal(settings_store.sfx_percent)
+	_update_audio_value_labels()
+
+
+func _update_audio_value_labels() -> void:
+	master_value_label.text = "MASTER  %d%%" % roundi(master_slider.value)
+	music_value_label.text = "MUSIQUE  %d%%" % roundi(music_slider.value)
+	sfx_value_label.text = "EFFETS  %d%%" % roundi(sfx_slider.value)
+
+
+func _apply_audio_settings_from_sliders() -> void:
+	audio_service.set_mix(
+		SettingsStoreNode.percent_to_db(master_slider.value),
+		SettingsStoreNode.percent_to_db(music_slider.value),
+		SettingsStoreNode.percent_to_db(sfx_slider.value)
+	)
+
+
+func _apply_audio_settings() -> void:
+	audio_service.set_mix(
+		SettingsStoreNode.percent_to_db(settings_store.master_percent),
+		SettingsStoreNode.percent_to_db(settings_store.music_percent),
+		SettingsStoreNode.percent_to_db(settings_store.sfx_percent)
+	)
+
+
+func _store_audio_settings() -> void:
+	settings_store.set_audio_levels(
+		master_slider.value,
+		music_slider.value,
+		sfx_slider.value
+	)
 
 
 func _on_flipper_activated(_action_name: StringName) -> void:

@@ -244,9 +244,12 @@ func _apply_bus_levels() -> void:
 	var master_index := AudioServer.get_bus_index(&"Master")
 	if master_index >= 0:
 		AudioServer.set_bus_volume_db(master_index, master_volume_db)
+		AudioServer.set_bus_mute(master_index, master_volume_db <= -60.0)
 	var music_index := AudioServer.get_bus_index(&"Music")
 	if music_index >= 0:
 		AudioServer.set_bus_volume_db(music_index, music_volume_db)
+		AudioServer.set_bus_mute(music_index, music_volume_db <= -60.0)
 	var sfx_index := AudioServer.get_bus_index(&"SFX")
 	if sfx_index >= 0:
 		AudioServer.set_bus_volume_db(sfx_index, sfx_volume_db)
+		AudioServer.set_bus_mute(sfx_index, sfx_volume_db <= -60.0)

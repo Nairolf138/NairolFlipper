@@ -5,6 +5,8 @@
 - Réduction des flashes.
 - Réduction du screen shake.
 - Master/Music/SFX séparés.
+- Réglages audio accessibles au tactile, exprimés en pourcentage et mémorisés
+  localement entre deux lancements.
 - Jeu possible sans son.
 - Remapping clavier/manette à terme.
 - Contrôle tactile simple.

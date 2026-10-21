@@ -36,6 +36,8 @@
   et Flow, feedback texte/flash/SFX et verrou anti-farm par pulse.
 - Horloge visuelle à quatre temps sur le plateau et compteur local de Sync pour
   comparer les futurs playtests sans télémétrie réseau.
+- Menu de réglages audio Master/Musique/Effets, avec application immédiate,
+  valeurs par défaut et persistance locale multiplateforme.
 
 ### Fixed
 

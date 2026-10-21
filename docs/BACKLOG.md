@@ -162,7 +162,7 @@ visible dans le HUD et un restart remet la conduite à Preset.
 
 ## P1 — Audio
 
-T040 Audio service ✅; T041 SFX buses ✅; T042 Music transport ✅; T043 Stem set ✅; T044 Sync Bonus ✅.
+T040 Audio service ✅; T041 SFX buses ✅; T042 Music transport ✅; T043 Stem set ✅; T044 Sync Bonus ✅; T045 Audio settings ✅.
 
 T040 ajoute un service audio logique multiplateforme : mix Master/Music/SFX,
 états de stems et demandes de SFX sont consommables par les cues sans rendre le
@@ -187,6 +187,11 @@ Perfect Sync et une fenêtre plus large donne Sync ; les deux ajoutent score et
 Flow avec texte, flash et SFX dédiés. Un pulse ne peut être récompensé qu'une
 fois et un tir hors tempo ne perd jamais ses gains normaux. Les témoins à quatre
 temps restent visibles même si le mix audio est coupé.
+
+T045 ajoute au menu trois réglages tactiles Master/Musique/Effets. Leur effet est
+immédiat, les valeurs peuvent être réinitialisées et elles sont sauvegardées
+localement avec un schéma versionné et un fallback sûr en cas de fichier absent
+ou invalide.
 
 ## P2 — Final
 
