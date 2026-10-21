@@ -38,3 +38,6 @@
 - Cycle de partie verrouillé à trois billes avec écran Game Over explicite.
 - Collisions des billes inactives désactivées pour supprimer les apparitions fantômes.
 - Safety limité à une utilisation par bille et récupération des billes coincées ou hors plateau.
+- Parois latérales prolongées jusqu'au drain pour fermer les sorties involontaires.
+- Guides supérieurs réorientés vers le centre et retours bas séparés des outlanes
+  et du couloir du lanceur.

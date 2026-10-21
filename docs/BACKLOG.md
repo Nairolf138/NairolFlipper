@@ -93,6 +93,14 @@ T023 ajoute Safety : une bille lancée peut être sauvée une fois pendant la fe
 T024 mappe les boutons X/Y d'une manette aux flippers gauche/droit et A au lancement, en conservant les actions clavier et tactiles communes.
 T025 enregistre localement les événements et la durée d'une session dans `user://playtest/latest.json`, sans réseau ni compte.
 
+### T026 — Trajectoires sûres ✅
+
+Les parois latérales ferment le plateau jusqu'au drain, les guides supérieurs
+renvoient une bille lente vers le centre et les rails bas séparent clairement
+les retours jouables des outlanes. Le couloir du lanceur ne croise plus le retour
+droit. La sensation de poids et le réglage fin des contacts restent le jalon
+suivant et demandent un playtest sur tablette.
+
 ## P1 — Show systems
 
 ### T030 Rig model ✅; T031 CueDefinition ✅; T032 CueManager ✅; T033 Flow ✅; T034 Warm/Cold ramps ✅; T035 Console scoop ✅; T036 First show sequence ✅.

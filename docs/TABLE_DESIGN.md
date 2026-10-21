@@ -59,3 +59,20 @@ La première refonte greybox matérialise la promesse « construire le show » :
 
 Cette version reste vectorielle et sans art final : elle valide d'abord les
 trajectoires, la compréhension des objectifs et le rythme sur tablette.
+
+## Table 2.1 — trajectoires sûres
+
+Les limites latérales rejoignent désormais la zone de drain afin qu'une bille ne
+puisse plus quitter silencieusement le plateau. Les guides supérieurs descendent
+vers le centre : une bille lente roule vers le jeu au lieu de se caler contre un
+mur dans un angle fermé.
+
+Le bas du plateau distingue trois chemins :
+
+- deux inlanes larges ramènent la bille au-dessus du flipper correspondant ;
+- deux outlanes restent des pertes volontaires et lisibles ;
+- le couloir du lanceur reste physiquement séparé jusqu'à proximité du drain.
+
+La géométrie conserve une ouverture centrale franche entre les flippers. Les
+guides améliorent les retours latéraux sans supprimer le risque principal du
+flipper.

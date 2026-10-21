@@ -514,6 +514,29 @@ def test_table_2_greybox_adds_playfield_routes_and_rig_objective():
         assert f"func {handler}" in main_text
 
 
+def test_playfield_geometry_closes_edges_and_separates_return_lanes():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    runner_text = (ROOT / "tests" / "godot" / "test_runner.gd").read_text(encoding="utf-8")
+
+    assert scene_text.count("size = Vector2(40, 1840)") == 2
+    for node_name in (
+        "UpperLeftGuide",
+        "UpperRightGuide",
+        "LeftOutlaneRail",
+        "LeftReturnRail",
+        "RightReturnRail",
+        "RightOutlaneRail",
+        "LauncherDivider",
+        "LauncherLowerDivider",
+    ):
+        assert f'name="{node_name}"' in scene_text
+    assert "position = Vector2(665, 1495)" in scene_text
+    assert "position = Vector2(770, 1495)" in scene_text
+    assert "position = Vector2(845, 1325)" in scene_text
+    assert "position = Vector2(870, 1600)" in scene_text
+    assert "_test_playfield_safe_trajectories" in runner_text
+
+
 def test_showflow_final_show_multiball_and_blackout_are_explicit():
     scene_text = MAIN_SCENE.read_text(encoding="utf-8")
     main_text = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
