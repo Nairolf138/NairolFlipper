@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CueDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/show/cue_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+cue_id = &"rhythm_drop"
+display_name = "RHYTHM DROP"
+objective_text = "RHYTHM BUMPERS x4"
+conditions = [&"bumper_hit"]
+condition_repetitions = 4
+bonus_points = 2000
+duration_seconds = 1.2
+light_changes = {"hit": "rhythm"}
+audio_changes = {"stems": {"kick": 0.7, "percussion": 0.65, "bass": 0.55}, "sfx": "cue_start"}

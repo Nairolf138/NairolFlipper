@@ -76,3 +76,20 @@ Le bas du plateau distingue trois chemins :
 La géométrie conserve une ouverture centrale franche entre les flippers. Les
 guides améliorent les retours latéraux sans supprimer le risque principal du
 flipper.
+
+## Table 2.3 — Cue Stack
+
+Le plateau transforme ses routes en conduite de spectacle :
+
+1. **Color Wash** demande un passage sur chacune des rampes Warm et Cold ;
+2. **Universe Chase** demande deux passages dans l'Universe Orbit ;
+3. **Rhythm Drop** demande quatre impacts sur les bumpers rythmiques.
+
+Une cue préparée clignote comme disponible, puis la Console sert de bouton
+`GO`. Le HUD affiche le nom, l'objectif et le nombre de tirs réalisés. Les
+éléments attendus sont renforcés visuellement et s'éteignent dès que leur part
+de l'objectif est acquise.
+
+Le Final Show s'arme uniquement lorsque la Cue Stack et le Rig `6 / 6` sont
+terminés. Les deux progressions peuvent être menées en parallèle et persistent
+entre les trois billes de la partie.

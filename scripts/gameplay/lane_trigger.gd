@@ -15,6 +15,7 @@ signal lane_completed(lane_id: StringName, display_name: String, score_value: in
 
 var _armed: bool = true
 var _flash_tween: Tween
+var _pulse_time: float = 0.0
 
 
 func _ready() -> void:
@@ -22,10 +23,25 @@ func _ready() -> void:
 	visual.color = Color(lane_color.r, lane_color.g, lane_color.b, 0.42)
 	label.text = display_name
 	label.modulate = lane_color
+	set_process(false)
+
+
+func _process(delta: float) -> void:
+	_pulse_time += delta
+	var energy := 1.08 + (sin(_pulse_time * 5.0) + 1.0) * 0.12
+	visual.modulate = Color(energy, energy, energy, 1.0)
 
 
 func reset() -> void:
 	_armed = true
+	set_objective_highlight(false)
+
+
+func set_objective_highlight(enabled: bool) -> void:
+	_pulse_time = 0.0
+	set_process(enabled)
+	visual.modulate = Color.WHITE
+	label.text = ("▶ " if enabled else "") + display_name
 
 
 func _on_body_entered(body: Node) -> void:

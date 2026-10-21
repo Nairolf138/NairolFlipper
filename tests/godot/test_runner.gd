@@ -14,7 +14,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	_test_flow_decay_and_multiplier()
-	_test_cue_bonus_and_reset()
+	_test_cue_stack_progression()
 	_test_show_flow_state_machine()
 	await _test_main_scene_scoring_and_reset()
 	await _test_physics_drain_lifecycle()
@@ -52,26 +52,41 @@ func _test_flow_decay_and_multiplier() -> void:
 	flow.free()
 
 
-func _test_cue_bonus_and_reset() -> void:
+func _test_cue_stack_progression() -> void:
 	var manager := CueManagerNode.new()
-	var cue := CueDefinitionResource.new()
-	cue.cue_id = &"test_cue"
-	cue.conditions = [&"ready"]
-	cue.bonus_points = 250
-	manager.cues = [cue]
+	var color_cue := CueDefinitionResource.new()
+	color_cue.cue_id = &"color_wash"
+	color_cue.conditions = [&"warm_ramp", &"cold_ramp"]
+	color_cue.bonus_points = 250
+	var orbit_cue := CueDefinitionResource.new()
+	orbit_cue.cue_id = &"universe_chase"
+	orbit_cue.conditions = [&"universe_orbit"]
+	orbit_cue.condition_repetitions = 2
+	manager.cues = [color_cue, orbit_cue]
 
 	var awarded_points: Array[int] = []
 	manager.bonus_awarded.connect(func(points: int) -> void: awarded_points.append(points))
-	manager.add_condition(&"ready")
-	_expect(manager.start_cue(&"test_cue"), "Eligible cue starts")
+	manager.add_condition(&"warm_ramp")
+	_expect(not manager.current_cue_ready(), "Color cue waits for both ramps")
+	manager.add_condition(&"cold_ramp")
+	_expect(manager.current_cue_ready(), "Color cue arms after both distinct ramps")
+	_expect(manager.start_current_cue(), "Console can run the armed color cue")
 	_expect(manager.complete_current_cue(), "Active cue completes")
 	_expect_equal(awarded_points, [250], "Cue completion emits its configured bonus")
+	_expect_equal(manager.current_cue_index, 1, "Cue Stack advances to its second cue")
 
-	manager.add_condition(&"ready")
-	_expect(manager.start_cue(&"test_cue"), "Cue can start again before reset")
+	manager.add_condition(&"universe_orbit")
+	_expect(not manager.current_cue_ready(), "Universe Chase requires two orbit shots")
+	manager.add_condition(&"universe_orbit")
+	_expect(manager.current_cue_ready(), "Repeated shots can arm a Cue Stack step")
+	_expect(manager.start_current_cue(), "Console runs the second armed cue")
+	_expect(manager.complete_current_cue(), "Second cue completes")
+	_expect(manager.is_stack_completed(), "Completing every cue closes the stack")
+
 	manager.reset_state()
 	_expect(manager.active_cue == null, "Cue reset clears the active cue")
-	_expect(not manager.start_cue(&"test_cue"), "Cue reset clears satisfied conditions")
+	_expect_equal(manager.current_cue_index, 0, "Cue reset returns to the first cue")
+	_expect(not manager.start_current_cue(), "Cue reset clears shot progress")
 	manager.free()
 
 
@@ -107,10 +122,11 @@ func _test_main_scene_scoring_and_reset() -> void:
 	main._on_bumper_hit(10, &"test_bumper")
 	_expect_equal(main.score_manager.score, 20, "Flow multiplier applies to gameplay score")
 
-	main.cue_manager.add_condition(&"console_validated")
-	_expect(main.cue_manager.start_cue(&"first_hit"), "Configured first cue starts")
+	main.cue_manager.add_condition(&"warm_ramp")
+	main.cue_manager.add_condition(&"cold_ramp")
+	_expect(main.cue_manager.start_current_cue(), "Configured first Cue Stack step starts")
 	main.cue_manager.complete_current_cue()
-	_expect_equal(main.score_manager.score, 520, "Cue bonus reaches ScoreManager with Flow multiplier")
+	_expect_equal(main.score_manager.score, 2020, "Cue bonus reaches ScoreManager with Flow multiplier")
 
 	_expect(main.rig_model.activate_family(&"front_wash"), "Rig family activates")
 	main.audio_service.set_stem_level(&"piano", 1.0)
@@ -122,7 +138,8 @@ func _test_main_scene_scoring_and_reset() -> void:
 	_expect_equal(main.flow_manager.flow_points, 0, "Restart resets Flow")
 	_expect_equal(main.flow_manager.multiplier, 1, "Restart resets multiplier")
 	_expect(main.cue_manager.active_cue == null, "Restart clears the active cue")
-	_expect(not main.cue_manager.start_cue(&"first_hit"), "Restart clears cue conditions")
+	_expect_equal(main.cue_manager.current_cue_index, 0, "Restart rewinds the Cue Stack")
+	_expect(not main.cue_manager.start_current_cue(), "Restart clears cue shot progress")
 	_expect(not main.rig_model.is_family_active(&"front_wash"), "Restart resets Rig state")
 	_expect(main.audio_service.stem_levels.is_empty(), "Restart clears stem state")
 	_expect(not main.audio_service.transport_playing, "Restart stops music transport")
@@ -327,6 +344,7 @@ func _test_table_2_objectives_and_routes() -> void:
 	await physics_frame
 	main.start_game()
 	await process_frame
+	main._launch_or_restart()
 
 	var rig_targets := main.get_tree().get_nodes_in_group("rig_targets")
 	_expect_equal(rig_targets.size(), 6, "Table 2.0 exposes six readable Rig targets")
@@ -334,16 +352,48 @@ func _test_table_2_objectives_and_routes() -> void:
 	_expect(main.get_node("LeftSlingshot") != null and main.get_node("RightSlingshot") != null, "Table 2.0 exposes two active slingshots")
 	_expect(main.get_node("LeftOutlaneRail") is StaticBody2D, "Table 2.0 left outlane has physical guidance")
 	_expect(main.get_node("LauncherDivider") is StaticBody2D, "Table 2.0 launcher is physically separated")
+	_expect(main.get_node("WarmRamp/Label").text.begins_with("▶"), "First cue highlights the Warm ramp")
+	_expect(main.get_node("ColdRamp/Label").text.begins_with("▶"), "First cue highlights the Cold ramp")
+	_expect(not main.get_node("UniverseOrbit/Label").text.begins_with("▶"), "Future cue routes stay visually quiet")
 
 	var starting_score: int = main.score_manager.score
 	for target in rig_targets:
 		main._on_rig_target_hit(target, target.family_id, target.display_name, target.score_value, target.flow_value)
 	_expect_equal(main._active_rig_family_count(), 6, "Every Rig family can be activated from the table")
 	_expect_equal(main.rig_progress_label.text, "RIG 6 / 6", "Rig objective reports complete progress")
-	_expect_equal(main.status_label.text, "FINAL SHOW ARMED — HIT CONSOLE", "Completing the Rig reveals the next shot")
+	_expect_equal(main.status_label.text, "RIG READY — COMPLETE CUE STACK", "Rig completion keeps the remaining objective explicit")
+	_expect(not main.show_flow.can_start_final_show(), "Rig completion alone cannot skip the Cue Stack")
 	_expect(main.score_manager.score > starting_score + 1500, "Rig targets and completion award score")
 	for target in rig_targets:
 		_expect(target.lit, "Activated Rig targets remain visibly lit")
+
+	var warm_ramp = main.get_node("WarmRamp")
+	var cold_ramp = main.get_node("ColdRamp")
+	main._on_ramp_completed(&"warm_ramp", warm_ramp.definition.score_value, warm_ramp.definition.flow_value)
+	_expect(not warm_ramp.get_node("Label").text.begins_with("▶"), "Completed cue shot stops flashing")
+	_expect(cold_ramp.get_node("Label").text.begins_with("▶"), "Outstanding cue shot remains highlighted")
+	main._on_ramp_completed(&"cold_ramp", cold_ramp.definition.score_value, cold_ramp.definition.flow_value)
+	_expect(main.cue_manager.current_cue_ready(), "Both color ramps prepare Color Wash")
+	main._on_scoop_completed(&"console_scoop", 500, 80)
+	_expect(main.cue_manager.active_cue != null, "Console executes an armed cue")
+	main.cue_manager._process(1.3)
+	_expect_equal(main.cue_manager.current_cue_index, 1, "Running cue advances automatically after its duration")
+	_expect(main.get_node("UniverseOrbit/Label").text.begins_with("▶"), "Universe Chase highlights its route")
+
+	main._on_lane_completed(&"universe_orbit", "UNIVERSE ORBIT", 600, 90)
+	_expect(not main.cue_manager.current_cue_ready(), "Universe Chase counts its first orbit")
+	main._on_lane_completed(&"universe_orbit", "UNIVERSE ORBIT", 600, 90)
+	_expect(main.cue_manager.current_cue_ready(), "Universe Chase requires its second orbit")
+	main._on_scoop_completed(&"console_scoop", 500, 80)
+	main.cue_manager.complete_current_cue()
+	for _hit in 4:
+		main._on_bumper_hit(100, &"KickBumper")
+	_expect(main.cue_manager.current_cue_ready(), "Four rhythm hits prepare Rhythm Drop")
+	main._on_scoop_completed(&"console_scoop", 500, 80)
+	main.cue_manager.complete_current_cue()
+	_expect(main.cue_manager.is_stack_completed(), "Three Console executions complete the Cue Stack")
+	_expect(main.show_flow.can_start_final_show(), "Cue Stack and Rig together arm Final Show")
+	_expect_equal(main.status_label.text, "FINAL SHOW ARMED — HIT CONSOLE", "Final Show exposes its Console trigger")
 
 	var route_score: int = main.score_manager.score
 	main._on_lane_completed(&"universe_orbit", "UNIVERSE ORBIT", 600, 90)
@@ -482,6 +532,7 @@ func _test_final_show_multiball_and_blackout() -> void:
 	main.start_game()
 	main._launch_or_restart()
 	_expect_equal(main.show_flow.state, ShowFlowManagerNode.State.BUILD, "Launching the first ball enters Build")
+	_complete_cue_stack(main)
 
 	var rig_targets := main.get_tree().get_nodes_in_group("rig_targets")
 	for target in rig_targets:
@@ -540,6 +591,7 @@ func _test_stage_identity_and_music_stems() -> void:
 	_expect_equal(main.stage_visuals.show_state, ShowFlowManagerNode.State.PRESET, "Stage visuals follow Preset")
 
 	main._launch_or_restart()
+	_complete_cue_stack(main)
 	var rig_targets := main.get_tree().get_nodes_in_group("rig_targets")
 	for index in 5:
 		var target: Node = rig_targets[index]
@@ -563,6 +615,17 @@ func _test_stage_identity_and_music_stems() -> void:
 	_expect_equal(main.stage_visuals.show_state, ShowFlowManagerNode.State.BLACKOUT, "Stage visuals follow Blackout")
 	main.free()
 	await process_frame
+
+
+func _complete_cue_stack(main: Node) -> void:
+	while not main.cue_manager.is_stack_completed():
+		var cue = main.cue_manager.current_cue()
+		for condition in cue.conditions:
+			for _repetition in cue.condition_repetitions:
+				main.cue_manager.add_condition(condition)
+		_expect(main.cue_manager.current_cue_ready(), "Configured cue can be armed by its required shots")
+		_expect(main.cue_manager.start_current_cue(), "Console can execute each armed cue")
+		_expect(main.cue_manager.complete_current_cue(), "Executed cue advances the Cue Stack")
 
 
 func _expect(condition: bool, message: String) -> void:

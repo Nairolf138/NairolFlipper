@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CueDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/show/cue_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+cue_id = &"color_wash"
+display_name = "COLOR WASH"
+objective_text = "WARM + COLD RAMPS"
+conditions = [&"warm_ramp", &"cold_ramp"]
+bonus_points = 1000
+duration_seconds = 1.2
+light_changes = {"palette": "split"}
+audio_changes = {"stems": {"piano": 0.7, "arp": 0.2}, "sfx": "cue_start"}

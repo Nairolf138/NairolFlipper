@@ -12,9 +12,8 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[node name="Ramp" type="Area2D"]
+[node name="Ramp" type="Area2D" groups=["show_ramps"]]
 script = ExtResource("1_ramp")
-groups = ["show_ramps"]
 collision_layer = 0
 collision_mask = 1
 monitoring = true

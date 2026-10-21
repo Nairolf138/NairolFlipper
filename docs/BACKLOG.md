@@ -110,6 +110,15 @@ activation plus rapide. Les forces du lanceur, des bumpers et des slingshots
 sont recalibrées pour la nouvelle masse. Une ombre de contact et un reflet
 simple renforcent la lecture de la bille sans asset supplémentaire.
 
+### T028 — Cue Stack jouable ✅
+
+Trois cues imposent des tirs variés avant le Final Show : les rampes Warm et
+Cold pour Color Wash, deux passages d'Universe Orbit pour Universe Chase, puis
+quatre impacts de bumpers pour Rhythm Drop. Chaque cue armée doit être exécutée
+sur la Console comme un vrai `GO`. Le HUD indique la progression et le plateau
+met en évidence les tirs encore nécessaires. Le Final Show exige désormais la
+Cue Stack et les six familles du Rig.
+
 ## P1 — Show systems
 
 ### T030 Rig model ✅; T031 CueDefinition ✅; T032 CueManager ✅; T033 Flow ✅; T034 Warm/Cold ramps ✅; T035 Console scoop ✅; T036 First show sequence ✅.
