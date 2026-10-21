@@ -119,6 +119,15 @@ sur la Console comme un vrai `GO`. Le HUD indique la progression et le plateau
 met en évidence les tirs encore nécessaires. Le Final Show exige désormais la
 Cue Stack et les six familles du Rig.
 
+### T029 — Passe visuelle Stagecraft ✅
+
+Le plateau quitte son apparence de greybox générique pour adopter l'identité
+« scène de spectacle jouable » : deck en perspective, routes de tir balisées,
+rails métalliques, lentilles de projecteurs, palettes mécaniques, launcher et
+drain signalés. HUD et menus partagent un thème de régie sombre à accents
+lumineux. La passe reste entièrement vectorielle, conserve les collisions et ne
+rajoute ni shader plein écran ni asset tiers, afin de tenir le budget Android/Web.
+
 ## P1 — Show systems
 
 ### T030 Rig model ✅; T031 CueDefinition ✅; T032 CueManager ✅; T033 Flow ✅; T034 Warm/Cold ramps ✅; T035 Console scoop ✅; T036 First show sequence ✅.

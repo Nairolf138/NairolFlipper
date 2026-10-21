@@ -10,13 +10,31 @@ script = ExtResource("1_bumper")
 monitoring = true
 monitorable = true
 
+[node name="ContactShadow" type="Polygon2D" parent="."]
+z_index = -1
+position = Vector2(0, 10)
+polygon = PackedVector2Array(0, -62, 44, -44, 62, 0, 44, 44, 0, 62, -44, 44, -62, 0, -44, -44)
+color = Color(0, 0, 0, 0.55)
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("BumperShape")
 
 [node name="Visual" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(0, -58, 41, -41, 58, 0, 41, 41, 0, 58, -41, 41, -58, 0, -41, -41)
-color = Color(0.95, 0.25, 0.45, 1)
+polygon = PackedVector2Array(0, -64, 45, -45, 64, 0, 45, 45, 0, 64, -45, 45, -64, 0, -45, -45)
+color = Color(0.035, 0.065, 0.1, 1)
+
+[node name="Bezel" type="Polygon2D" parent="Visual"]
+polygon = PackedVector2Array(0, -55, 39, -39, 55, 0, 39, 39, 0, 55, -39, 39, -55, 0, -39, -39)
+color = Color(0.28, 0.36, 0.43, 1)
+
+[node name="Lens" type="Polygon2D" parent="Visual"]
+polygon = PackedVector2Array(0, -43, 30, -30, 43, 0, 30, 30, 0, 43, -30, 30, -43, 0, -30, -30)
+color = Color(1, 0.08, 0.42, 0.92)
+
+[node name="LensHighlight" type="Polygon2D" parent="Visual"]
+polygon = PackedVector2Array(-25, -25, 3, -36, 24, -25, 8, -16, -15, -14)
+color = Color(1, 0.6, 0.8, 0.58)
 
 [node name="Core" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(0, -24, 17, -17, 24, 0, 17, 17, 0, 24, -17, 17, -24, 0, -17, -17)
-color = Color(1, 0.8, 0.3, 1)
+polygon = PackedVector2Array(0, -22, 16, -16, 22, 0, 16, 16, 0, 22, -16, 16, -22, 0, -16, -16)
+color = Color(1, 0.76, 0.2, 1)

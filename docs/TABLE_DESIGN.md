@@ -93,3 +93,25 @@ de l'objectif est acquise.
 Le Final Show s'arme uniquement lorsque la Cue Stack et le Rig `6 / 6` sont
 terminés. Les deux progressions peuvent être menées en parallèle et persistent
 entre les trois billes de la partie.
+
+## Table 2.4 — identité Stagecraft
+
+Le greybox devient une scène de spectacle cohérente sans modifier les
+collisions validées :
+
+- le plateau est un **stage deck** sombre, segmenté et dessiné en perspective ;
+- trois routes lumineuses distinguent Warm, Cold et Console tout en conservant
+  une silhouette lisible en niveaux de gris ;
+- les rails ressemblent à des profilés métalliques plutôt qu'à des barres
+  blanches posées sur le plateau ;
+- bumpers, cibles Rig, rampes et Console reprennent les formes de lentilles,
+  flight-cases, faders et signalétique d'une régie live ;
+- launcher et drain disposent de leur propre marquage, afin d'indiquer clairement
+  l'entrée et la zone de danger ;
+- le HUD occupe une baie technique séparée du jeu et les menus utilisent le même
+  vocabulaire de cadres sombres et de bordures lumineuses.
+
+Les faisceaux, la haze discrète et les footlights restent derrière les pièces de
+jeu et la bille. Ce jalon ne change ni la géométrie physique, ni les règles de la
+Cue Stack : il rend leur hiérarchie et l'identité du produit immédiatement
+perceptibles.
