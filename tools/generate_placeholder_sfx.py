@@ -85,6 +85,13 @@ def main() -> None:
         * math.sin(math.pi * t / d),
     )
     write_sound(
+        "sync",
+        0.20,
+        lambda t, d: 0.46
+        * (sine(880 * t) + 0.55 * sine(1320 * t))
+        * math.sin(math.pi * t / d),
+    )
+    write_sound(
         "safety",
         0.30,
         lambda t, d: 0.5 * chirp(t, 420, 840, d) * math.sin(math.pi * t / d),

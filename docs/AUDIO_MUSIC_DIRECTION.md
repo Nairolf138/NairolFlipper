@@ -37,6 +37,10 @@ Priorité : signaux critiques → impacts → musique → ambience. Sliders Mast
 ## Sync
 
 Horloge musicale logique indépendante du rendu. Le jeu reste jouable son coupé.
+Le transport conserve une position totale monotone en plus de sa position dans
+la boucle : le Sync Bonus peut ainsi distinguer deux pulses de boucles
+successives. Un marqueur visuel à quatre temps et un SFX court original rendent
+le timing perceptible sans exiger que le joueur entende parfaitement la musique.
 
 ## Web
 

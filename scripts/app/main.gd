@@ -7,6 +7,7 @@ const PlaytestRecorderNode = preload("res://scripts/app/playtest_recorder.gd")
 const RigModelNode = preload("res://scripts/show/rig_model.gd")
 const ShowFlowManagerNode = preload("res://scripts/show/show_flow_manager.gd")
 const StageVisualControllerNode = preload("res://scripts/show/stage_visual_controller.gd")
+const SyncBonusManagerNode = preload("res://scripts/show/sync_bonus_manager.gd")
 
 enum SessionState {
 	MENU,
@@ -32,6 +33,7 @@ enum SessionState {
 @onready var audio_service: AudioServiceNode = $AudioService
 @onready var rig_model: RigModelNode = $RigModel
 @onready var show_flow: ShowFlowManagerNode = $ShowFlowManager
+@onready var sync_bonus_manager: SyncBonusManagerNode = $SyncBonusManager
 @onready var start_overlay: Control = $Interface/StartOverlay
 @onready var game_controls: Control = $Interface/GameControls
 @onready var play_button: Button = $Interface/StartOverlay/Menu/PlayButton
@@ -43,6 +45,7 @@ enum SessionState {
 @onready var replay_button: Button = $Interface/GameOverOverlay/Menu/ReplayButton
 @onready var game_over_menu_button: Button = $Interface/GameOverOverlay/Menu/MenuButton
 @onready var final_show_label: Label = $Interface/GameControls/FinalShowLabel
+@onready var sync_feedback_label: Label = $Interface/GameControls/SyncFeedbackLabel
 @onready var blackout_overlay: Control = $Interface/BlackoutOverlay
 
 @export var respawn_delay: float = 1.0
@@ -61,6 +64,7 @@ var stalled_ball_time: float = 0.0
 var session_generation: int = 0
 var multiball_active: bool = false
 var show_generation: int = 0
+var _sync_feedback_tween: Tween
 
 
 func _ready() -> void:
@@ -91,6 +95,8 @@ func _ready() -> void:
 	cue_manager.stack_progress_changed.connect(_on_cue_stack_progress_changed)
 	cue_manager.stack_completed.connect(_on_cue_stack_completed)
 	show_flow.state_changed.connect(_on_show_state_changed)
+	sync_bonus_manager.sync_awarded.connect(_on_sync_awarded)
+	audio_service.transport_changed.connect(_on_transport_changed)
 	play_button.pressed.connect(start_game)
 	menu_quit_button.pressed.connect(_on_quit_pressed)
 	reset_button.pressed.connect(_on_reset_pressed)
@@ -172,6 +178,7 @@ func _show_start_menu() -> void:
 	game_over_overlay.hide()
 	blackout_overlay.hide()
 	final_show_label.hide()
+	sync_feedback_label.hide()
 	game_controls.hide()
 	_release_all_touches()
 	_deactivate_all_balls()
@@ -193,6 +200,7 @@ func _show_game_over() -> void:
 	game_over_overlay.show()
 	blackout_overlay.hide()
 	final_show_label.hide()
+	sync_feedback_label.hide()
 	status_label.text = "GAME OVER"
 
 
@@ -258,6 +266,7 @@ func _on_bumper_hit(points: int, _bumper_name: StringName) -> void:
 	playtest_recorder.record_bumper_hit(points)
 	audio_service.request_sfx(StringName(String(_bumper_name).to_snake_case()))
 	stage_visuals.trigger_hit(Color("ff2bd6"))
+	_register_sync_hit()
 
 
 func _on_ramp_completed(ramp_id: StringName, score_value: int, flow_value: int) -> void:
@@ -267,6 +276,7 @@ func _on_ramp_completed(ramp_id: StringName, score_value: int, flow_value: int) 
 	status_label.text = "CUE READY — HIT CONSOLE" if cue_manager.current_cue_ready() else "RAMP HIT"
 	audio_service.request_sfx(&"ramp")
 	stage_visuals.trigger_hit(Color("ffb14a") if ramp_id == &"warm_ramp" else Color("00e5ff"))
+	_register_sync_hit()
 
 
 func _on_rig_target_hit(
@@ -292,6 +302,7 @@ func _on_rig_target_hit(
 		else:
 			status_label.text = "%s ONLINE — %d / 6" % [display_name.to_upper(), active_count]
 	_update_rig_progress()
+	_register_sync_hit()
 
 
 func _on_lane_completed(
@@ -310,6 +321,7 @@ func _on_lane_completed(
 	)
 	audio_service.request_sfx(&"ramp")
 	stage_visuals.trigger_hit(Color("7c4dff"))
+	_register_sync_hit()
 
 
 func _on_slingshot_hit(score_value: int, flow_value: int, _slingshot_name: StringName) -> void:
@@ -318,6 +330,7 @@ func _on_slingshot_hit(score_value: int, flow_value: int, _slingshot_name: Strin
 	status_label.text = "SLINGSHOT"
 	audio_service.request_sfx(&"flipper")
 	stage_visuals.trigger_hit(Color("ff2bd6"))
+	_register_sync_hit()
 
 
 func _active_rig_family_count() -> int:
@@ -343,6 +356,7 @@ func _on_scoop_completed(_scoop_id: StringName, score_value: int, flow_value: in
 	flow_manager.add_flow(flow_value)
 	audio_service.request_sfx(&"scoop")
 	stage_visuals.trigger_hit(Color("eaf6ff"))
+	_register_sync_hit()
 	if show_flow.can_start_final_show():
 		_start_final_show()
 		return
@@ -432,6 +446,52 @@ func _update_cue_shot_highlights() -> void:
 func _on_cue_bonus_awarded(points: int) -> void:
 	_add_score_with_flow(points)
 	audio_service.request_sfx(&"cue")
+
+
+func _register_sync_hit() -> void:
+	if (
+		not gameplay_active
+		or session_state != SessionState.PLAYING
+		or show_flow.state == ShowFlowManagerNode.State.BLACKOUT
+	):
+		return
+	sync_bonus_manager.register_hit(
+		audio_service.transport_total_beats,
+		audio_service.transport_playing
+	)
+
+
+func _on_sync_awarded(
+	tier: StringName,
+	score_bonus: int,
+	flow_bonus: int,
+	_distance_beats: float
+) -> void:
+	var show_multiplier := show_flow.final_show_score_multiplier if multiball_active else 1
+	score_manager.add_points(score_bonus * show_multiplier)
+	flow_manager.add_flow(flow_bonus)
+	playtest_recorder.record_sync(tier)
+	audio_service.request_sfx(&"sync")
+	var perfect := tier == &"perfect"
+	var label := "PERFECT SYNC" if perfect else "SYNC"
+	sync_feedback_label.text = "%s  +%d  •  FLOW +%d" % [label, score_bonus * show_multiplier, flow_bonus]
+	sync_feedback_label.add_theme_color_override(
+		"font_color",
+		Color("ffca4a") if perfect else Color("00e5ff")
+	)
+	sync_feedback_label.modulate = Color.WHITE
+	sync_feedback_label.show()
+	stage_visuals.trigger_hit(Color("ffca4a") if perfect else Color("00e5ff"))
+	if is_instance_valid(_sync_feedback_tween):
+		_sync_feedback_tween.kill()
+	_sync_feedback_tween = create_tween()
+	_sync_feedback_tween.tween_interval(0.45)
+	_sync_feedback_tween.tween_property(sync_feedback_label, "modulate", Color(1, 1, 1, 0), 0.35)
+	_sync_feedback_tween.tween_callback(sync_feedback_label.hide)
+
+
+func _on_transport_changed(position_beats: float, playing: bool) -> void:
+	stage_visuals.set_beat_position(position_beats, playing)
 
 
 func _add_score_with_flow(points: int) -> void:
@@ -567,6 +627,7 @@ func _finish_final_show(message: String) -> void:
 			ball.deactivate_ball()
 	show_flow.start_blackout()
 	final_show_label.hide()
+	sync_feedback_label.hide()
 	cue_progress_label.show()
 	blackout_overlay.show()
 	status_label.text = "BLACKOUT — %s" % message
@@ -670,9 +731,11 @@ func restart_game() -> void:
 	game_over_overlay.hide()
 	blackout_overlay.hide()
 	final_show_label.hide()
+	sync_feedback_label.hide()
 	cue_progress_label.show()
 	score_manager.reset_score()
 	flow_manager.reset_flow()
+	sync_bonus_manager.reset_state()
 	cue_manager.reset_state()
 	rig_model.reset_state()
 	audio_service.reset_state()

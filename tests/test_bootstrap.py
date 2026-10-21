@@ -256,9 +256,10 @@ def test_local_playtest_recorder_tracks_session_events_without_networking():
     assert "record_drain" in recorder_text
     assert "record_ball_save" in recorder_text
     assert "record_restart" in recorder_text
+    assert "record_sync" in recorder_text
     assert "HTTPRequest" not in recorder_text
     assert 'name="PlaytestRecorder"' in scene_text
-    for event in ("record_launch", "record_bumper_hit", "record_drain", "record_ball_save", "record_restart"):
+    for event in ("record_launch", "record_bumper_hit", "record_drain", "record_ball_save", "record_restart", "record_sync"):
         assert event in main_script
 
 
@@ -446,6 +447,7 @@ def test_audio_service_plays_original_placeholder_sfx():
         "ramp.wav",
         "scoop.wav",
         "cue.wav",
+        "sync.wav",
         "safety.wav",
         "drain.wav",
     ):
@@ -677,3 +679,28 @@ def test_stagecraft_visual_pass_is_layered_and_mobile_safe():
     # The pass remains vector-only and does not add a costly full-screen shader.
     assert "shader_type" not in art_script.read_text(encoding="utf-8")
     assert "_test_stagecraft_visual_language" in runner_text
+
+
+def test_sync_bonus_rewards_timing_without_punishing_normal_shots():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    main_text = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    audio_text = (ROOT / "scripts" / "audio" / "audio_service.gd").read_text(encoding="utf-8")
+    sync_script = ROOT / "scripts" / "show" / "sync_bonus_manager.gd"
+    stage_text = (ROOT / "scripts" / "show" / "stage_visual_controller.gd").read_text(encoding="utf-8")
+    runner_text = (ROOT / "tests" / "godot" / "test_runner.gd").read_text(encoding="utf-8")
+
+    assert sync_script.is_file()
+    sync_text = sync_script.read_text(encoding="utf-8")
+    assert "class_name SyncBonusManager" in sync_text
+    assert "signal sync_awarded" in sync_text
+    assert "perfect_window_beats" in sync_text
+    assert "sync_window_beats" in sync_text
+    assert "func register_hit" in sync_text
+    assert 'name="SyncBonusManager"' in scene_text
+    assert 'name="SyncFeedbackLabel"' in scene_text
+    assert "transport_total_beats" in audio_text
+    assert 'request_sfx(&"sync")' in main_text
+    assert "func _draw_sync_clock" in stage_text
+    assert "_test_sync_bonus_timing" in runner_text
+    assert "_test_sync_bonus_integration" in runner_text
+    assert "Off-beat shots keep all normal gameplay points" in runner_text
