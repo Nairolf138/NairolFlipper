@@ -11,6 +11,11 @@ signal ball_drained(ball: RigidBody2D)
 @export var ball_save_duration: float = 4.0
 
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
+@onready var contact_shadow: Polygon2D = $ContactShadow
+@onready var highlight: Polygon2D = $Highlight
+
+const SHADOW_OFFSET := Vector2(5, 7)
+const HIGHLIGHT_OFFSET := Vector2(-7, -8)
 
 var launch_ready: bool = true
 var input_enabled: bool = true
@@ -25,6 +30,9 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	# Keep the table contact and light direction stable while the rigid body spins.
+	contact_shadow.position = SHADOW_OFFSET.rotated(-rotation)
+	highlight.position = HIGHLIGHT_OFFSET.rotated(-rotation)
 	ball_save_remaining = maxf(0.0, ball_save_remaining - _delta)
 	if tuning != null and linear_velocity.length() > tuning.max_speed:
 		linear_velocity = linear_velocity.limit_length(tuning.max_speed)

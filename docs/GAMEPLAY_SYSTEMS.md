@@ -6,6 +6,18 @@
 
 Paramètres : masse, gravité, restitution, friction, vitesse max, force launcher, force bumper.
 
+### Réglage Table 2.2
+
+Le profil de playtest privilégie une descente franche et des contacts peu
+élastiques : masse `1.4`, gravité `1.55`, friction `0.48` et restitution `0.14`.
+Les rails et murs utilisent un matériau passif à faible rebond tandis que les
+flippers disposent d'une surface plus vive. Le lanceur, les bumpers et les
+slingshots compensent la masse supplémentaire afin de conserver leur portée.
+
+Ces valeurs forment une base mesurable, pas un réglage final. Le temps de chute
+est couvert automatiquement ; le contrôle, le plaisir et la perception du poids
+doivent être validés sur une tablette réelle.
+
 ## Flippers
 
 Deux flippers MVP : activation instantanée, retour rapide, maintien levé, collision reproductible, mêmes actions pour clavier/tactile/manette.

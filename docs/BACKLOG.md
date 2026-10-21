@@ -101,6 +101,15 @@ les retours jouables des outlanes. Le couloir du lanceur ne croise plus le retou
 droit. La sensation de poids et le réglage fin des contacts restent le jalon
 suivant et demandent un playtest sur tablette.
 
+### T027 — Sensation de plateau incliné ✅
+
+La bille descend plus franchement, conserve davantage de traction et perd le
+rebond uniforme qui la faisait paraître en apesanteur. Rails et murs absorbent
+les contacts tandis que les flippers gardent une surface plus dynamique et une
+activation plus rapide. Les forces du lanceur, des bumpers et des slingshots
+sont recalibrées pour la nouvelle masse. Une ombre de contact et un reflet
+simple renforcent la lecture de la bille sans asset supplémentaire.
+
 ## P1 — Show systems
 
 ### T030 Rig model ✅; T031 CueDefinition ✅; T032 CueManager ✅; T033 Flow ✅; T034 Warm/Cold ramps ✅; T035 Console scoop ✅; T036 First show sequence ✅.

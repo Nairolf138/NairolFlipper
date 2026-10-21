@@ -1,9 +1,12 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PhysicsMaterial" path="res://data/tuning/PassiveSurfaceMaterial.tres" id="1_surface"]
 
 [sub_resource type="RectangleShape2D" id="RailShape"]
 size = Vector2(220, 18)
 
 [node name="GuideRail" type="StaticBody2D"]
+physics_material_override = ExtResource("1_surface")
 
 [node name="Visual" type="Polygon2D" parent="."]
 polygon = PackedVector2Array(-110, -9, 110, -9, 110, 9, -110, 9)

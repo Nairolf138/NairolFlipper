@@ -1,12 +1,14 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/gameplay/flipper.gd" id="1_flipper"]
+[ext_resource type="PhysicsMaterial" path="res://data/tuning/FlipperMaterial.tres" id="2_surface"]
 
 [sub_resource type="RectangleShape2D" id="FlipperShape"]
 size = Vector2(180, 34)
 
 [node name="Flipper" type="AnimatableBody2D"]
 script = ExtResource("1_flipper")
+physics_material_override = ExtResource("2_surface")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(90, 0)
