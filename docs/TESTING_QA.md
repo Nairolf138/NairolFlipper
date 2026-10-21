@@ -160,6 +160,16 @@ toucher, les collisions inactives et la récupération hors limites.
   sont conservées ;
 - utiliser `VALEURS PAR DÉFAUT` et confirmer le retour des trois niveaux à 100 %.
 
+### How to Play — checklist tablette
+
+- ouvrir `COMMENT JOUER` depuis le menu et vérifier que textes, schémas et boutons
+  restent entièrement visibles en portrait ;
+- parcourir les quatre pages avec `SUIVANT` et `PRÉCÉDENT` au doigt ;
+- confirmer que les illustrations correspondent aux commandes, au Rig, aux Cues
+  et au Final Show réellement présents sur le plateau ;
+- terminer le guide puis vérifier le retour au menu sans lancement de partie ;
+- vérifier également Retour/Échap et la navigation clavier ou manette.
+
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 
 ## Instrumentation locale de playtest

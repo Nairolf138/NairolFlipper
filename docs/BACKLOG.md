@@ -193,6 +193,15 @@ immédiat, les valeurs peuvent être réinitialisées et elles sont sauvegardée
 localement avec un schéma versionné et un fallback sûr en cas de fichier absent
 ou invalide.
 
+## P1 — UX
+
+T046 How to Play ✅.
+
+T046 ajoute un guide en quatre pages accessible depuis le menu. Des schémas
+vectoriels expliquent les zones tactiles, les six familles du Rig, la Cue Stack,
+la Console et le Final Show. Les boutons sont adaptés au portrait et la fermeture
+du guide revient au menu sans lancer de partie.
+
 ## P2 — Final
 
 T050 Ball lock; T051 Multiball ✅; T052 Final Show ✅; T053 Blackout ✅; T054 Encore prototype.

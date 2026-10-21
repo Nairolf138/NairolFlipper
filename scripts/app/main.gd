@@ -3,6 +3,7 @@ extends Node2D
 const AudioServiceNode = preload("res://scripts/audio/audio_service.gd")
 const CueManagerNode = preload("res://scripts/show/cue_manager.gd")
 const FlowManagerNode = preload("res://scripts/show/flow_manager.gd")
+const HowToPlayPanelNode = preload("res://scripts/ui/how_to_play_panel.gd")
 const PlaytestRecorderNode = preload("res://scripts/app/playtest_recorder.gd")
 const RigModelNode = preload("res://scripts/show/rig_model.gd")
 const SettingsStoreNode = preload("res://scripts/app/settings_store.gd")
@@ -39,6 +40,7 @@ enum SessionState {
 @onready var start_overlay: Control = $Interface/StartOverlay
 @onready var game_controls: Control = $Interface/GameControls
 @onready var play_button: Button = $Interface/StartOverlay/Menu/PlayButton
+@onready var how_to_play_button: Button = $Interface/StartOverlay/Menu/HowToPlayButton
 @onready var settings_button: Button = $Interface/StartOverlay/Menu/SettingsButton
 @onready var menu_quit_button: Button = $Interface/StartOverlay/Menu/QuitButton
 @onready var start_menu: VBoxContainer = $Interface/StartOverlay/Menu
@@ -51,6 +53,7 @@ enum SessionState {
 @onready var sfx_value_label: Label = $Interface/StartOverlay/SettingsPanel/Menu/SFXValue
 @onready var audio_defaults_button: Button = $Interface/StartOverlay/SettingsPanel/Menu/DefaultsButton
 @onready var audio_back_button: Button = $Interface/StartOverlay/SettingsPanel/Menu/BackButton
+@onready var how_to_play_panel: HowToPlayPanelNode = $Interface/StartOverlay/HowToPlayPanel
 @onready var reset_button: Button = $Interface/GameControls/ResetButton
 @onready var game_quit_button: Button = $Interface/GameControls/QuitButton
 @onready var game_over_overlay: Control = $Interface/GameOverOverlay
@@ -111,6 +114,7 @@ func _ready() -> void:
 	sync_bonus_manager.sync_awarded.connect(_on_sync_awarded)
 	audio_service.transport_changed.connect(_on_transport_changed)
 	play_button.pressed.connect(start_game)
+	how_to_play_button.pressed.connect(_open_how_to_play)
 	settings_button.pressed.connect(_open_audio_settings)
 	menu_quit_button.pressed.connect(_on_quit_pressed)
 	master_slider.value_changed.connect(_on_audio_slider_changed)
@@ -121,6 +125,7 @@ func _ready() -> void:
 	sfx_slider.drag_ended.connect(_on_audio_slider_drag_ended)
 	audio_defaults_button.pressed.connect(_on_audio_defaults_pressed)
 	audio_back_button.pressed.connect(_close_audio_settings)
+	how_to_play_panel.closed.connect(_close_how_to_play)
 	reset_button.pressed.connect(_on_reset_pressed)
 	game_quit_button.pressed.connect(_on_quit_pressed)
 	replay_button.pressed.connect(start_game)
@@ -158,6 +163,14 @@ func _physics_process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if how_to_play_panel.visible and event.is_action_pressed("ui_cancel"):
+		how_to_play_panel.close_panel()
+		get_viewport().set_input_as_handled()
+		return
+	if settings_panel.visible and event.is_action_pressed("ui_cancel"):
+		_close_audio_settings()
+		get_viewport().set_input_as_handled()
+		return
 	if not gameplay_active:
 		return
 	if event.is_action_pressed("launch_ball"):
@@ -201,6 +214,7 @@ func _show_start_menu() -> void:
 	start_overlay.show()
 	start_menu.show()
 	settings_panel.hide()
+	how_to_play_panel.hide()
 	game_over_overlay.hide()
 	blackout_overlay.hide()
 	final_show_label.hide()
@@ -249,6 +263,18 @@ func _open_audio_settings() -> void:
 	start_menu.hide()
 	settings_panel.show()
 	master_slider.grab_focus()
+
+
+func _open_how_to_play() -> void:
+	start_menu.hide()
+	settings_panel.hide()
+	how_to_play_panel.open_panel()
+
+
+func _close_how_to_play() -> void:
+	how_to_play_panel.hide()
+	start_menu.show()
+	how_to_play_button.grab_focus()
 
 
 func _close_audio_settings() -> void:
