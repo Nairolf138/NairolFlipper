@@ -123,6 +123,20 @@ toucher, les collisions inactives et la récupération hors limites.
 - vérifier que la progression des cues survit à la perte d'une bille et revient
   à zéro après Reset ou Rejouer.
 
+### Table 2.4 — checklist identité Stagecraft
+
+- vérifier que la bille blanche reste immédiatement lisible sur toutes les zones ;
+- confirmer que rails, flippers, bumpers, cibles, rampes et Console ressemblent
+  à des pièces distinctes, et non à des formes plates interchangeables ;
+- identifier sans texte les routes Warm, Cold, Console, launcher et drain ;
+- contrôler que les faisceaux, la haze et les footlights restent derrière la
+  bille et ne gênent jamais un tir ;
+- comparer Standby, Build, Flow, Final Show et Blackout pour confirmer une montée
+  d'énergie sans saturation permanente ;
+- vérifier boutons et textes des menus en portrait, en particulier l'absence de
+  coupe sur les bords d'une tablette ;
+- surveiller fluidité, chauffe et batterie pendant une partie complète Android.
+
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 
 ## Instrumentation locale de playtest

@@ -11,13 +11,27 @@ collision_layer = 0
 collision_mask = 1
 monitoring = true
 
+[node name="Shadow" type="Polygon2D" parent="."]
+z_index = -1
+position = Vector2(0, 7)
+polygon = PackedVector2Array(-68, -42, 68, -42, 58, 42, -58, 42)
+color = Color(0, 0, 0, 0.48)
+
 [node name="Visual" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(-63, -38, 63, -38, 54, 38, -54, 38)
+polygon = PackedVector2Array(-68, -42, 68, -42, 58, 42, -58, 42)
 color = Color(1, 0.75, 0.3, 0.28)
 
+[node name="MetalFrame" type="Polygon2D" parent="Visual"]
+polygon = PackedVector2Array(-61, -35, 61, -35, 53, 35, -53, 35)
+color = Color(0.22, 0.31, 0.4, 1)
+
 [node name="Core" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(-51, -27, 51, -27, 44, 27, -44, 27)
+polygon = PackedVector2Array(-54, -29, 54, -29, 47, 29, -47, 29)
 color = Color(0.08, 0.12, 0.18, 1)
+
+[node name="Indicator" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-42, 21, 42, 21, 40, 26, -40, 26)
+color = Color(0.28, 0.34, 0.42, 0.8)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("TargetShape")
@@ -28,6 +42,9 @@ offset_top = -19.0
 offset_right = 58.0
 offset_bottom = 19.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 17
 text = "WASH"
 horizontal_alignment = 1

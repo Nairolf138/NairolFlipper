@@ -59,32 +59,54 @@ func trigger_hit(color: Color = COLD_WHITE) -> void:
 
 
 func _draw() -> void:
+	_draw_haze()
 	_draw_stage_grid()
 	_draw_truss()
 	_draw_fixture_beams()
 	_draw_runway()
+	_draw_footlights()
 	if hit_flash > 0.0:
 		draw_circle(Vector2(540, 920), 410.0 * hit_flash, Color(hit_color, 0.045 * hit_flash), false, 18.0)
 
 
+func _draw_haze() -> void:
+	if show_state == BLACKOUT:
+		return
+	var energy := 0.018 + flow_ratio * 0.02
+	draw_circle(Vector2(270, 760), 280.0, Color(AMBER, energy))
+	draw_circle(Vector2(810, 760), 280.0, Color(CYAN, energy))
+	draw_circle(Vector2(540, 1180), 390.0, Color(VIOLET, energy * 0.7))
+
+
 func _draw_stage_grid() -> void:
-	var grid_color := Color(CYAN, 0.025 + flow_ratio * 0.025)
-	for x in range(120, 1000, 80):
-		draw_line(Vector2(x, 410), Vector2(x, 1680), grid_color, 1.0)
-	for y in range(440, 1680, 80):
-		draw_line(Vector2(100, y), Vector2(980, y), grid_color, 1.0)
+	var grid_color := Color(CYAN, 0.035 + flow_ratio * 0.025)
+	for x in range(120, 1000, 88):
+		var top_x := lerpf(440.0, 640.0, inverse_lerp(120.0, 1000.0, float(x)))
+		draw_line(Vector2(top_x, 390), Vector2(x, 1680), grid_color, 1.0)
+	for index in range(11):
+		var ratio := float(index) / 10.0
+		var y := lerpf(450.0, 1680.0, pow(ratio, 1.45))
+		var width := lerpf(150.0, 860.0, ratio)
+		draw_line(Vector2(540 - width * 0.5, y), Vector2(540 + width * 0.5, y), grid_color, 1.0)
 
 
 func _draw_truss() -> void:
-	draw_line(Vector2(135, 300), Vector2(945, 300), Color(0.36, 0.46, 0.62, 0.58), 10.0)
-	draw_line(Vector2(155, 278), Vector2(925, 278), Color(0.15, 0.2, 0.3, 0.8), 4.0)
+	draw_line(Vector2(135, 300), Vector2(945, 300), Color(0.36, 0.46, 0.62, 0.72), 10.0)
+	draw_line(Vector2(145, 268), Vector2(935, 268), Color(0.16, 0.22, 0.31, 0.95), 7.0)
+	for brace_x in range(155, 920, 55):
+		var direction := 1.0 if int(brace_x / 55) % 2 == 0 else -1.0
+		draw_line(Vector2(brace_x, 270), Vector2(brace_x + 42.0 * direction, 298), Color(0.5, 0.62, 0.72, 0.38), 3.0, true)
 	for index in FIXTURE_COLORS.size():
 		var fixture_position := Vector2(165 + index * 150, 310)
 		var active := index < rig_count or show_state == FINAL_SHOW
 		var fixture_color := FIXTURE_COLORS[index]
-		draw_circle(fixture_position, 22.0, Color(0.025, 0.035, 0.06, 1.0))
-		draw_circle(fixture_position, 15.0, Color(fixture_color, 0.95 if active else 0.14))
-		draw_arc(fixture_position, 25.0, 0.0, TAU, 24, Color(fixture_color, 0.8 if active else 0.2), 3.0)
+		draw_line(fixture_position - Vector2(0, 27), fixture_position - Vector2(0, 18), Color(0.52, 0.62, 0.72, 0.8), 5.0)
+		draw_colored_polygon(PackedVector2Array([
+			fixture_position + Vector2(-27, -18), fixture_position + Vector2(27, -18),
+			fixture_position + Vector2(23, 22), fixture_position + Vector2(-23, 22),
+		]), Color(0.018, 0.03, 0.052, 1.0))
+		draw_circle(fixture_position + Vector2(0, 3), 16.0, Color(fixture_color, 0.95 if active else 0.12))
+		draw_arc(fixture_position + Vector2(0, 3), 20.0, 0.0, TAU, 24, Color(fixture_color, 0.85 if active else 0.22), 3.0)
 
 
 func _draw_fixture_beams() -> void:
@@ -122,3 +144,14 @@ func _draw_runway() -> void:
 		var y := 560.0 + step * 125.0
 		var half_width := 52.0 + step * 10.0
 		draw_line(Vector2(540 - half_width, y), Vector2(540 + half_width, y), Color(runway_color, runway_color.a * 0.65), 2.0)
+
+
+func _draw_footlights() -> void:
+	if show_state == BLACKOUT:
+		return
+	var pulse := 0.42 + sin(pulse_time * 2.4) * 0.14
+	for index in range(9):
+		var light_position := Vector2(220 + index * 80, 1640)
+		var color := MAGENTA.lerp(CYAN, float(index) / 8.0)
+		draw_circle(light_position, 8.0, Color(color, pulse + flow_ratio * 0.22))
+		draw_line(light_position + Vector2(0, 10), light_position + Vector2(0, 28), Color(color, 0.18), 5.0, true)

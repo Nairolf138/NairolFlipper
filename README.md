@@ -103,9 +103,12 @@ La première étape de développement est définie dans [`docs/BACKLOG.md`](docs
 
 ## État
 
-**Préproduction / cadrage.**
+**Pré-alpha jouable / préparation de l'Alpha 1.0.**
 
-Le premier jalon réussi n'est pas « le jeu complet ». C'est un build Web et un APK Android avec une bille, deux batteurs, des collisions, quelques bumpers, un drain et un score, suffisamment agréable pour permettre une vraie boucle de playtest.
+Le prototype dispose désormais d'une partie à trois billes, d'une Cue Stack, du
+Rig en six familles, du Final Show multiball, d'une musique en stems et d'une
+première identité visuelle Stagecraft. Les builds Web, Android et Windows servent
+à affiner le plateau avant le jalon Alpha 1.0.
 
 ## Licence
 

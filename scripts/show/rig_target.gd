@@ -18,6 +18,7 @@ signal target_hit(
 
 @onready var visual: Polygon2D = $Visual
 @onready var core: Polygon2D = $Core
+@onready var indicator: Polygon2D = $Indicator
 @onready var label: Label = $Label
 
 var lit: bool = false
@@ -45,6 +46,7 @@ func set_lit(value: bool) -> void:
 func _apply_visual_state() -> void:
 	visual.color = Color(target_color.r, target_color.g, target_color.b, 0.95 if lit else 0.28)
 	core.color = target_color if lit else Color(0.08, 0.12, 0.18, 1.0)
+	indicator.color = Color(target_color.r, target_color.g, target_color.b, 1.0 if lit else 0.32)
 	label.modulate = Color.WHITE if lit else Color(0.68, 0.72, 0.8, 1.0)
 
 

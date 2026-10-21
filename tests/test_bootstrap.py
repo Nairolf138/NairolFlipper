@@ -642,3 +642,38 @@ def test_stage_identity_uses_original_synchronized_music_stems():
         "impact.ogg",
     ):
         assert (music_dir / filename).is_file()
+
+
+def test_stagecraft_visual_pass_is_layered_and_mobile_safe():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    art_script = ROOT / "scripts" / "show" / "playfield_visual_controller.gd"
+    stage_script = ROOT / "scripts" / "show" / "stage_visual_controller.gd"
+    theme = ROOT / "data" / "ui" / "StageTheme.tres"
+    runner_text = (ROOT / "tests" / "godot" / "test_runner.gd").read_text(encoding="utf-8")
+
+    assert art_script.is_file()
+    assert theme.is_file()
+    assert 'name="PlayfieldArt"' in scene_text
+    assert 'path="res://data/ui/StageTheme.tres"' in scene_text
+    assert "_draw_shot_routes" in art_script.read_text(encoding="utf-8")
+    assert "_draw_launcher_lane" in art_script.read_text(encoding="utf-8")
+    assert "_draw_drain_apron" in art_script.read_text(encoding="utf-8")
+    assert "_draw_haze" in stage_script.read_text(encoding="utf-8")
+    assert "_draw_footlights" in stage_script.read_text(encoding="utf-8")
+
+    visual_parts = {
+        "GuideRail.tscn": ("MetalFace", "EdgeLight"),
+        "Flipper.tscn": ("TopFace", "MetalSpine", "PivotCap"),
+        "Bumper.tscn": ("Bezel", "Lens", "LensHighlight"),
+        "RigTarget.tscn": ("MetalFrame", "Indicator"),
+        "Ramp.tscn": ("Deck", "EntryEdge"),
+        "ConsoleScoop.tscn": ("Faceplate", "GoStrip"),
+    }
+    for filename, node_names in visual_parts.items():
+        content = (ROOT / "scenes" / "gameplay" / filename).read_text(encoding="utf-8")
+        for node_name in node_names:
+            assert f'name="{node_name}"' in content
+
+    # The pass remains vector-only and does not add a costly full-screen shader.
+    assert "shader_type" not in art_script.read_text(encoding="utf-8")
+    assert "_test_stagecraft_visual_language" in runner_text

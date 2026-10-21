@@ -52,3 +52,21 @@ grille technique et un runway animé. Chaque famille active durablement sa
 fixture ; Flow augmente l'énergie et Final Show lance une chase plus rapide.
 Blackout coupe les faisceaux. Le renderer reste vectoriel, sans texture ni shader
 plein écran, pour préserver la lisibilité et les performances mobiles.
+
+## Table 2.4 — langage Stagecraft
+
+La première passe d'identité remplace les grandes formes plates du prototype par
+un système visuel commun : métal sombre, verre coloré, repères de gaffer, baies
+techniques et signalétique lumineuse. Chaque pièce garde une silhouette propre :
+
+- **rails** : profilé acier, face sombre et arête lumineuse ;
+- **flippers** : palette mécanique, pivot apparent et spine métallique ;
+- **bumpers** : lentille de projecteur dans un bezel octogonal ;
+- **cibles Rig** : module de rack avec témoin d'état persistant ;
+- **rampes** : deck sombre encadré par sa couleur Warm ou Cold ;
+- **Console** : faceplate et strip `GO`, distincte d'une simple cible de score.
+
+La couleur guide mais ne porte jamais seule l'information : différences de
+forme, largeur, position et contraste restent visibles. Toute la passe utilise
+les primitives Canvas 2D de Godot ; aucun asset tiers, texture HD, système de
+particules ou shader plein écran n'est ajouté.

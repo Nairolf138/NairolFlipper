@@ -28,6 +28,10 @@
   préparée par des tirs dédiés puis exécutée via la Console.
 - Objectif courant permanent et mise en évidence des rampes, de l'orbite ou des
   bumpers encore attendus.
+- Passe visuelle Stagecraft vectorielle : stage deck en perspective, routes de
+  tir, launcher, drain, truss, haze et footlights cohérents.
+- Habillage mécanique des rails, flippers, bumpers, cibles Rig, rampes et Console,
+  ainsi qu'un thème partagé pour les menus et commandes de partie.
 
 ### Fixed
 

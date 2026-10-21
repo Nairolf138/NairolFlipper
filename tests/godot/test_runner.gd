@@ -25,12 +25,13 @@ func _run() -> void:
 	await _test_weighted_pinball_feel()
 	await _test_final_show_multiball_and_blackout()
 	await _test_stage_identity_and_music_stems()
+	await _test_stagecraft_visual_language()
 	# Give the audio server and deferred frees time to release stream references.
 	await process_frame
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 12 passed")
+		print("Godot behavioral tests: 13 passed")
 		quit(0)
 		return
 
@@ -613,6 +614,36 @@ func _test_stage_identity_and_music_stems() -> void:
 	main.show_flow.start_blackout()
 	_expect_equal(main.audio_service.stem_levels[&"atmosphere"], 0.0, "Blackout mutes the stem mix")
 	_expect_equal(main.stage_visuals.show_state, ShowFlowManagerNode.State.BLACKOUT, "Stage visuals follow Blackout")
+	main.free()
+	await process_frame
+
+
+func _test_stagecraft_visual_language() -> void:
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Main scene loads for the stagecraft visual pass")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	root.add_child(main)
+	await process_frame
+
+	var playfield_art := main.get_node_or_null("PlayfieldArt") as Node2D
+	_expect(playfield_art != null, "The playfield exposes its dedicated vector-art layer")
+	if playfield_art != null:
+		_expect(playfield_art.z_index < main.stage_visuals.z_index, "Reactive beams render above the static deck")
+	_expect(main.get_node_or_null("UpperLeftGuide/Visual/MetalFace") != null, "Guide rails have a readable metal face")
+	_expect(main.get_node_or_null("LeftFlipper/Visual/MetalSpine") != null, "Flippers expose their mechanical spine")
+	_expect(main.get_node_or_null("KickBumper/Visual/Lens") != null, "Bumpers read as stage-light lenses")
+	_expect(main.get_node_or_null("FrontWashTarget/Indicator") != null, "Rig targets expose a persistent status indicator")
+	_expect(main.get_node_or_null("WarmRamp/Visual/Deck") != null, "Ramps expose a distinct physical deck")
+	_expect(main.get_node_or_null("ConsoleScoop/Visual/GoStrip") != null, "The Console exposes a dedicated GO strip")
+
+	var right_flipper := main.get_node("RightFlipper")
+	_expect(right_flipper.get_node("ContactShadow").scale.x < 0.0, "Right flipper art and contact shadow mirror together")
+	var start_overlay := main.get_node("Interface/StartOverlay") as Control
+	_expect(start_overlay.theme != null, "Menus use the shared stage-control theme")
+
 	main.free()
 	await process_frame
 

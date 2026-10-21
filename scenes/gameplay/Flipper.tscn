@@ -10,10 +10,36 @@ size = Vector2(180, 34)
 script = ExtResource("1_flipper")
 physics_material_override = ExtResource("2_surface")
 
+[node name="ContactShadow" type="Polygon2D" parent="."]
+z_index = -1
+position = Vector2(0, 10)
+polygon = PackedVector2Array(0, -18, 148, -18, 184, 0, 148, 18, 0, 18)
+color = Color(0, 0, 0, 0.58)
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(90, 0)
 shape = SubResource("FlipperShape")
 
 [node name="Visual" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(0, -17, 145, -17, 180, 0, 145, 17, 0, 17)
-color = Color(0.95, 0.32, 0.58, 1)
+polygon = PackedVector2Array(0, -21, 145, -21, 184, 0, 145, 21, 0, 21)
+color = Color(0.24, 0.035, 0.14, 1)
+
+[node name="TopFace" type="Polygon2D" parent="Visual"]
+polygon = PackedVector2Array(7, -14, 142, -14, 171, 0, 142, 14, 7, 14)
+color = Color(1, 0.18, 0.52, 1)
+
+[node name="MetalSpine" type="Polygon2D" parent="Visual"]
+polygon = PackedVector2Array(12, -3, 151, -3, 160, 0, 151, 3, 12, 3)
+color = Color(0.82, 0.91, 0.98, 0.72)
+
+[node name="EdgeLight" type="Polygon2D" parent="Visual"]
+polygon = PackedVector2Array(12, -15, 140, -15, 148, -11, 14, -11)
+color = Color(1, 0.68, 0.87, 0.9)
+
+[node name="PivotHousing" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, -25, 18, -18, 25, 0, 18, 18, 0, 25, -18, 18, -25, 0, -18, -18)
+color = Color(0.055, 0.09, 0.13, 1)
+
+[node name="PivotCap" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, -13, 9, -9, 13, 0, 9, 9, 0, 13, -9, 9, -13, 0, -9, -9)
+color = Color(0.72, 0.82, 0.9, 1)
