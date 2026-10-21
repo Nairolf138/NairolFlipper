@@ -162,7 +162,7 @@ visible dans le HUD et un restart remet la conduite à Preset.
 
 ## P1 — Audio
 
-T040 Audio service ✅; T041 SFX buses ✅; T042 Music transport ✅; T043 Stem set ✅; T044 Sync Bonus.
+T040 Audio service ✅; T041 SFX buses ✅; T042 Music transport ✅; T043 Stem set ✅; T044 Sync Bonus ✅.
 
 T040 ajoute un service audio logique multiplateforme : mix Master/Music/SFX,
 états de stems et demandes de SFX sont consommables par les cues sans rendre le
@@ -181,6 +181,12 @@ T043 ajoute huit stems originaux pré-rendus et synchronisés sur une boucle de
 16 temps à 120 BPM. Atmosphère, piano, kick, percussions, basse et arp entrent
 progressivement avec le Rig ; lead et impact rejoignent le mix au Final Show.
 Un renderer 2D léger traduit la même progression en truss, faisceaux et runway.
+
+T044 relie les impacts du plateau à l'horloge musicale. Une fenêtre serrée donne
+Perfect Sync et une fenêtre plus large donne Sync ; les deux ajoutent score et
+Flow avec texte, flash et SFX dédiés. Un pulse ne peut être récompensé qu'une
+fois et un tir hors tempo ne perd jamais ses gains normaux. Les témoins à quatre
+temps restent visibles même si le mix audio est coupé.
 
 ## P2 — Final
 

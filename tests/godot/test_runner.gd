@@ -4,6 +4,7 @@ const CueDefinitionResource = preload("res://scripts/show/cue_definition.gd")
 const CueManagerNode = preload("res://scripts/show/cue_manager.gd")
 const FlowManagerNode = preload("res://scripts/show/flow_manager.gd")
 const ShowFlowManagerNode = preload("res://scripts/show/show_flow_manager.gd")
+const SyncBonusManagerNode = preload("res://scripts/show/sync_bonus_manager.gd")
 
 var _failures: Array[String] = []
 
@@ -16,6 +17,7 @@ func _run() -> void:
 	_test_flow_decay_and_multiplier()
 	_test_cue_stack_progression()
 	_test_show_flow_state_machine()
+	_test_sync_bonus_timing()
 	await _test_main_scene_scoring_and_reset()
 	await _test_physics_drain_lifecycle()
 	await _test_android_playtest_regressions()
@@ -26,12 +28,13 @@ func _run() -> void:
 	await _test_final_show_multiball_and_blackout()
 	await _test_stage_identity_and_music_stems()
 	await _test_stagecraft_visual_language()
+	await _test_sync_bonus_integration()
 	# Give the audio server and deferred frees time to release stream references.
 	await process_frame
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 13 passed")
+		print("Godot behavioral tests: 15 passed")
 		quit(0)
 		return
 
@@ -107,6 +110,27 @@ func _test_show_flow_state_machine() -> void:
 	show.reset_show()
 	_expect(not show.final_show_completed, "A restart clears Final Show completion")
 	show.free()
+
+
+func _test_sync_bonus_timing() -> void:
+	var sync := SyncBonusManagerNode.new()
+	var awarded_tiers: Array[StringName] = []
+	sync.sync_awarded.connect(
+		func(tier: StringName, _score: int, _flow: int, _distance: float) -> void:
+			awarded_tiers.append(tier)
+	)
+
+	_expect(sync.register_hit(4.05), "A hit close to the pulse earns Sync")
+	_expect_equal(awarded_tiers, [&"perfect"], "The tight timing window earns Perfect Sync")
+	_expect(not sync.register_hit(4.10), "Only one award is granted on the same pulse")
+	_expect(not sync.register_hit(4.50), "An off-beat hit receives no bonus and no penalty")
+	_expect(sync.register_hit(5.22), "The forgiving outer window earns regular Sync")
+	_expect_equal(awarded_tiers, [&"perfect", &"sync"], "Both Sync tiers are distinguishable")
+	_expect(not sync.register_hit(6.02, false), "A stopped transport cannot award Sync")
+	sync.reset_state()
+	_expect_equal(sync.awards, 0, "Reset clears the session Sync counter")
+	_expect(sync.register_hit(6.02), "Reset re-opens the timing window")
+	sync.free()
 
 
 func _test_main_scene_scoring_and_reset() -> void:
@@ -644,6 +668,43 @@ func _test_stagecraft_visual_language() -> void:
 	var start_overlay := main.get_node("Interface/StartOverlay") as Control
 	_expect(start_overlay.theme != null, "Menus use the shared stage-control theme")
 
+	main.free()
+	await process_frame
+
+
+func _test_sync_bonus_integration() -> void:
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Main scene loads for Sync Bonus")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	root.add_child(main)
+	await process_frame
+	main.start_game()
+	main._launch_or_restart()
+	main.audio_service.seek_transport(8.04)
+	main._on_bumper_hit(100, &"KickBumper")
+
+	_expect_equal(main.sync_bonus_manager.awards, 1, "A timed gameplay hit awards Sync once")
+	_expect_equal(main.sync_bonus_manager.perfect_awards, 1, "The central window records Perfect Sync")
+	_expect_equal(main.score_manager.score, 300, "Perfect Sync adds its score without replacing base points")
+	_expect_equal(main.flow_manager.flow_points, 135, "Perfect Sync adds Flow on top of the physical hit")
+	_expect(main.sync_feedback_label.visible, "Sync exposes a readable on-table feedback label")
+	_expect("PERFECT SYNC" in main.sync_feedback_label.text, "Perfect timing is named, not colour-only")
+	_expect_equal(main.audio_service.last_sfx_id, &"sync", "Sync requests its dedicated audible feedback")
+
+	main._on_bumper_hit(100, &"KickBumper")
+	_expect_equal(main.sync_bonus_manager.awards, 1, "Multiple contacts cannot farm one musical pulse")
+	var score_before_offbeat: int = main.score_manager.score
+	main.audio_service.seek_transport(8.50)
+	main._on_slingshot_hit(75, 15, &"LeftSlingshot")
+	_expect(main.score_manager.score > score_before_offbeat, "Off-beat shots keep all normal gameplay points")
+	_expect_equal(main.sync_bonus_manager.awards, 1, "Off-beat shots do not create a hidden award")
+
+	main.restart_game()
+	_expect_equal(main.sync_bonus_manager.awards, 0, "Restart clears Sync Bonus state")
+	_expect(not main.sync_feedback_label.visible, "Restart clears transient Sync feedback")
 	main.free()
 	await process_frame
 

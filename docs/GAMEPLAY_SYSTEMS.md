@@ -60,7 +60,18 @@ Proposition : `1x → 2x → 3x → 4x → 6x → 8x`. Monte par variété, ramp
 
 ## Sync Bonus
 
-Bonus visuel/score/Flow près d'un pulse. Jamais de pénalité totale hors tempo.
+Chaque impact de bumper, cible Rig, rampe, orbite, slingshot ou Console est
+comparé au pulse entier le plus proche du transport musical :
+
+- **Perfect Sync** dans une fenêtre de `±0,12 beat` : `+200` points et `+35 Flow` ;
+- **Sync** jusqu'à `±0,28 beat` : `+100` points et `+18 Flow` ;
+- hors fenêtre : le tir conserve tous ses points, son Flow et sa progression.
+
+Un même pulse ne peut donner qu'un bonus, y compris en multiball. Le timing est
+fondé sur l'horloge logique et continue donc à fonctionner lorsque le son est
+coupé ou indisponible, sans rendre le gameplay dépendant de la latence audio.
+Les valeurs sont exportées dans `SyncBonusManager` pour être affinées après
+playtest sur tablette.
 
 ## Multiball
 

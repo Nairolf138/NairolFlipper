@@ -32,6 +32,10 @@
   tir, launcher, drain, truss, haze et footlights cohérents.
 - Habillage mécanique des rails, flippers, bumpers, cibles Rig, rampes et Console,
   ainsi qu'un thème partagé pour les menus et commandes de partie.
+- Sync Bonus à deux niveaux, calé sur le transport musical, avec gains de score
+  et Flow, feedback texte/flash/SFX et verrou anti-farm par pulse.
+- Horloge visuelle à quatre temps sur le plateau et compteur local de Sync pour
+  comparer les futurs playtests sans télémétrie réseau.
 
 ### Fixed
 

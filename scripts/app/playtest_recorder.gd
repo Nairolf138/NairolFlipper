@@ -3,7 +3,7 @@ extends Node
 
 ## Local-only counters make feel sessions reviewable without telemetry or accounts.
 const SAVE_PATH := "user://playtest/latest.json"
-const SCHEMA_VERSION := 1
+const SCHEMA_VERSION := 2
 
 var session_started_msec: int = 0
 var launches: int = 0
@@ -12,6 +12,8 @@ var drains: int = 0
 var ball_saves: int = 0
 var restarts: int = 0
 var score_points: int = 0
+var sync_awards: int = 0
+var perfect_syncs: int = 0
 
 
 func _ready() -> void:
@@ -45,6 +47,13 @@ func record_restart() -> void:
 	save_session()
 
 
+func record_sync(tier: StringName) -> void:
+	sync_awards += 1
+	if tier == &"perfect":
+		perfect_syncs += 1
+	save_session()
+
+
 func save_session() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://playtest"))
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -59,6 +68,8 @@ func save_session() -> void:
 		"ball_saves": ball_saves,
 		"restarts": restarts,
 		"score_points": score_points,
+		"sync_awards": sync_awards,
+		"perfect_syncs": perfect_syncs,
 	}
 	file.store_string(JSON.stringify(session, "  "))
 	file.close()

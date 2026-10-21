@@ -2,18 +2,18 @@
 
 ## Dernière exécution
 
-- Date : 2026-10-20
-- Cycle : T043 — identité scénique et premier set de stems
-- Statut : 34 contrats Python et 10 groupes Godot préparés, build CI à valider
+- Date : 2026-10-21
+- Cycle : T044 — Sync Bonus
+- Statut : 38 contrats Python validés localement, 15 groupes Godot préparés, build CI à valider
 
 ## Dépôt
 
-- Branche : `feat/stage-identity-audio`
-- Base : `a3d4258` (fusion de la PR #19 sur `origin/main`)
-- Validation : stems, mix Showflow, renderer scénique et Blackout ajoutés ; CI à exécuter
+- Branche : `feat/sync-bonus`
+- Base : `bef870c` (fusion de la PR #24 sur `origin/main`)
+- Validation : fenêtres Perfect/Sync, anti-farm par pulse, feedback audiovisuel et instrumentation locale ajoutés ; CI à exécuter
 - CI de la branche : à valider par la pull request
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` auditée : `a3d4258`
+- Branche `main` auditée : `bef870c`
 
 ## État actuel
 
@@ -200,6 +200,6 @@ T012 complète le premier filet de livraison cross-platform :
 
 ## Prochaine exécution
 
-Faire valider sur tablette la lisibilité des faisceaux, l'équilibre des huit
-stems et les performances pendant le Final Show. Ensuite, implémenter Sync Bonus
-et les réglages de volume accessibles depuis le menu.
+Faire valider sur tablette la lisibilité de l'horloge à quatre temps, les deux
+fenêtres de Sync et l'absence de gêne pendant le multiball. Ensuite, ajouter les
+réglages Master/Music/SFX accessibles depuis le menu et persistés localement.

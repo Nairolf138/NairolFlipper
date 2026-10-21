@@ -13,6 +13,7 @@ const SFX_STREAMS: Dictionary[StringName, AudioStream] = {
 	&"scoop": preload("res://assets/audio/sfx/scoop.wav"),
 	&"cue": preload("res://assets/audio/sfx/cue.wav"),
 	&"cue_start": preload("res://assets/audio/sfx/cue.wav"),
+	&"sync": preload("res://assets/audio/sfx/sync.wav"),
 	&"safety": preload("res://assets/audio/sfx/safety.wav"),
 	&"drain": preload("res://assets/audio/sfx/drain.wav"),
 }
@@ -33,6 +34,7 @@ signal sfx_requested(sfx_id: StringName)
 
 var stem_levels: Dictionary = {}
 var transport_position_beats: float = 0.0
+var transport_total_beats: float = 0.0
 var transport_playing: bool = false
 var last_sfx_id: StringName = &""
 var _sfx_players: Array[AudioStreamPlayer] = []
@@ -56,7 +58,9 @@ func _process(delta: float) -> void:
 	if not transport_playing or bpm <= 0.0 or loop_beats <= 0.0:
 		return
 	var beats_per_second := bpm / 60.0
-	transport_position_beats += delta * beats_per_second
+	var beat_delta := delta * beats_per_second
+	transport_position_beats += beat_delta
+	transport_total_beats += beat_delta
 	if transport_position_beats >= loop_beats:
 		transport_position_beats = fmod(transport_position_beats, loop_beats)
 		transport_looped.emit()
@@ -87,6 +91,7 @@ func stop_transport(reset_position: bool = false) -> void:
 		player.stop()
 	if reset_position:
 		transport_position_beats = 0.0
+		transport_total_beats = 0.0
 	transport_changed.emit(transport_position_beats, transport_playing)
 
 
@@ -95,6 +100,7 @@ func seek_transport(position_beats: float) -> void:
 		transport_position_beats = 0.0
 	else:
 		transport_position_beats = fmod(maxf(position_beats, 0.0), loop_beats)
+	transport_total_beats = maxf(position_beats, 0.0)
 	if transport_playing:
 		_start_stem_players()
 	transport_changed.emit(transport_position_beats, transport_playing)

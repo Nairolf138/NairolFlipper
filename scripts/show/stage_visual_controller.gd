@@ -25,6 +25,9 @@ var flow_ratio: float = 0.0
 var pulse_time: float = 0.0
 var hit_flash: float = 0.0
 var hit_color: Color = COLD_WHITE
+var beat_phase: float = 0.0
+var beat_index: int = 0
+var transport_playing: bool = false
 
 
 func _ready() -> void:
@@ -58,12 +61,20 @@ func trigger_hit(color: Color = COLD_WHITE) -> void:
 	queue_redraw()
 
 
+func set_beat_position(position_beats: float, playing: bool) -> void:
+	transport_playing = playing
+	beat_phase = fposmod(position_beats, 1.0)
+	beat_index = floori(position_beats)
+	queue_redraw()
+
+
 func _draw() -> void:
 	_draw_haze()
 	_draw_stage_grid()
 	_draw_truss()
 	_draw_fixture_beams()
 	_draw_runway()
+	_draw_sync_clock()
 	_draw_footlights()
 	if hit_flash > 0.0:
 		draw_circle(Vector2(540, 920), 410.0 * hit_flash, Color(hit_color, 0.045 * hit_flash), false, 18.0)
@@ -144,6 +155,22 @@ func _draw_runway() -> void:
 		var y := 560.0 + step * 125.0
 		var half_width := 52.0 + step * 10.0
 		draw_line(Vector2(540 - half_width, y), Vector2(540 + half_width, y), Color(runway_color, runway_color.a * 0.65), 2.0)
+
+
+func _draw_sync_clock() -> void:
+	if not transport_playing or show_state in [STANDBY, BLACKOUT]:
+		return
+	var distance_to_pulse := minf(beat_phase, 1.0 - beat_phase)
+	var pulse := pow(1.0 - clampf(distance_to_pulse * 2.0, 0.0, 1.0), 3.0)
+	var display_beat := beat_index + (1 if beat_phase > 0.5 else 0)
+	var active_step := posmod(display_beat, 4)
+	for index in range(4):
+		var position := Vector2(492 + index * 32, 404)
+		var active := index == active_step
+		draw_circle(position, 7.0 + (4.0 * pulse if active else 0.0), Color(CYAN, 0.9 if active else 0.18))
+		draw_arc(position, 12.0, 0.0, TAU, 20, Color(COLD_WHITE, (0.35 + pulse * 0.5) if active else 0.1), 2.0, true)
+	var center := Vector2(540, 404)
+	draw_arc(center, 31.0 + pulse * 7.0, 0.0, TAU, 32, Color(AMBER, 0.18 + pulse * 0.42), 3.0, true)
 
 
 func _draw_footlights() -> void:

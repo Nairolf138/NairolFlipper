@@ -137,13 +137,24 @@ toucher, les collisions inactives et la récupération hors limites.
   coupe sur les bords d'une tablette ;
 - surveiller fluidité, chauffe et batterie pendant une partie complète Android.
 
+### Sync Bonus — checklist tablette
+
+- repérer les quatre témoins de tempo et confirmer qu'ils suivent la musique ;
+- toucher plusieurs éléments sur le pulse et obtenir `PERFECT SYNC` ou `SYNC` ;
+- vérifier que texte, flash et SFX sont perceptibles sans masquer la bille ;
+- provoquer deux contacts presque simultanés et confirmer un seul bonus ;
+- jouer volontairement hors tempo et confirmer que score, Flow et objectifs
+  continuent normalement ;
+- vérifier le comportement pendant le Final Show multiball et après un Blackout ;
+- refaire le test avec le volume coupé : le marqueur visuel doit suffire.
+
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 
 ## Instrumentation locale de playtest
 
 Le nœud `PlaytestRecorder` écrit `user://playtest/latest.json` avec la durée de
-session, lancements, impacts de bumpers, drains, ball saves, relances et points
-marqués. Cette trace reste locale : aucun réseau, compte ou télémétrie n'est
+session, lancements, impacts de bumpers, drains, ball saves, relances, points
+marqués, Sync et Perfect Sync. Cette trace reste locale : aucun réseau, compte ou télémétrie n'est
 utilisé. Elle sert à comparer les sensations entre builds pendant un playtest.
 
 Avant release publique : au moins Android réel, iPhone/iPad réel pour iOS, navigateurs récents, Windows natif, macOS/Linux selon disponibilité.

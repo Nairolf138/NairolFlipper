@@ -50,6 +50,11 @@ Toucher gauche/droite, lancer, montrer un objectif, laisser jouer.
 
 Combiner son, flash, texte, animation, vibration optionnelle. Ne jamais dépendre uniquement de vibration ou couleur.
 
+Le Sync Bonus suit cette règle : quatre témoins marquent le tempo sur le plateau,
+un flash renforce l'impact et un texte temporaire annonce `SYNC` ou
+`PERFECT SYNC` avec les gains de score et Flow. La couleur cyan/ambre reste un
+renfort, jamais l'unique distinction entre les deux résultats.
+
 ## Conduite du show
 
 Le HUD affiche toujours l'état courant sous la forme `SHOW PRESET`, `SHOW BUILD`,
