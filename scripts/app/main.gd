@@ -179,12 +179,20 @@ func _physics_process(delta: float) -> void:
 	if _is_ball_outside_playfield(ball.global_position):
 		_recover_active_ball("BILLE RÉCUPÉRÉE — APPUYEZ SUR GO")
 		return
-	if ball.linear_velocity.length() <= stuck_speed_threshold:
+	if ball.linear_velocity.length() <= stuck_speed_threshold and not _is_ball_on_held_flipper(ball):
 		stalled_ball_time += delta
 	else:
 		stalled_ball_time = 0.0
 	if stalled_ball_time >= ball_recovery_delay:
 		_recover_active_ball("BILLE RÉCUPÉRÉE — APPUYEZ SUR GO")
+
+
+func _is_ball_on_held_flipper(ball: RigidBody2D) -> bool:
+	for collider in ball.get_colliding_bodies():
+		if collider == $LeftFlipper or collider == $RightFlipper:
+			if collider.is_held():
+				return true
+	return false
 
 
 func _input(event: InputEvent) -> void:
@@ -914,6 +922,8 @@ func restart_game() -> void:
 	session_generation += 1
 	show_generation += 1
 	_release_all_touches()
+	for flipper in [$LeftFlipper, $RightFlipper]:
+		flipper.reset_flipper()
 	remaining_balls = balls.size()
 	active_ball_index = 0
 	game_over = false

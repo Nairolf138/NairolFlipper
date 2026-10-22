@@ -1,13 +1,15 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/gameplay/flipper.gd" id="1_flipper"]
 [ext_resource type="PhysicsMaterial" path="res://data/tuning/FlipperMaterial.tres" id="2_surface"]
+[ext_resource type="Resource" path="res://data/tuning/FlipperTuning.tres" id="3_tuning"]
 
-[sub_resource type="RectangleShape2D" id="FlipperShape"]
-size = Vector2(180, 34)
+[sub_resource type="ConvexPolygonShape2D" id="FlipperShape"]
+points = PackedVector2Array(-90, -17, 55, -14, 77, -10, 90, 0, 77, 10, 55, 14, -90, 17)
 
 [node name="Flipper" type="AnimatableBody2D"]
 script = ExtResource("1_flipper")
+tuning = ExtResource("3_tuning")
 physics_material_override = ExtResource("2_surface")
 
 [node name="ContactShadow" type="Polygon2D" parent="."]

@@ -3,23 +3,24 @@
 ## Dernière exécution
 
 - Date : 2026-10-22
-- Cycle : T049 — GO, lancement guidé et retours jouables
-- Statut : 42 contrats Python et 22 groupes Godot validés localement ; validation tablette requise
+- Cycle : T055 — Roulement et contrôle des flippers
+- Statut : 42 contrats Python et 24 groupes Godot ; validation tablette requise
 
 ## Dépôt
 
-- Branche : `feat/guided-launch-go`
-- Base : `8f4f91c` (fusion de la PR #29 sur `origin/main`)
-- Validation : neuf lancements et six retours physiques, GO/GUI, clavier et manette ; CI à exécuter
+- Branche : `feat/rolling-pinball-physics`
+- Base : `13c588b` (fusion de la PR #30 sur `origin/main`)
+- Validation : roulement 60/120 Hz, maintien et visée sur deux flippers, neuf lancements et six retours ; CI à exécuter
 - CI de la branche : à valider par la pull request
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` auditée : `8f4f91c`
+- Branche `main` auditée : `13c588b`
 
 ## État actuel
 
-Le playtest après PR 29 invalide le statut de candidate Alpha. T049 reconstruit
-le lanceur et les retours physiques. Les menus et règles sont acquis ; le
-roulement, les vraies rampes et les graphismes restent les prochains jalons.
+Le playtest après PR 29 invalide le statut de candidate Alpha. Après le lanceur
+et les retours de T049, T055 remplace la chute amortie par un roulement projeté
+et des palettes permettant le maintien puis la visée. Les menus et règles sont
+acquis ; les vrais parcours et les graphismes restent les prochains jalons.
 
 T013 consolide l'état livré après T042 :
 
@@ -198,15 +199,15 @@ T012 complète le premier filet de livraison cross-platform :
 - `export_presets.cfg` avec presets Web, Android debug et Windows Desktop.
 - `.github/workflows/godot.yml` avec import propre, tests comportementaux, smoke et exports P0.
 - `tests/test_bootstrap.py` avec 42 contrats de structure.
-- `tests/godot/test_runner.gd` avec 22 groupes de validations comportementales.
+- `tests/godot/test_runner.gd` avec 24 groupes de validations comportementales.
 - `docs/BACKLOG.md` mis à jour.
 - Ce journal `AUTONOMY_STATE.md`.
 
 ## Prochaine exécution
 
-Valider sur tablette GO, les lancements répétés et le premier retour jouable sur
-chaque flipper. Puis poursuivre la reprise de pente/roulement et des flippers en
-PR 31, avant les vrais parcours et la refonte artistique.
+Valider sur tablette la descente, les contacts, le maintien et les tirs précoces/
+tardifs des deux côtés, en conservant GO et les retours PR 30. Puis poursuivre
+en PR 32 avec les vrais parcours de rampes et d'orbite, avant la refonte artistique.
 
 ### T045 — Réglages audio persistants
 
@@ -244,3 +245,12 @@ PR 31, avant les vrais parcours et la refonte artistique.
 - neuf lancements suivis jusqu'au premier renvoi physique, six retours dédiés,
   perte centrale et commandes GUI/tactile/clavier/manette vérifiés ;
 - qualification Alpha et sensation physique laissées à la validation humaine.
+
+### T055 — Roulement et contrôle des flippers
+
+- pente 6,5°, résistance au roulement constante et intégrateur 2D documenté en ADR 0005 ;
+- moteurs progressifs, retour plus lent, caoutchouc et forme de collision revus ;
+- collecteurs dégagés, symétrie droite et slingshots dirigés vers le jeu ;
+- maintien sur palette exclu du watchdog ; récupération toujours active ailleurs ;
+- 42 contrats et 24 groupes, dont mesure à 60/120 Hz, maintien et deux visées par côté ;
+- aucune qualification Alpha avant playtest, parcours physiques et refonte artistique.

@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Roulement et contrôle — PR 31
+
+- Accélération calculée depuis une pente de 6,5°, résistance au roulement
+  constante et intégration indépendante de la masse, sans amortissement visqueux.
+- Montée progressive des flippers, retour plus lent, caoutchouc moins rebondissant
+  et collision effilée permettant de retenir puis de viser avec la bille.
+- Dégagement des palettes levées, retours symétriques et slingshots vers le jeu.
+- Maintien sur flipper exclu du sauvetage des billes coincées ; restart moteur complet.
+- Mesures physiques à 60/120 Hz, maintien et deux points de frappe par côté ;
+  neuf lancements et six retours de la PR 30 conservés.
+- Modèle de roulement projeté en 2D documenté ; validation de sensation sur tablette
+  et vrais parcours de rampes toujours nécessaires avant qualification Alpha.
+
 ### Reprise de jouabilité — PR 30
 
 - Bouton GO lorsque la bille est prête ; suppression du lancement par toucher

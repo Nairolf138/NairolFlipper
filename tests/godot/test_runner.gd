@@ -3,6 +3,7 @@ extends SceneTree
 const CueDefinitionResource = preload("res://scripts/show/cue_definition.gd")
 const CueManagerNode = preload("res://scripts/show/cue_manager.gd")
 const FlowManagerNode = preload("res://scripts/show/flow_manager.gd")
+const PhysicsTuningResource = preload("res://scripts/gameplay/physics_tuning.gd")
 const MainNode = preload("res://scripts/app/main.gd")
 const SettingsStoreNode = preload("res://scripts/app/settings_store.gd")
 const ShowFlowManagerNode = preload("res://scripts/show/show_flow_manager.gd")
@@ -38,12 +39,14 @@ func _run() -> void:
 	await _test_alpha_candidate_player_journey()
 	await _test_guided_launcher_and_go()
 	await _test_flipper_return_control()
+	await _test_rolling_dynamics()
+	await _test_flipper_motor_and_cradle_shots()
 	# Give the audio server and deferred frees time to release stream references.
 	await process_frame
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 22 passed")
+		print("Godot behavioral tests: 24 passed")
 		quit(0)
 		return
 
@@ -545,6 +548,9 @@ func _sample_return_exit(start_position: Vector2) -> Vector2:
 	var ball: RigidBody2D = main.balls[0]
 	ball.input_enabled = false
 	ball.reset_ball(start_position)
+	# Let the frozen pose reach the server before enabling shape-cast CCD.
+	await physics_frame
+	await physics_frame
 	ball.freeze = false
 	ball.linear_velocity = Vector2(0, 120)
 	var exit_position := Vector2(-1, -1)
@@ -571,7 +577,7 @@ func _test_weighted_pinball_feel() -> void:
 	var ball: RigidBody2D = main.balls[0]
 	var ball_material := ball.physics_material_override
 	_expect(ball.mass >= 1.35, "Ball keeps deliberate collision mass")
-	_expect(ball.gravity_scale >= 1.5, "Ball uses a decisive table slope")
+	_expect(ball.custom_integrator and is_zero_approx(ball.gravity_scale), "Ball rolls on the deck without global free-fall gravity")
 	_expect(ball_material != null and ball_material.bounce <= 0.15, "Ball no longer rebounds like rubber")
 	_expect(ball_material != null and ball_material.friction >= 0.45, "Ball keeps traction on contacts")
 	_expect(ball.has_node("ContactShadow") and ball.has_node("Highlight"), "Ball has readable table contact and volume")
@@ -579,8 +585,8 @@ func _test_weighted_pinball_feel() -> void:
 	var guide := main.get_node("UpperLeftGuide") as StaticBody2D
 	var flipper := main.get_node("LeftFlipper") as AnimatableBody2D
 	_expect(guide.physics_material_override != null and guide.physics_material_override.bounce <= 0.05, "Passive guides absorb excess rebound")
-	_expect(flipper.physics_material_override != null and flipper.physics_material_override.bounce >= 0.3, "Flippers keep a lively striking surface")
-	_expect(flipper.rotation_speed_degrees >= 900.0, "Flippers respond quickly enough for the heavier ball")
+	_expect(flipper.physics_material_override != null and flipper.physics_material_override.bounce < 0.3, "Flipper rubber absorbs a catch instead of bouncing like a bumper")
+	_expect(flipper.tuning != null, "Flipper motor response uses shared tuning")
 
 	ball.input_enabled = false
 	ball.reset_ball(Vector2(540, 900))
@@ -589,8 +595,8 @@ func _test_weighted_pinball_feel() -> void:
 	while ball.global_position.y < 1300.0 and fall_frames < 140:
 		await physics_frame
 		fall_frames += 1
-	_expect(fall_frames <= 96, "Ball crosses the middle table without floating (got %d frames)" % fall_frames)
-	_expect(ball.linear_velocity.y >= 950.0, "Ball carries visible weight after a free descent")
+	_expect(fall_frames <= 104, "Ball crosses the middle table on the measured slope (got %d frames)" % fall_frames)
+	_expect(ball.linear_velocity.y >= 850.0, "Ball accelerates consistently along the inclined deck")
 
 	main.free()
 	await process_frame
@@ -1073,23 +1079,8 @@ func _test_guided_launcher_and_go() -> void:
 		_expect_equal(main.playtest_recorder.ball_saves, 0, "Guided launch needs no safety teleport")
 		if entered_playfield:
 			ball.ball_save_used = true
-			var contacted := false
-			var returned := false
-			for _frame in 1440:
-				await physics_frame
-				if ball.global_position.y > 1640.0 and ball.linear_velocity.y > 0.0:
-					Input.action_press(&"flipper_left" if ball.global_position.x < 540.0 else &"flipper_right")
-				for body in ball.get_colliding_bodies():
-					if body == main.get_node("LeftFlipper") or body == main.get_node("RightFlipper"):
-						contacted = true
-				if contacted and ball.global_position.y < 1550.0 and ball.linear_velocity.y < 0.0:
-					returned = true
-					break
-				if main.session_state != MainNode.SessionState.PLAYING:
-					break
-			Input.action_release(&"flipper_left")
-			Input.action_release(&"flipper_right")
-			_expect(returned, "Launch first return can be struck back into play (%s, end %s)" % [sample, ball.global_position])
+			var played := await _play_physical_return(main, ball, &"", 1440)
+			_expect(played.returned, "Launch first return can be caught or struck back into play (%s, %s)" % [sample, played])
 		main.free()
 		await process_frame
 
@@ -1141,31 +1132,212 @@ func _sample_flipper_control(start_position: Vector2, velocity: Vector2, action:
 	root.add_child(main)
 	await physics_frame
 	main.start_game()
-	main._launch_or_restart()
+	main.session_state = MainNode.SessionState.PLAYING
 	var ball: RigidBody2D = main.balls[0]
 	ball.reset_ball(start_position, false)
+	await physics_frame
+	await physics_frame
 	ball.launch_ready = false
 	ball.ball_save_used = true
 	ball.freeze = false
 	ball.linear_velocity = velocity
-	var flipper: Node2D = main.get_node("LeftFlipper" if action == &"flipper_left" else "RightFlipper")
+	var result := await _play_physical_return(main, ball, action, 900)
+	main.free()
+	await process_frame
+	return result
+
+
+func _play_physical_return(main: Node, ball: RigidBody2D, action: StringName, frames: int) -> Dictionary:
+	var left: Node2D = main.get_node("LeftFlipper")
+	var right: Node2D = main.get_node("RightFlipper")
 	var contacted := false
 	var returned := false
 	var activated := false
-	for _frame in 360:
+	var released_catch := false
+	var replayed := false
+	var flipper: Node2D
+	for _frame in frames:
 		await physics_frame
-		if ball.global_position.y >= 1660.0 and not activated:
+		if ball.global_position.y >= 1640.0 and ball.linear_velocity.y > 0.0 and not activated:
+			if action == &"":
+				action = &"flipper_left" if ball.global_position.x < 540.0 else &"flipper_right"
+			flipper = left if action == &"flipper_left" else right
 			Input.action_press(action)
 			activated = true
-		if flipper in ball.get_colliding_bodies():
-			contacted = true
+		for body in ball.get_colliding_bodies():
+			if body == left or body == right:
+				contacted = true
+		if contacted and activated and not released_catch and ball.global_position.y > 1600.0 and ball.linear_velocity.length() < 80.0:
+			Input.action_release(action)
+			released_catch = true
+		if released_catch and not replayed:
+			var local_distance := (ball.global_position - flipper.global_position).rotated(-flipper.rotation).x
+			if action == &"flipper_right":
+				local_distance = -local_distance
+			if local_distance >= 95.0:
+				Input.action_press(action)
+				replayed = true
 		if contacted and ball.global_position.y < 1550.0 and ball.linear_velocity.y < 0.0:
 			returned = true
 			break
 		if ball.drain_locked or main.remaining_balls != 3:
 			break
+	Input.action_release(&"flipper_left")
+	Input.action_release(&"flipper_right")
+	return {"contacted": contacted, "returned": returned, "catch_replayed": replayed, "end": ball.global_position}
+
+
+func _test_rolling_dynamics() -> void:
+	var tuning := PhysicsTuningResource.new()
+	# With a 6.5-degree slope and 1600 px/m, an ideal rolling sphere gains
+	# about 1247 px/s each second after the configured rolling resistance.
+	var light := await _measure_ball_motion(tuning, Vector2.ZERO, 60, 0.7)
+	var heavy := await _measure_ball_motion(tuning, Vector2.ZERO, 60, 2.8)
+	_expect(absf(light.velocity.y - 624.0) < 25.0, "Inclined rolling acceleration matches the physical scale: %s" % light)
+	_expect(absf(light.velocity.y - heavy.velocity.y) < 2.0, "Downhill acceleration is independent of collision mass")
+	_expect(light.position.y > 145.0 and light.position.y < 175.0, "Half-second rolling displacement matches the slope: %s" % light)
+	tuning.table_slope_degrees = 0.0
+	var slow := await _measure_ball_motion(tuning, Vector2(600, 0), 120)
+	var fast := await _measure_ball_motion(tuning, Vector2(1200, 0), 120)
+	_expect(absf(slow.velocity.x - 577.6) < 3.0, "Flat deck loses speed to rolling resistance, not air drag: %s" % slow)
+	_expect(absf((600.0 - slow.velocity.x) - (1200.0 - fast.velocity.x)) < 2.0, "Rolling resistance does not grow with speed like viscous drag")
+	var stopped := await _measure_ball_motion(tuning, Vector2(30, 0), 240)
+	_expect(stopped.velocity.length() < 0.1, "A slow ball stops on a level deck without reversing")
+	var capped := await _measure_ball_motion(tuning, Vector2(3000, 0), 6)
+	_expect(capped.velocity.length() <= tuning.max_speed + 0.1, "Physics integration caps excess speed safely")
+	tuning.table_slope_degrees = 9.0
+	var steeper := await _measure_ball_motion(tuning, Vector2.ZERO, 60)
+	_expect(steeper.velocity.y > heavy.velocity.y * 1.3, "A steeper deck measurably accelerates the ball faster")
+	tuning.table_slope_degrees = 6.5
+	var original_tick_rate := Engine.physics_ticks_per_second
+	Engine.physics_ticks_per_second = 60
+	var fewer_ticks := await _measure_ball_motion(tuning, Vector2.ZERO, 30)
+	Engine.physics_ticks_per_second = original_tick_rate
+	_expect(absf(fewer_ticks.velocity.y - light.velocity.y) < 25.0, "Rolling speed stays consistent at 60 and 120 physics ticks")
+	_expect(absf(fewer_ticks.position.y - light.position.y) < 10.0, "Rolling travel stays consistent at 60 and 120 physics ticks")
+
+
+func _measure_ball_motion(tuning: Resource, velocity: Vector2, frames: int, collision_mass: float = 1.4) -> Dictionary:
+	var scene := load("res://scenes/gameplay/Ball.tscn") as PackedScene
+	var ball := scene.instantiate() as RigidBody2D
+	ball.tuning = tuning
+	ball.input_enabled = false
+	root.add_child(ball)
+	await physics_frame
+	ball.reset_ball(Vector2.ZERO)
+	await physics_frame
+	await physics_frame
+	ball.mass = collision_mass
+	ball.freeze = false
+	ball.linear_velocity = velocity
+	for _frame in frames:
+		await physics_frame
+	var result := {"position": ball.global_position, "velocity": ball.linear_velocity}
+	ball.free()
+	await process_frame
+	return result
+
+
+func _test_flipper_motor_and_cradle_shots() -> void:
+	var scene := load("res://scenes/app/Main.tscn") as PackedScene
+	var main := scene.instantiate()
+	root.add_child(main)
+	await physics_frame
+	var flipper: Node2D = main.get_node("LeftFlipper")
+	Input.action_press(&"flipper_left")
+	var press_frames := 0
+	while absf(rad_to_deg(flipper.rotation) - flipper.active_angle_degrees) > 0.1 and press_frames < 30:
+		await physics_frame
+		press_frames += 1
+	Input.action_release(&"flipper_left")
+	var return_frames := 0
+	while absf(rad_to_deg(flipper.rotation) - flipper.rest_angle_degrees) > 0.1 and return_frames < 40:
+		await physics_frame
+		return_frames += 1
+	_expect(press_frames >= 4 and press_frames <= 15, "Coil ramps up without an instant angle jump (%d frames)" % press_frames)
+	_expect(return_frames > press_frames, "Return spring is slower than the firing stroke (%d vs %d)" % [return_frames, press_frames])
+	main.free()
+	await process_frame
+	for action in [&"flipper_left", &"flipper_right"]:
+		var early := await _sample_cradle_shot(action, 95.0)
+		var late := await _sample_cradle_shot(action, 145.0)
+		_expect(early.held and late.held, "Held flipper physically cradles the ball on either timing (%s): %s / %s" % [action, early, late])
+		_expect(early.shot and late.shot, "Release and timed re-press produce real upward shots (%s): %s / %s" % [action, early, late])
+		if early.shot and late.shot:
+			_expect(absf(early.crossing_x - late.crossing_x) > 80.0, "Shot timing changes the aimed route (%s): %.1f / %.1f" % [action, early.crossing_x, late.crossing_x])
+
+	main = scene.instantiate()
+	main.ball_recovery_delay = 0.35
+	main.stuck_speed_threshold = 100.0
+	root.add_child(main)
+	await physics_frame
+	main.start_game()
+	main.session_state = MainNode.SessionState.PLAYING
+	var stranded: RigidBody2D = main.balls[0]
+	stranded.reset_ball(Vector2(960, 1720), false)
+	await physics_frame
+	await physics_frame
+	stranded.launch_ready = false
+	stranded.freeze = false
+	Input.action_press(&"flipper_left")
+	for _frame in 240:
+		await physics_frame
+		if main.session_state == MainNode.SessionState.READY:
+			break
+	Input.action_release(&"flipper_left")
+	_expect_equal(main.session_state, MainNode.SessionState.READY, "Holding a flipper does not suppress recovery elsewhere on the table")
+	_expect_equal(main.remaining_balls, 3, "Stuck-ball recovery still preserves the numbered ball")
+	main.free()
+	await process_frame
+
+
+func _sample_cradle_shot(action: StringName, fire_distance: float) -> Dictionary:
+	var scene := load("res://scenes/app/Main.tscn") as PackedScene
+	var main := scene.instantiate()
+	main.ball_recovery_delay = 0.35
+	main.stuck_speed_threshold = 100.0
+	root.add_child(main)
+	await physics_frame
+	main.start_game()
+	main.session_state = MainNode.SessionState.PLAYING
+	var flipper: Node2D = main.get_node("LeftFlipper" if action == &"flipper_left" else "RightFlipper")
+	var mirror := -1.0 if action == &"flipper_right" else 1.0
+	Input.action_press(action)
+	for _frame in 30:
+		await physics_frame
+	var ball: RigidBody2D = main.balls[0]
+	ball.reset_ball(flipper.global_position + Vector2(60.0 * mirror, -100.0), false)
+	await physics_frame
+	await physics_frame
+	ball.launch_ready = false
+	ball.ball_save_used = true
+	ball.freeze = false
+	ball.linear_velocity = Vector2(0, 60)
+	for _frame in 240:
+		await physics_frame
+	var held: bool = not ball.drain_locked and main.remaining_balls == 3 and ball.linear_velocity.length() < 50.0 and ball.global_position.distance_to(flipper.global_position) < 100.0
+	if "--trace-physics" in OS.get_cmdline_user_args():
+		print("HELD ", action, " ", fire_distance, " pos=", ball.global_position, " velocity=", ball.linear_velocity, " rotation=", rad_to_deg(flipper.rotation))
 	Input.action_release(action)
-	var result := {"contacted": contacted, "returned": returned, "end": ball.global_position}
+	var fired := false
+	var shot := false
+	var crossing_x := -1.0
+	for frame in 480:
+		await physics_frame
+		var local_distance := (ball.global_position - flipper.global_position).rotated(-flipper.rotation).x * mirror
+		if not fired and local_distance >= fire_distance:
+			Input.action_press(action)
+			fired = true
+		if "--trace-physics" in OS.get_cmdline_user_args() and frame % 30 == 0:
+			print("CRADLE ", action, " at ", fire_distance, " f=", frame, " pos=", ball.global_position, " velocity=", ball.linear_velocity, " fired=", fired)
+		if fired and ball.global_position.y <= 1400.0 and ball.linear_velocity.y < 0.0:
+			shot = true
+			crossing_x = ball.global_position.x
+			break
+		if main.remaining_balls != 3:
+			break
+	Input.action_release(action)
+	var result := {"held": held, "shot": shot, "crossing_x": crossing_x, "end": ball.global_position}
 	main.free()
 	await process_frame
 	return result

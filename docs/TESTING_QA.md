@@ -223,6 +223,26 @@ La validation de cette PR porte sur la géométrie et les commandes. Le roulemen
 les vrais parcours de rampes et la refonte artistique restent à réaliser avant
 qualification Alpha.
 
+### PR 31 — roulement et tirs sur tablette
+
+- Comparer plusieurs descentes libres : accélération franche vers le bas,
+  conservation de la vitesse en traversée et contacts sans rebond excessif.
+- Refaire les lancements GO et jouer le premier retour des deux côtés.
+- Retenir la bille sur chaque flipper levé pendant au moins cinq secondes :
+  aucun sauvetage automatique ni retour au launcher ne doit interrompre le maintien.
+- Relâcher brièvement puis réappuyer ; comparer frappe précoce et frappe tardive.
+  Vérifier que les deux côtés offrent des visées distinctes et accessibles.
+- Vérifier le passage autour des palettes levées, les retours latéraux et les
+  slingshots ; signaler le lieu d'un blocage ou d'une perte injuste.
+- Une bille réellement coincée ailleurs doit encore être récupérée, même si un
+  flipper reste maintenu. Recommencer la partie remet les deux moteurs au repos.
+- Noter modèle de tablette, version, vitesse ressentie, précision des tirs et
+  contacts problématiques. Les tests numériques ne valident pas le plaisir de jeu.
+
+Les essais Godot mesurent aussi masse indépendante, pente, résistance constante,
+arrêt sans inversion, limite de vitesse et cohérence à 60/120 Hz. Les rampes en
+hauteur, le glissement transitoire et le spin complet restent hors du modèle 2D.
+
 ## Instrumentation locale de playtest
 
 Le nœud `PlaytestRecorder` écrit `user://playtest/latest.json` avec la durée de

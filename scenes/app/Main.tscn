@@ -243,20 +243,20 @@ scale = Vector2(1.43, 1)
 modulate = Color(1, 0.28, 0.46, 1)
 
 [node name="LeftReturnRail" parent="." instance=ExtResource("26_rail")]
-position = Vector2(405, 1495)
+position = Vector2(397.5, 1452.5)
 rotation = 1.4
-scale = Vector2(1.34, 1)
+scale = Vector2(0.945, 1)
 modulate = Color(1, 0.48, 0.22, 1)
 
 [node name="RightReturnRail" parent="." instance=ExtResource("26_rail")]
-position = Vector2(665, 1495)
-rotation = -1.468
-scale = Vector2(1.325, 1)
+position = Vector2(682.5, 1452.5)
+rotation = -1.4
+scale = Vector2(0.945, 1)
 
 [node name="RightOutlaneRail" parent="." instance=ExtResource("26_rail")]
-position = Vector2(770, 1495)
-rotation = -1.502
-scale = Vector2(1.321, 1)
+position = Vector2(820, 1495)
+rotation = -1.18
+scale = Vector2(1.43, 1)
 modulate = Color(0.2, 0.7, 1, 1)
 
 [node name="LauncherDivider" type="StaticBody2D" parent="."]
@@ -284,12 +284,12 @@ edge_color = Color(1, 0.55, 0.3, 1)
 [node name="RightWingGuide" type="StaticBody2D" parent="."]
 script = ExtResource("38_rail_path")
 physics_material_override = ExtResource("30_surface")
-points = PackedVector2Array(890, 950, 855, 1240, 760, 1350)
+points = PackedVector2Array(890, 950, 890, 1240, 880, 1350)
 
 [node name="RightReturnExtension" type="StaticBody2D" parent="."]
 script = ExtResource("38_rail_path")
 physics_material_override = ExtResource("30_surface")
-points = PackedVector2Array(780, 1640, 745, 1700)
+points = PackedVector2Array(760, 1640, 745, 1700)
 
 [node name="UniverseOrbit" parent="." instance=ExtResource("24_lane")]
 position = Vector2(540, 310)
@@ -348,13 +348,13 @@ target_color = Color(1, 0.95, 0.72, 1)
 
 [node name="LeftSlingshot" parent="." instance=ExtResource("25_slingshot")]
 position = Vector2(275, 1450)
-kick_direction = Vector2(-0.62, -1)
+kick_direction = Vector2(0.45, -1)
 flash_color = Color(1, 0.34, 0.22, 1)
 
 [node name="RightSlingshot" parent="." instance=ExtResource("25_slingshot")]
 position = Vector2(805, 1450)
 scale = Vector2(-1, 1)
-kick_direction = Vector2(0.62, -1)
+kick_direction = Vector2(-0.45, -1)
 flash_color = Color(0.2, 0.72, 1, 1)
 
 [node name="BallOne" parent="." instance=ExtResource("1_ball")]
