@@ -8,6 +8,10 @@ const FLOW := 3
 const FINAL_SHOW := 4
 const BLACKOUT := 5
 
+const FLASHING_FULL: StringName = &"full"
+const FLASHING_REDUCED: StringName = &"reduced"
+const FLASHING_OFF: StringName = &"off"
+
 const CYAN := Color("00e5ff")
 const MAGENTA := Color("ff2bd6")
 const AMBER := Color("ffb14a")
@@ -28,6 +32,7 @@ var hit_color: Color = COLD_WHITE
 var beat_phase: float = 0.0
 var beat_index: int = 0
 var transport_playing: bool = false
+var flashing_effects: StringName = FLASHING_FULL
 
 
 func _ready() -> void:
@@ -36,7 +41,8 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	pulse_time += delta
-	hit_flash = maxf(0.0, hit_flash - delta * 3.8)
+	var flash_decay := 2.2 if flashing_effects == FLASHING_REDUCED else 3.8
+	hit_flash = maxf(0.0, hit_flash - delta * flash_decay)
 	queue_redraw()
 
 
@@ -57,7 +63,22 @@ func set_flow(flow_points: int, maximum_flow: int = 1000) -> void:
 
 func trigger_hit(color: Color = COLD_WHITE) -> void:
 	hit_color = color
-	hit_flash = 1.0
+	match flashing_effects:
+		FLASHING_OFF:
+			hit_flash = 0.0
+		FLASHING_REDUCED:
+			hit_flash = 0.3
+		_:
+			hit_flash = 1.0
+	queue_redraw()
+
+
+func set_flashing_effects(mode: StringName) -> void:
+	if mode not in [FLASHING_FULL, FLASHING_REDUCED, FLASHING_OFF]:
+		mode = FLASHING_FULL
+	flashing_effects = mode
+	if flashing_effects == FLASHING_OFF:
+		hit_flash = 0.0
 	queue_redraw()
 
 
@@ -77,7 +98,15 @@ func _draw() -> void:
 	_draw_sync_clock()
 	_draw_footlights()
 	if hit_flash > 0.0:
-		draw_circle(Vector2(540, 920), 410.0 * hit_flash, Color(hit_color, 0.045 * hit_flash), false, 18.0)
+		var flash_alpha := 0.02 if flashing_effects == FLASHING_REDUCED else 0.045
+		var flash_width := 10.0 if flashing_effects == FLASHING_REDUCED else 18.0
+		draw_circle(
+			Vector2(540, 920),
+			410.0 * hit_flash,
+			Color(hit_color, flash_alpha * hit_flash),
+			false,
+			flash_width
+		)
 
 
 func _draw_haze() -> void:
@@ -130,17 +159,22 @@ func _draw_fixture_beams() -> void:
 		base_intensity = 0.46 + flow_ratio * 0.16
 	elif show_state == FINAL_SHOW:
 		base_intensity = final_show_intensity
+	var motion_scale := 1.0
+	if flashing_effects == FLASHING_REDUCED:
+		motion_scale = 0.22
+	elif flashing_effects == FLASHING_OFF:
+		motion_scale = 0.0
 	var chase := int(floor(pulse_time * (7.0 if show_state == FINAL_SHOW else 2.0)))
 	for index in FIXTURE_COLORS.size():
 		var active := index < rig_count or show_state in [PRESET, FINAL_SHOW]
 		if not active:
 			continue
 		var source := Vector2(165 + index * 150, 330)
-		var sway := sin(pulse_time * 1.4 + index * 0.8) * (100.0 if show_state == FINAL_SHOW else 45.0)
+		var sway := sin(pulse_time * 1.4 + index * 0.8) * (100.0 if show_state == FINAL_SHOW else 45.0) * motion_scale
 		var target := Vector2(315 + index * 90 + sway, 1380)
 		var width := 105.0 if show_state == FINAL_SHOW else 72.0
 		var intensity := base_intensity
-		if show_state == FINAL_SHOW and (index + chase) % 3 == 0:
+		if flashing_effects == FLASHING_FULL and show_state == FINAL_SHOW and (index + chase) % 3 == 0:
 			intensity = minf(1.0, intensity + 0.2)
 		var beam_color := Color(FIXTURE_COLORS[index], intensity * 0.16)
 		draw_colored_polygon(PackedVector2Array([source - Vector2(8, 0), source + Vector2(8, 0), target + Vector2(width, 0), target - Vector2(width, 0)]), beam_color)
@@ -148,7 +182,12 @@ func _draw_fixture_beams() -> void:
 
 
 func _draw_runway() -> void:
-	var pulse := 0.55 + sin(pulse_time * 2.0) * 0.18
+	var pulse_amplitude := 0.18
+	if flashing_effects == FLASHING_REDUCED:
+		pulse_amplitude = 0.04
+	elif flashing_effects == FLASHING_OFF:
+		pulse_amplitude = 0.0
+	var pulse := 0.55 + sin(pulse_time * 2.0) * pulse_amplitude
 	var runway_color := Color(MAGENTA.lerp(CYAN, flow_ratio), (0.18 + flow_ratio * 0.25) * pulse)
 	draw_polyline(PackedVector2Array([Vector2(475, 430), Vector2(400, 1580), Vector2(680, 1580), Vector2(605, 430)]), runway_color, 4.0)
 	for step in 8:
@@ -162,6 +201,10 @@ func _draw_sync_clock() -> void:
 		return
 	var distance_to_pulse := minf(beat_phase, 1.0 - beat_phase)
 	var pulse := pow(1.0 - clampf(distance_to_pulse * 2.0, 0.0, 1.0), 3.0)
+	if flashing_effects == FLASHING_REDUCED:
+		pulse *= 0.3
+	elif flashing_effects == FLASHING_OFF:
+		pulse = 0.0
 	var display_beat := beat_index + (1 if beat_phase > 0.5 else 0)
 	var active_step := posmod(display_beat, 4)
 	for index in range(4):
@@ -176,7 +219,12 @@ func _draw_sync_clock() -> void:
 func _draw_footlights() -> void:
 	if show_state == BLACKOUT:
 		return
-	var pulse := 0.42 + sin(pulse_time * 2.4) * 0.14
+	var pulse_amplitude := 0.14
+	if flashing_effects == FLASHING_REDUCED:
+		pulse_amplitude = 0.04
+	elif flashing_effects == FLASHING_OFF:
+		pulse_amplitude = 0.0
+	var pulse := 0.42 + sin(pulse_time * 2.4) * pulse_amplitude
 	for index in range(9):
 		var light_position := Vector2(220 + index * 80, 1640)
 		var color := MAGENTA.lerp(CYAN, float(index) / 8.0)

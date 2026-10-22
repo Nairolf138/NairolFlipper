@@ -150,7 +150,7 @@ toucher, les collisions inactives et la récupération hors limites.
 
 ### Réglages audio — checklist tablette
 
-- ouvrir `RÉGLAGES AUDIO` depuis le menu et vérifier que les trois sliders sont
+- ouvrir `RÉGLAGES` depuis le menu et vérifier que les trois sliders sont
   lisibles et manipulables au doigt en portrait ;
 - régler séparément Master, Musique et Effets, puis confirmer que le changement
   est audible immédiatement ;
@@ -169,6 +169,19 @@ toucher, les collisions inactives et la récupération hors limites.
   et au Final Show réellement présents sur le plateau ;
 - terminer le guide puis vérifier le retour au menu sans lancement de partie ;
 - vérifier également Retour/Échap et la navigation clavier ou manette.
+
+### Effets lumineux — checklist tablette
+
+- ouvrir `RÉGLAGES`, vérifier que les trois modes sont lisibles et manipulables
+  au doigt en portrait ;
+- en `COMPLETS`, confirmer le comportement scénique actuel ;
+- en `RÉDUITS`, vérifier que flashes, pulsations et Blackout sont nettement plus
+  doux sans rendre les objectifs ambigus ;
+- en `DÉSACTIVÉS`, confirmer l'absence de flash d'impact et de Blackout plein
+  écran, tout en suivant les objectifs, le Rig et le pas actif de l'horloge Sync ;
+- fermer puis relancer l'application et confirmer que le choix est conservé ;
+- utiliser `VALEURS PAR DÉFAUT` et confirmer le retour à `COMPLETS` et aux trois
+  niveaux audio à 100 %.
 
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 

@@ -3,6 +3,10 @@ extends Area2D
 
 signal slingshot_hit(score_value: int, flow_value: int, slingshot_name: StringName)
 
+const FLASHING_FULL: StringName = &"full"
+const FLASHING_REDUCED: StringName = &"reduced"
+const FLASHING_OFF: StringName = &"off"
+
 @export var kick_direction: Vector2 = Vector2(-0.65, -1.0)
 @export var kick_impulse: float = 585.0
 @export var score_value: int = 75
@@ -14,6 +18,7 @@ signal slingshot_hit(score_value: int, flow_value: int, slingshot_name: StringNa
 
 var _armed: bool = true
 var _flash_tween: Tween
+var flashing_effects: StringName = FLASHING_FULL
 
 
 func _ready() -> void:
@@ -22,6 +27,13 @@ func _ready() -> void:
 
 func reset() -> void:
 	_armed = true
+
+
+func set_flashing_effects(mode: StringName) -> void:
+	flashing_effects = mode if mode in [FLASHING_FULL, FLASHING_REDUCED, FLASHING_OFF] else FLASHING_FULL
+	if is_instance_valid(_flash_tween):
+		_flash_tween.kill()
+	visual.modulate = Color.WHITE
 
 
 func _on_body_entered(body: Node) -> void:
@@ -42,6 +54,18 @@ func _on_body_entered(body: Node) -> void:
 func _flash() -> void:
 	if is_instance_valid(_flash_tween):
 		_flash_tween.kill()
-	visual.modulate = flash_color
+	if flashing_effects == FLASHING_OFF:
+		visual.modulate = Color.WHITE
+		return
+	visual.modulate = (
+		Color.WHITE.lerp(flash_color, 0.35)
+		if flashing_effects == FLASHING_REDUCED
+		else flash_color
+	)
 	_flash_tween = create_tween()
-	_flash_tween.tween_property(visual, "modulate", Color.WHITE, 0.14)
+	_flash_tween.tween_property(
+		visual,
+		"modulate",
+		Color.WHITE,
+		0.32 if flashing_effects == FLASHING_REDUCED else 0.14
+	)

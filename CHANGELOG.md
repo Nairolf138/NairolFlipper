@@ -40,6 +40,8 @@
   valeurs par défaut et persistance locale multiplateforme.
 - Guide How to Play en quatre pages illustrées pour les commandes, le Rig, la
   Cue Stack et le Final Show, navigable au tactile, au clavier et à la manette.
+- Réglage persistant des effets lumineux avec modes Complets, Réduits et
+  Désactivés, appliqué aux flashes, pulsations, faisceaux et Blackout.
 
 ### Fixed
 

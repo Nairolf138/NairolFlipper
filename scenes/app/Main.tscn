@@ -554,7 +554,7 @@ text = "COMMENT JOUER"
 custom_minimum_size = Vector2(0, 82)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "RÉGLAGES AUDIO"
+text = "RÉGLAGES"
 
 [node name="QuitButton" type="Button" parent="Interface/StartOverlay/Menu"]
 custom_minimum_size = Vector2(0, 82)
@@ -587,19 +587,19 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -340.0
-offset_top = -420.0
+offset_top = -560.0
 offset_right = 340.0
-offset_bottom = 420.0
+offset_bottom = 560.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 16
 alignment = 1
 
 [node name="Title" type="Label" parent="Interface/StartOverlay/SettingsPanel/Menu"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
 theme_override_font_sizes/font_size = 48
-text = "RÉGLAGES AUDIO"
+text = "RÉGLAGES"
 horizontal_alignment = 1
 
 [node name="Hint" type="Label" parent="Interface/StartOverlay/SettingsPanel/Menu"]
@@ -652,22 +652,46 @@ text = "EFFETS  100%"
 custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
 focus_neighbor_top = NodePath("../MusicSlider")
-focus_neighbor_bottom = NodePath("../DefaultsButton")
+focus_neighbor_bottom = NodePath("../FlashingEffectsOption")
 max_value = 100.0
 step = 5.0
 value = 100.0
 tick_count = 11
 ticks_on_borders = true
 
+[node name="FlashingEffectsLabel" type="Label" parent="Interface/StartOverlay/SettingsPanel/Menu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.965, 1, 1)
+theme_override_font_sizes/font_size = 27
+text = "EFFETS LUMINEUX"
+
+[node name="FlashingEffectsOption" type="OptionButton" parent="Interface/StartOverlay/SettingsPanel/Menu"]
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
+focus_neighbor_top = NodePath("../SFXSlider")
+focus_neighbor_bottom = NodePath("../DefaultsButton")
+theme_override_font_sizes/font_size = 25
+
+[node name="FlashingEffectsHint" type="Label" parent="Interface/StartOverlay/SettingsPanel/Menu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.64, 0.76, 0.88, 1)
+theme_override_font_sizes/font_size = 19
+text = "Réduits ou désactivés : objectifs et informations conservés"
+horizontal_alignment = 1
+autowrap_mode = 2
+
 [node name="DefaultsButton" type="Button" parent="Interface/StartOverlay/SettingsPanel/Menu"]
 custom_minimum_size = Vector2(0, 82)
 layout_mode = 2
+focus_neighbor_top = NodePath("../FlashingEffectsOption")
+focus_neighbor_bottom = NodePath("../BackButton")
 theme_override_font_sizes/font_size = 26
 text = "VALEURS PAR DÉFAUT"
 
 [node name="BackButton" type="Button" parent="Interface/StartOverlay/SettingsPanel/Menu"]
 custom_minimum_size = Vector2(0, 82)
 layout_mode = 2
+focus_neighbor_top = NodePath("../DefaultsButton")
 theme_override_font_sizes/font_size = 28
 text = "RETOUR"
 

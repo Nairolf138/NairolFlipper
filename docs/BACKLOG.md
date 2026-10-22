@@ -195,12 +195,17 @@ ou invalide.
 
 ## P1 — UX
 
-T046 How to Play ✅.
+T046 How to Play ✅; T047 effets lumineux accessibles ✅.
 
 T046 ajoute un guide en quatre pages accessible depuis le menu. Des schémas
 vectoriels expliquent les zones tactiles, les six familles du Rig, la Cue Stack,
 la Console et le Final Show. Les boutons sont adaptés au portrait et la fermeture
 du guide revient au menu sans lancer de partie.
+
+T047 ajoute dans Réglages les modes Complets, Réduits et Désactivés. Le choix
+est sauvegardé localement et pilote les flashes d'impact, les pulsations des
+objectifs, les chases, les faisceaux et le Blackout sans supprimer les repères
+textuels ou statiques nécessaires au gameplay.
 
 ## P2 — Final
 

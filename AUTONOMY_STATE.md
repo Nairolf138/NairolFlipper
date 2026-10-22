@@ -2,18 +2,18 @@
 
 ## Dernière exécution
 
-- Date : 2026-10-21
-- Cycle : T046 — How to Play illustré
-- Statut : 40 contrats Python et 18 groupes Godot préparés, build CI à valider
+- Date : 2026-10-22
+- Cycle : T047 — Effets lumineux accessibles
+- Statut : 41 contrats Python et 19 groupes Godot préparés, build CI à valider
 
 ## Dépôt
 
-- Branche : `feat/how-to-play`
-- Base : `9244f40` (fusion de la PR #26 sur `origin/main`)
-- Validation : guide en quatre pages, schémas vectoriels et navigation tactile/clavier/manette ajoutés ; CI à exécuter
+- Branche : `feat/reduced-flashes`
+- Base : `532e262` (fusion de la PR #27 sur `origin/main`)
+- Validation : modes Complets/Réduits/Désactivés persistants et propagation aux effets du plateau ; CI à exécuter
 - CI de la branche : à valider par la pull request
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` auditée : `9244f40`
+- Branche `main` auditée : `532e262`
 
 ## État actuel
 
@@ -193,16 +193,16 @@ T012 complète le premier filet de livraison cross-platform :
 
 - `export_presets.cfg` avec presets Web, Android debug et Windows Desktop.
 - `.github/workflows/godot.yml` avec import propre, tests comportementaux, smoke et exports P0.
-- `tests/test_bootstrap.py` avec 40 contrats de structure.
-- `tests/godot/test_runner.gd` avec 18 groupes de validations comportementales.
+- `tests/test_bootstrap.py` avec 41 contrats de structure.
+- `tests/godot/test_runner.gd` avec 19 groupes de validations comportementales.
 - `docs/BACKLOG.md` mis à jour.
 - Ce journal `AUTONOMY_STATE.md`.
 
 ## Prochaine exécution
 
-Faire valider sur tablette la lisibilité des quatre pages et leur navigation au
-doigt. Ensuite, préparer la stabilisation alpha 1.0 : réglage de réduction des
-flashs, revue des textes et parcours complet de non-régression sur appareil réel.
+Faire valider sur tablette les modes Réduits/Désactivés, la lisibilité du panneau
+Réglages et la conservation du choix après relance. Ensuite, préparer la revue
+des textes et le parcours complet de non-régression de l'Alpha 1.0.
 
 ### T045 — Réglages audio persistants
 
@@ -219,3 +219,12 @@ flashs, revue des textes et parcours complet de non-régression sur appareil ré
 - schémas vectoriels légers sans asset tiers ni shader ;
 - navigation tactile, clavier et manette avec retour explicite au menu ;
 - 40 contrats et 18 groupes Godot préparés pour la CI.
+
+### T047 — Effets lumineux accessibles
+
+- réglage tactile `Complets / Réduits / Désactivés` ajouté au panneau Réglages ;
+- schéma de sauvegarde local migré en version 2 tout en acceptant les fichiers
+  audio de version 1 ;
+- flashes d'impact, pulsations d'objectifs, faisceaux, chases, footlights et
+  Blackout adaptés sans supprimer les informations de gameplay ;
+- 41 contrats et 19 groupes Godot préparés pour la CI.
