@@ -15,9 +15,10 @@ Bille → dangers → objectif → mode → score → décoration. Si l'UI gêne
 ## Mobile
 
 Zones tactiles larges et discrètes : la moitié basse gauche/droite commande
-les flippers, tandis qu'un toucher dans la zone haute lance ou relance la
-bille. Les commandes Reset et Quit restent en haut du plateau, hors des zones
-de flipper sous les pouces.
+les flippers. Un bouton `GO` en bas à droite lance la bille quand elle est prête,
+y compris après Safety ou récupération. Il disparaît pendant le jeu ; toucher
+le haut du plateau ne lance plus. Espace et A sur manette restent disponibles.
+Les commandes Recommencer et Quitter restent en haut du plateau.
 
 ## Desktop
 
@@ -52,7 +53,7 @@ Cue Stack, Flow, Sync, Final Show, Blackout et Safety.
 
 Le guide accessible depuis le menu tient en quatre pages illustrées :
 
-1. lancer dans la zone haute et contrôler les flippers dans les zones basses ;
+1. lancer avec GO et contrôler les flippers dans les zones basses ;
 2. toucher les six familles pour construire le Rig ;
 3. suivre les tirs demandés puis passer par la Console pour exécuter les Cues ;
 4. compléter Rig + Cue Stack et déclencher le Final Show.

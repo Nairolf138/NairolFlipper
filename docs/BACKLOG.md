@@ -84,6 +84,15 @@ artistique finale et le Final Show restent hors de cette tâche.
 
 ## P1 — Feel
 
+### T049 — GO, lancement guidé et retours jouables
+
+Implémentation PR 30, validation tablette en attente : bouton GO contextuel,
+couloir physique courbe avec sortie inclinée, flippers rapprochés et collecteurs
+latéraux. La simulation couvre neuf lancements jusqu'au premier renvoi, six
+retours sur les flippers et une perte centrale légitime. Les anciennes tâches
+de feel ne constituent pas une validation Alpha ; poursuivre par la reprise du
+roulement et de la dynamique des flippers en PR 31.
+
 T020 Physics tuning resource ✅; T021 Ball max speed/anti-tunneling ✅; T022 Feedback hit ✅; T023 Ball save ✅; T024 Controller support ✅; T025 instrumentation locale de playtest ✅.
 
 T020 centralise les paramètres de bille dans `data/tuning/PhysicsTuning.tres`, appliqués par `Ball`.

@@ -35,7 +35,7 @@ def test_greybox_scene_declares_playfield_boundaries_and_launcher():
     for node_name in ("LeftWall", "RightWall", "TopWall", "Drain", "LauncherLane"):
         assert f'name="{node_name}"' in scene_text
 
-    assert scene_text.count("type=\"StaticBody2D\"") == 4
+    assert scene_text.count("type=\"StaticBody2D\"") >= 4
     assert scene_text.count("type=\"CollisionShape2D\"") == 5
 
 
@@ -120,7 +120,7 @@ def test_weighted_feel_uses_distinct_passive_and_flipper_surfaces():
         assert (ROOT / "data" / "tuning" / material_name).is_file()
     assert "gravity_scale = 1.55" in tuning_text
     assert "bounce = 0.14" in tuning_text
-    assert "launch_force = 2500.0" in tuning_text
+    assert "launch_force = 3300.0" in tuning_text
     for node_name in ("ContactShadow", "Rim", "Highlight"):
         assert f'name="{node_name}"' in ball_scene
     assert "PassiveSurfaceMaterial.tres" in guide_scene
@@ -151,7 +151,7 @@ def test_ball_save_safety_is_armed_on_launch_and_consumed_at_drain():
     assert "func try_ball_save() -> bool" in ball_script
     assert "body.try_ball_save()" in main_script
     assert "body.reset_ball(body.spawn_position, false)" in main_script
-    assert 'status_label.text = "SAFETY — MÊME BILLE — TOUCHEZ EN HAUT"' in main_script
+    assert 'status_label.text = "SAFETY — MÊME BILLE — APPUYEZ SUR GO"' in main_script
 
 
 def test_main_scene_declares_three_rhythmic_bumpers():
@@ -574,19 +574,18 @@ def test_playfield_geometry_closes_edges_and_separates_return_lanes():
     assert scene_text.count("size = Vector2(40, 1840)") == 2
     for node_name in (
         "UpperLeftGuide",
-        "UpperRightGuide",
+        "LauncherOuterGuide",
         "LeftOutlaneRail",
         "LeftReturnRail",
         "RightReturnRail",
         "RightOutlaneRail",
         "LauncherDivider",
-        "LauncherLowerDivider",
+        "LeftReturnExtension",
+        "RightReturnExtension",
     ):
         assert f'name="{node_name}"' in scene_text
     assert "position = Vector2(665, 1495)" in scene_text
     assert "position = Vector2(770, 1495)" in scene_text
-    assert "position = Vector2(845, 1325)" in scene_text
-    assert "position = Vector2(870, 1600)" in scene_text
     assert "_test_playfield_safe_trajectories" in runner_text
 
 
@@ -771,7 +770,7 @@ def test_flashing_effects_setting_is_persistent_and_keeps_readable_feedback():
     assert "Off mode keeps the readable Sync clock contract" in runner_text
 
 
-def test_alpha_candidate_has_consistent_version_and_french_action_copy():
+def test_playtest_has_consistent_version_and_french_action_copy():
     version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
     project_text = PROJECT.read_text(encoding="utf-8")
     export_text = (ROOT / "export_presets.cfg").read_text(encoding="utf-8")
@@ -785,13 +784,13 @@ def test_alpha_candidate_has_consistent_version_and_french_action_copy():
     assert 'application/file_version="0.1.0.0"' in export_text
     assert 'application/product_version="0.1.0-alpha.1"' in export_text
     assert "greybox" not in export_text.lower()
-    assert "ALPHA 0.1.0" in scene_text
+    assert "PLAYTEST 0.1.0" in scene_text
     assert "TABLE 2.3" not in scene_text
     assert "TABLE 2.4" not in scene_text
 
     for expected_copy in (
         "BILLE RÉCUPÉRÉE",
-        "TOUCHEZ EN HAUT POUR LANCER",
+        "GO POUR LANCER",
         "CUE PRÊTE — VISEZ LA CONSOLE",
         "RIG PRÊT — TERMINEZ LA CUE STACK",
         "FINAL SHOW ARMÉ — VISEZ LA CONSOLE",

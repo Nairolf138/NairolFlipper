@@ -103,12 +103,14 @@ La première étape de développement est définie dans [`docs/BACKLOG.md`](docs
 
 ## État
 
-**Candidate Alpha 0.1.0 (`0.1.0-alpha.1`).**
+**Prototype en reprise de jouabilité avant qualification Alpha.**
 
 Le prototype dispose désormais d'une partie à trois billes, d'une Cue Stack, du
 Rig en six familles, du Final Show multiball, d'une musique en stems et d'une
 première identité visuelle Stagecraft. Les builds Web, Android et Windows servent
-maintenant à valider le parcours complet avant la publication de l'Alpha 0.1.0.
+maintenant à valider le lancement guidé et les retours vers les flippers sur
+appareil réel. La qualification Alpha reste suspendue à la validation de la
+jouabilité, de la physique et des parcours physiques du plateau.
 
 ## Licence
 

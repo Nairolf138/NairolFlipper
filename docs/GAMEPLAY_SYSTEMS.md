@@ -18,6 +18,11 @@ Ces valeurs forment une base mesurable, pas un réglage final. Le temps de chute
 est couvert automatiquement ; le contrôle, le plaisir et la perception du poids
 doivent être validés sur une tablette réelle.
 
+La PR 30 conserve ce profil de bille mais remplace le lancement diagonal par
+une impulsion verticale de `3300`, suivie d'un couloir physique courbe. La masse,
+la gravité et le roulement seront réévalués dans la PR 31 ; augmenter la masse
+ne suffit pas à simuler une bille roulant sur un plateau incliné.
+
 ## Flippers
 
 Deux flippers MVP : activation instantanée, retour rapide, maintien levé, collision reproductible, mêmes actions pour clavier/tactile/manette.

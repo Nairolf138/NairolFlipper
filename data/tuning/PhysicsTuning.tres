@@ -11,5 +11,5 @@ bounce = 0.14
 linear_damp = 0.16
 angular_damp = 0.08
 max_speed = 2300.0
-launch_force = 2500.0
-launch_direction = Vector2(-0.15, -1)
+launch_force = 3300.0
+launch_direction = Vector2(0, -1)

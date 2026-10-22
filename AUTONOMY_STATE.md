@@ -3,19 +3,23 @@
 ## Dernière exécution
 
 - Date : 2026-10-22
-- Cycle : T048 — Stabilisation Alpha 0.1.0
-- Statut : 42 contrats Python et 20 groupes Godot préparés, build CI à valider
+- Cycle : T049 — GO, lancement guidé et retours jouables
+- Statut : 42 contrats Python et 22 groupes Godot validés localement ; validation tablette requise
 
 ## Dépôt
 
-- Branche : `feat/alpha-1-polish`
-- Base : `08c1b1b` (fusion de la PR #28 sur `origin/main`)
-- Validation : version Alpha cohérente, textes joueur harmonisés et parcours complet automatisé ; CI à exécuter
+- Branche : `feat/guided-launch-go`
+- Base : `8f4f91c` (fusion de la PR #29 sur `origin/main`)
+- Validation : neuf lancements et six retours physiques, GO/GUI, clavier et manette ; CI à exécuter
 - CI de la branche : à valider par la pull request
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` auditée : `08c1b1b`
+- Branche `main` auditée : `8f4f91c`
 
 ## État actuel
+
+Le playtest après PR 29 invalide le statut de candidate Alpha. T049 reconstruit
+le lanceur et les retours physiques. Les menus et règles sont acquis ; le
+roulement, les vraies rampes et les graphismes restent les prochains jalons.
 
 T013 consolide l'état livré après T042 :
 
@@ -56,7 +60,7 @@ T012 complète le premier filet de livraison cross-platform :
 - `scripts/app/main.gd` connecte les impacts des bumpers au ScoreManager et met à jour `ScoreLabel` ;
 - `ScoreManager` et `ScoreLabel` sont présents dans la scène principale ;
 - la scène contient trois billes, un drain détectant leur entrée, un respawn temporisé, un compteur de vies, un état game over et un restart ;
-- `scripts/app/main.gd` accepte les touchers/drags : flippers en moitié basse, lancement dans la zone haute, sans bouton HUD persistant ;
+- `scripts/app/main.gd` accepte les touchers/drags pour les flippers en moitié basse ; GO apparaît quand une bille est prête, avec Espace/A manette conservés ;
 - `project.godot` mappe les boutons X/Y/A d'une manette aux actions flippers gauche/droit/lancement ;
 - `PlaytestRecorder` enregistre localement la durée et les événements de session dans `user://playtest/latest.json`, sans réseau ;
 - aucun addon ou asset externe n’a été ajouté ;
@@ -194,15 +198,15 @@ T012 complète le premier filet de livraison cross-platform :
 - `export_presets.cfg` avec presets Web, Android debug et Windows Desktop.
 - `.github/workflows/godot.yml` avec import propre, tests comportementaux, smoke et exports P0.
 - `tests/test_bootstrap.py` avec 42 contrats de structure.
-- `tests/godot/test_runner.gd` avec 20 groupes de validations comportementales.
+- `tests/godot/test_runner.gd` avec 22 groupes de validations comportementales.
 - `docs/BACKLOG.md` mis à jour.
 - Ce journal `AUTONOMY_STATE.md`.
 
 ## Prochaine exécution
 
-Installer l'APK Alpha candidate sur tablette et rejouer le parcours complet :
-menu, Réglages, How to Play, trois billes, Rig, Cue Stack, Final Show, Blackout
-et fin de partie. Relever séparément tout défaut bloquant l'Alpha 0.1.0.
+Valider sur tablette GO, les lancements répétés et le premier retour jouable sur
+chaque flipper. Puis poursuivre la reprise de pente/roulement et des flippers en
+PR 31, avant les vrais parcours et la refonte artistique.
 
 ### T045 — Réglages audio persistants
 
@@ -228,3 +232,15 @@ et fin de partie. Relever séparément tout défaut bloquant l'Alpha 0.1.0.
 - flashes d'impact, pulsations d'objectifs, faisceaux, chases, footlights et
   Blackout adaptés sans supprimer les informations de gameplay ;
 - 41 contrats et 19 groupes Godot préparés pour la CI.
+
+### T049 — Lancement guidé et retours jouables
+
+- GO contextuel, consignes et guide mis à jour ; Espace/A manette conservés ;
+- parois courbes à capsules jointives, matériau de lanceur peu frictionnel,
+  impulsion verticale et sortie inclinée ;
+- pivots rapprochés, collecteurs latéraux et prolongements vers les flippers ;
+- 42 contrats et 22 groupes Godot validés avec Godot 4.7.2 localement, en cadence
+  réelle et avec pas fixe ; smoke test et analyse des logs sans erreur ;
+- neuf lancements suivis jusqu'au premier renvoi physique, six retours dédiés,
+  perte centrale et commandes GUI/tactile/clavier/manette vérifiés ;
+- qualification Alpha et sensation physique laissées à la validation humaine.
