@@ -12,6 +12,7 @@
   retour et une perte centrale légitime simulés sans sauvetage.
 - Correction d'un polygone de tablier qui se croisait ; les erreurs de rendu
   Godot font désormais échouer l'analyse des logs CI.
+- Icône de playtest originale configurée pour supprimer l'erreur d'export Android.
 - Qualification Alpha suspendue au playtest et aux reprises physique/artistique.
 
 ### Alpha 0.1.0 candidate
