@@ -105,23 +105,25 @@ func _draw_route(points: PackedVector2Array, color: Color) -> void:
 
 
 func _draw_launcher_lane() -> void:
-	var lane := Rect2(887, 1010, 110, 690)
-	draw_rect(lane, Color(0.025, 0.09, 0.15, 0.9), true)
-	draw_rect(lane, Color(CYAN, 0.4), false, 3.0, true)
-	draw_line(Vector2(942, 1645), Vector2(942, 1110), Color(CYAN, 0.2), 5.0, true)
+	var centerline := PackedVector2Array([
+		Vector2(960, 1740), Vector2(960, 650), Vector2(951, 604),
+		Vector2(925, 565), Vector2(886, 539), Vector2(840, 530), Vector2(650, 590),
+	])
+	draw_polyline(centerline, Color(0.025, 0.09, 0.15, 0.9), 110.0, true)
+	draw_line(Vector2(960, 1645), Vector2(960, 700), Color(CYAN, 0.2), 5.0, true)
 	for index in range(4):
 		var y := 1530.0 - index * 125.0
 		draw_colored_polygon(PackedVector2Array([
-			Vector2(922, y + 26), Vector2(942, y), Vector2(962, y + 26), Vector2(952, y + 26),
-			Vector2(942, y + 13), Vector2(932, y + 26),
+			Vector2(940, y + 26), Vector2(960, y), Vector2(980, y + 26), Vector2(970, y + 26),
+			Vector2(960, y + 13), Vector2(950, y + 26),
 		]), Color(CYAN, 0.3 + index * 0.08))
 
 
 func _draw_drain_apron() -> void:
 	var apron := PackedVector2Array([
 		Vector2(175, 1660), Vector2(405, 1760), Vector2(540, 1835),
-		Vector2(675, 1760), Vector2(905, 1660), Vector2(905, 1815),
-		Vector2(175, 1815),
+		Vector2(675, 1760), Vector2(905, 1660), Vector2(905, 1870),
+		Vector2(175, 1870),
 	])
 	draw_colored_polygon(apron, Color(0.045, 0.02, 0.04, 0.78))
 	draw_arc(Vector2(540, 1795), 145.0, PI, TAU, 40, Color(MAGENTA, 0.35), 4.0, true)

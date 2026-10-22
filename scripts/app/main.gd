@@ -70,6 +70,7 @@ enum SessionState {
 @onready var audio_back_button: Button = $Interface/StartOverlay/SettingsPanel/Menu/BackButton
 @onready var how_to_play_panel: HowToPlayPanelNode = $Interface/StartOverlay/HowToPlayPanel
 @onready var reset_button: Button = $Interface/GameControls/ResetButton
+@onready var launch_button: Button = $Interface/GameControls/LaunchButton
 @onready var game_quit_button: Button = $Interface/GameControls/QuitButton
 @onready var game_over_overlay: Control = $Interface/GameOverOverlay
 @onready var final_score_label: Label = $Interface/GameOverOverlay/Menu/FinalScoreLabel
@@ -89,7 +90,11 @@ var remaining_balls: int = 3
 var active_ball_index: int = 0
 var game_over: bool = false
 var gameplay_active: bool = false
-var session_state: int = SessionState.MENU
+var session_state: int = SessionState.MENU:
+	set(value):
+		session_state = value
+		if is_instance_valid(launch_button):
+			launch_button.visible = gameplay_active and value == SessionState.READY
 var active_touches: Dictionary[int, StringName] = {}
 var stalled_ball_time: float = 0.0
 var session_generation: int = 0
@@ -144,6 +149,7 @@ func _ready() -> void:
 	audio_back_button.pressed.connect(_close_audio_settings)
 	how_to_play_panel.closed.connect(_close_how_to_play)
 	reset_button.pressed.connect(_on_reset_pressed)
+	launch_button.button_down.connect(_launch_or_restart)
 	game_quit_button.pressed.connect(_on_quit_pressed)
 	replay_button.pressed.connect(start_game)
 	game_over_menu_button.pressed.connect(_show_start_menu)
@@ -171,14 +177,20 @@ func _physics_process(delta: float) -> void:
 	if ball.freeze or ball.drain_locked:
 		return
 	if _is_ball_outside_playfield(ball.global_position):
-		_recover_active_ball("BILLE RÉCUPÉRÉE — TOUCHEZ EN HAUT")
+		_recover_active_ball("BILLE RÉCUPÉRÉE — APPUYEZ SUR GO")
 		return
 	if ball.linear_velocity.length() <= stuck_speed_threshold:
 		stalled_ball_time += delta
 	else:
 		stalled_ball_time = 0.0
 	if stalled_ball_time >= ball_recovery_delay:
-		_recover_active_ball("BILLE RÉCUPÉRÉE — TOUCHEZ EN HAUT")
+		_recover_active_ball("BILLE RÉCUPÉRÉE — APPUYEZ SUR GO")
+
+
+func _input(event: InputEvent) -> void:
+	# A release must reach a held flipper even over GO or another GUI control.
+	if event is InputEventScreenTouch and not event.pressed:
+		_release_touch(event.index)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -218,7 +230,7 @@ func start_game() -> void:
 	game_controls.show()
 	cue_progress_label.show()
 	restart_game()
-	status_label.text = "BILLE 1 / %d — TOUCHEZ EN HAUT POUR LANCER" % balls.size()
+	status_label.text = "BILLE 1 / %d — GO POUR LANCER" % balls.size()
 
 
 func _show_start_menu() -> void:
@@ -268,7 +280,7 @@ func _on_reset_pressed() -> void:
 		return
 	playtest_recorder.record_restart()
 	restart_game()
-	status_label.text = "BILLE 1 / %d — TOUCHEZ EN HAUT POUR LANCER" % balls.size()
+	status_label.text = "BILLE 1 / %d — GO POUR LANCER" % balls.size()
 
 
 func _on_quit_pressed() -> void:
@@ -394,7 +406,6 @@ func _on_flipper_activated(_action_name: StringName) -> void:
 func _handle_touch(event: InputEventScreenTouch) -> void:
 	if event.pressed:
 		if event.position.y < get_viewport_rect().size.y * 0.65:
-			_launch_or_restart()
 			return
 		var action := _flipper_action_for_position(event.position)
 		active_touches[event.index] = action
@@ -823,7 +834,7 @@ func _run_blackout_timer(generation: int) -> void:
 	blackout_overlay.hide()
 	show_flow.finish_blackout()
 	if session_state == SessionState.READY:
-		status_label.text = "SHOW TERMINÉ — TOUCHEZ EN HAUT"
+		status_label.text = "SHOW TERMINÉ — APPUYEZ SUR GO"
 	else:
 		status_label.text = "SHOW TERMINÉ — CONTINUEZ"
 
@@ -865,7 +876,7 @@ func _resolve_ball_drain(body: Node) -> void:
 		body.reset_ball(body.spawn_position, false)
 		session_state = SessionState.READY
 		stalled_ball_time = 0.0
-		status_label.text = "SAFETY — MÊME BILLE — TOUCHEZ EN HAUT"
+		status_label.text = "SAFETY — MÊME BILLE — APPUYEZ SUR GO"
 		return
 	playtest_recorder.record_drain()
 	audio_service.request_sfx(&"drain")
@@ -896,7 +907,7 @@ func _on_ball_drained(ball: RigidBody2D) -> void:
 	if generation == session_generation and session_state == SessionState.RESPAWNING:
 		balls[active_ball_index].reset_ball(balls[active_ball_index].spawn_position)
 		session_state = SessionState.READY
-		status_label.text = "BILLE %d / %d — TOUCHEZ EN HAUT" % [active_ball_index + 1, balls.size()]
+		status_label.text = "BILLE %d / %d — APPUYEZ SUR GO" % [active_ball_index + 1, balls.size()]
 
 
 func restart_game() -> void:

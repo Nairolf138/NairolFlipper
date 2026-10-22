@@ -34,7 +34,6 @@ func _draw() -> void:
 
 
 func _draw_controls(board: Rect2) -> void:
-	var top_zone := Rect2(board.position, Vector2(board.size.x, board.size.y * 0.55))
 	var left_zone := Rect2(
 		board.position + Vector2(0.0, board.size.y * 0.55),
 		Vector2(board.size.x * 0.5, board.size.y * 0.45)
@@ -43,19 +42,24 @@ func _draw_controls(board: Rect2) -> void:
 		board.position + Vector2(board.size.x * 0.5, board.size.y * 0.55),
 		Vector2(board.size.x * 0.5, board.size.y * 0.45)
 	)
-	draw_rect(top_zone, Color(CYAN, 0.18), true)
 	draw_rect(left_zone, Color(MAGENTA, 0.2), true)
 	draw_rect(right_zone, Color(AMBER, 0.18), true)
 	_draw_ball(board.get_center() + Vector2(board.size.x * 0.32, board.size.y * 0.32))
-	draw_line(
-		board.get_center() + Vector2(board.size.x * 0.32, board.size.y * 0.26),
-		board.get_center() + Vector2(board.size.x * 0.16, -board.size.y * 0.27),
+	draw_polyline(
+		PackedVector2Array([
+			board.get_center() + Vector2(board.size.x * 0.32, board.size.y * 0.26),
+			board.get_center() + Vector2(board.size.x * 0.32, -board.size.y * 0.18),
+			board.get_center() + Vector2(board.size.x * 0.26, -board.size.y * 0.27),
+			board.get_center() + Vector2(board.size.x * 0.12, -board.size.y * 0.27),
+		]),
 		CYAN,
 		8.0,
 		true
 	)
 	_draw_flippers(board)
-	_draw_centered_text("TOUCHER POUR LANCER", top_zone.get_center(), 24, CYAN)
+	var go_center := board.position + Vector2(board.size.x * 0.84, board.size.y * 0.92)
+	draw_rect(Rect2(go_center - Vector2(35, 22), Vector2(70, 44)), Color(CYAN, 0.3), true)
+	_draw_centered_text("GO", go_center, 24, CYAN)
 	_draw_centered_text("FLIPPER G", left_zone.get_center() + Vector2(0.0, board.size.y * 0.1), 22, ICE)
 	_draw_centered_text("FLIPPER D", right_zone.get_center() + Vector2(0.0, board.size.y * 0.1), 22, ICE)
 

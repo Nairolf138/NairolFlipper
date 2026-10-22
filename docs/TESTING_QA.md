@@ -201,6 +201,28 @@ toucher, les collisions inactives et la récupération hors limites.
 
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 
+### PR 30 — validation prioritaire sur tablette
+
+- Depuis Jouer, vérifier GO en bas à droite et l'absence de lancement au toucher
+  du haut du plateau ; Espace et A manette doivent rester utilisables.
+- Appuyer sur GO : la bille monte dans le couloir, négocie la courbe puis entre
+  dans le haut du jeu. Répéter plusieurs lancements, sans toucher les flippers,
+  puis en jouant le premier retour.
+- Vérifier que GO disparaît pendant le jeu et revient après Safety ou au début
+  de la bille suivante ; des appuis répétés ne créent aucune bille supplémentaire.
+- Maintenir chaque flipper séparément puis simultanément ; relâcher au-dessus
+  d'un bouton ne doit pas laisser de flipper bloqué.
+- Observer des retours depuis les deux côtés et viser un renvoi vers le plateau.
+  Signaler précisément le côté et la trajectoire de toute perte injuste.
+- Vérifier que la bille ne se bloque pas aux jonctions des guides et qu'aucun
+  sauvetage automatique n'est nécessaire pendant un lancement normal.
+- Une perte centrale reste normale ; le lancement et les retours ne doivent
+  plus y conduire systématiquement sans possibilité de jouer.
+
+La validation de cette PR porte sur la géométrie et les commandes. Le roulement,
+les vrais parcours de rampes et la refonte artistique restent à réaliser avant
+qualification Alpha.
+
 ## Instrumentation locale de playtest
 
 Le nœud `PlaytestRecorder` écrit `user://playtest/latest.json` avec la durée de

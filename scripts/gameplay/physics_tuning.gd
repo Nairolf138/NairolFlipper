@@ -9,5 +9,5 @@ extends Resource
 @export var linear_damp: float = 0.16
 @export var angular_damp: float = 0.08
 @export var max_speed: float = 2300.0
-@export var launch_force: float = 2500.0
-@export var launch_direction: Vector2 = Vector2(-0.15, -1.0)
+@export var launch_force: float = 3300.0
+@export var launch_direction: Vector2 = Vector2.UP

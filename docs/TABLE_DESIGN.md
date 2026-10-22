@@ -29,6 +29,22 @@ Plateau principal **portrait**, canvas logique `1080 × 1920`. Sur desktop/Web l
 
 Launcher, deux flippers, drain, outlanes, trois bumpers, deux trajectoires longues, une orbite, Console, cibles Rig.
 
+## Reprise de jouabilité — PR 30
+
+Le lanceur utilise deux parois continues, une courbe en haut à droite et une
+sortie inclinée vers le centre. Le bouton GO applique une impulsion verticale ;
+la déviation provient des collisions avec le couloir, sans repositionnement de
+bille. Un matériau de guide à faible friction conserve l'énergie dans la courbe.
+
+Les pivots des flippers passent à `(335, 1700)` et `(745, 1700)`. Leur ouverture
+au repos est d'environ 60 px pour une bille de 44 px, contre environ 130 px avant
+cette reprise. Des guides latéraux collectent les retours et prolongent les
+rails jusqu'aux pivots. La perte centrale reste possible.
+
+Le prototype n'est pas encore une Alpha validée. Les éléments Warm/Cold sont
+encore des capteurs : leurs vrais parcours, la physique de roulement et la
+refonte artistique sont les étapes suivantes.
+
 ## Principes
 
 - Lisibilité par silhouette/mouvement/lumière/position, pas couleur seule.

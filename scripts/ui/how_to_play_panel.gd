@@ -9,7 +9,7 @@ const PAGES: Array[Dictionary] = [
 	{
 		"eyebrow": "GUIDE RAPIDE  //  1 / 4",
 		"title": "LANCEZ ET JOUEZ",
-		"body": "Touchez la zone haute pour lancer la bille. Maintenez le bas gauche ou droit pour actionner chaque flipper.",
+		"body": "Appuyez sur GO pour lancer la bille dans le couloir guidé. Maintenez le bas gauche ou droit pour actionner chaque flipper.",
 		"objective": "OBJECTIF  •  Gardez la bille en jeu et visez les éléments éclairés.",
 	},
 	{

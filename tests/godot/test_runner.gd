@@ -36,12 +36,14 @@ func _run() -> void:
 	await _test_flashing_effects_accessibility()
 	await _test_how_to_play_menu()
 	await _test_alpha_candidate_player_journey()
+	await _test_guided_launcher_and_go()
+	await _test_flipper_return_control()
 	# Give the audio server and deferred frees time to release stream references.
 	await process_frame
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 20 passed")
+		print("Godot behavioral tests: 22 passed")
 		quit(0)
 		return
 
@@ -324,15 +326,15 @@ func _test_android_playtest_regressions() -> void:
 	var ball: RigidBody2D = main.balls[0]
 	var start_position := ball.global_position
 	main._launch_or_restart()
+	_expect_equal(main.audio_service.last_sfx_id, &"launcher", "Launcher requests audible feedback")
 	var minimum_x := start_position.x
 	var minimum_y := start_position.y
-	for frame in 60:
+	for frame in 240:
 		await physics_frame
 		minimum_x = minf(minimum_x, ball.global_position.x)
 		minimum_y = minf(minimum_y, ball.global_position.y)
 	_expect(minimum_y < start_position.y - 300.0, "Launcher sends the ball upward")
 	_expect(minimum_x < start_position.x - 60.0, "Launcher feeds the ball left into the playfield")
-	_expect_equal(main.audio_service.last_sfx_id, &"launcher", "Launcher requests audible feedback")
 
 	main.score_manager.add_points(100)
 	main._on_reset_pressed()
@@ -513,19 +515,16 @@ func _test_playfield_safe_trajectories() -> void:
 		_expect((right_wall_shape.shape as RectangleShape2D).size.y >= 1840.0, "Right boundary reaches the drain")
 
 	var upper_left := main.get_node("UpperLeftGuide") as StaticBody2D
-	var upper_right := main.get_node("UpperRightGuide") as StaticBody2D
-	_expect(upper_left.rotation > 0.0 and upper_right.rotation < 0.0, "Upper guides slope back toward the playfield")
+	_expect(upper_left.rotation > 0.0, "Upper left guide slopes back toward the playfield")
 
 	var left_outlane := main.get_node("LeftOutlaneRail") as StaticBody2D
 	var left_return := main.get_node("LeftReturnRail") as StaticBody2D
 	var right_return := main.get_node("RightReturnRail") as StaticBody2D
 	var right_outlane := main.get_node("RightOutlaneRail") as StaticBody2D
 	var launcher_divider := main.get_node("LauncherDivider") as StaticBody2D
-	var launcher_lower_divider := main.get_node("LauncherLowerDivider") as StaticBody2D
 	_expect(left_outlane.position.x < left_return.position.x, "Left outlane remains outside its playable return")
 	_expect(right_return.position.x < right_outlane.position.x, "Right playable return remains inside its outlane")
-	_expect(right_outlane.position.x < launcher_divider.position.x, "Right outlane remains separate from the launcher")
-	_expect(launcher_divider.position.x < launcher_lower_divider.position.x, "Launcher exit opens toward the playfield")
+	_expect(right_outlane.position.x < launcher_divider.points[0].x, "Right outlane remains separate from the launcher")
 	_expect(left_return.position.x < 540.0 and right_return.position.x > 540.0, "Both returns feed their matching flipper")
 
 	main.free()
@@ -979,6 +978,197 @@ func _test_alpha_candidate_player_journey() -> void:
 
 	main.free()
 	await process_frame
+
+
+func _test_guided_launcher_and_go() -> void:
+	var scene := load("res://scenes/app/Main.tscn") as PackedScene
+	var main := scene.instantiate()
+	root.add_child(main)
+	await physics_frame
+	_expect(not main.launch_button.visible, "GO is absent from the menu")
+	main.start_game()
+	await physics_frame
+	_expect(main.launch_button.visible, "GO is visible when a numbered ball is ready")
+	var top_touch := InputEventScreenTouch.new()
+	top_touch.index = 12
+	top_touch.pressed = true
+	top_touch.position = Vector2(540, 600)
+	main._unhandled_input(top_touch)
+	_expect_equal(main.session_state, MainNode.SessionState.READY, "Touching the upper table no longer launches")
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	click.position = main.launch_button.get_global_rect().get_center()
+	root.push_input(click, true)
+	click = click.duplicate()
+	click.pressed = false
+	root.push_input(click, true)
+	_expect_equal(main.session_state, MainNode.SessionState.PLAYING, "A real GUI press on GO launches the ball")
+	main._launch_or_restart()
+	_expect_equal(main.playtest_recorder.launches, 1, "Repeated GO cannot launch an active ball twice")
+	await physics_frame
+	_expect(not main.launch_button.visible, "GO leaves the right flipper touch zone free during play")
+	var left_touch := InputEventScreenTouch.new()
+	left_touch.index = 20
+	left_touch.pressed = true
+	left_touch.position = Vector2(200, 1600)
+	var right_touch := left_touch.duplicate() as InputEventScreenTouch
+	right_touch.index = 21
+	right_touch.position = Vector2(800, 1600)
+	main._unhandled_input(left_touch)
+	main._unhandled_input(right_touch)
+	_expect(Input.is_action_pressed(&"flipper_left") and Input.is_action_pressed(&"flipper_right"), "Both flippers can be held by independent touches")
+	left_touch.pressed = false
+	right_touch.pressed = false
+	main._input(left_touch)
+	main._input(right_touch)
+	_expect(not Input.is_action_pressed(&"flipper_left") and not Input.is_action_pressed(&"flipper_right"), "GUI-independent releases do not leave a flipper stuck")
+	main._on_reset_pressed()
+	var key := InputEventKey.new()
+	key.physical_keycode = KEY_SPACE
+	key.pressed = true
+	main._unhandled_input(key)
+	_expect_equal(main.session_state, MainNode.SessionState.PLAYING, "Space still launches through the shared action")
+	main._on_reset_pressed()
+	var gamepad := InputEventJoypadButton.new()
+	gamepad.button_index = JOY_BUTTON_A
+	gamepad.pressed = true
+	main._unhandled_input(gamepad)
+	_expect_equal(main.session_state, MainNode.SessionState.PLAYING, "Gamepad A still launches through the shared action")
+	main.free()
+	await process_frame
+
+	# Actual rigid bodies must negotiate the curve from varied shooter positions
+	# and strengths. No scoring signal, position correction or rescue is injected.
+	for sample in [
+		Vector2(950, 0.95), Vector2(950, 1.0), Vector2(950, 1.05),
+		Vector2(960, 0.95), Vector2(960, 1.0), Vector2(960, 1.05),
+		Vector2(970, 0.95), Vector2(970, 1.0), Vector2(970, 1.05),
+	]:
+		main = scene.instantiate()
+		root.add_child(main)
+		await physics_frame
+		main.start_game()
+		var ball: RigidBody2D = main.balls[0]
+		ball.reset_ball(Vector2(sample.x, 1650))
+		ball.launch_force *= sample.y
+		main._launch_or_restart()
+		var entered_playfield := false
+		var touched_curve := false
+		for _frame in 480:
+			await physics_frame
+			if "--trace-launch" in OS.get_cmdline_user_args() and _frame % 30 == 0:
+				print("LAUNCH ", sample, " t=", _frame, " pos=", ball.global_position, " velocity=", ball.linear_velocity)
+			for body in ball.get_colliding_bodies():
+				if body == main.get_node("LauncherOuterGuide") and ball.global_position.y < 650.0:
+					touched_curve = true
+			if ball.global_position.x < 620.0 and ball.global_position.y < 700.0:
+				entered_playfield = true
+				break
+			if main.session_state != MainNode.SessionState.PLAYING:
+				break
+		_expect(touched_curve, "Launcher is physically steered by the curved guide (%s)" % sample)
+		_expect(entered_playfield, "Guided launch reaches the upper playfield (%s, end %s)" % [sample, ball.global_position])
+		_expect_equal(main.remaining_balls, 3, "Guided launch does not consume a ball")
+		_expect_equal(main.playtest_recorder.ball_saves, 0, "Guided launch needs no safety teleport")
+		if entered_playfield:
+			ball.ball_save_used = true
+			var contacted := false
+			var returned := false
+			for _frame in 1440:
+				await physics_frame
+				if ball.global_position.y > 1640.0 and ball.linear_velocity.y > 0.0:
+					Input.action_press(&"flipper_left" if ball.global_position.x < 540.0 else &"flipper_right")
+				for body in ball.get_colliding_bodies():
+					if body == main.get_node("LeftFlipper") or body == main.get_node("RightFlipper"):
+						contacted = true
+				if contacted and ball.global_position.y < 1550.0 and ball.linear_velocity.y < 0.0:
+					returned = true
+					break
+				if main.session_state != MainNode.SessionState.PLAYING:
+					break
+			Input.action_release(&"flipper_left")
+			Input.action_release(&"flipper_right")
+			_expect(returned, "Launch first return can be struck back into play (%s, end %s)" % [sample, ball.global_position])
+		main.free()
+		await process_frame
+
+
+func _test_flipper_return_control() -> void:
+	for sample in [
+		[Vector2(240, 1330), Vector2(0, 120), &"flipper_left"],
+		[Vector2(270, 1400), Vector2(40, 180), &"flipper_left"],
+		[Vector2(770, 1330), Vector2(0, 120), &"flipper_right"],
+		[Vector2(735, 1400), Vector2(-40, 180), &"flipper_right"],
+		[Vector2(495, 1500), Vector2(0, 120), &"flipper_left"],
+		[Vector2(585, 1500), Vector2(0, 120), &"flipper_right"],
+	]:
+		var result := await _sample_flipper_control(sample[0], sample[1], sample[2])
+		_expect(result.contacted, "Return makes physical contact with its flipper (%s): %s" % [sample[0], result])
+		_expect(result.returned, "Timed flipper strike returns the ball into play (%s): %s" % [sample[0], result])
+
+	# A deliberate straight centre drain remains possible: no invisible assist
+	# or safety teleport is allowed to make the positive trajectory tests pass.
+	var scene := load("res://scenes/app/Main.tscn") as PackedScene
+	var main := scene.instantiate()
+	root.add_child(main)
+	await physics_frame
+	main.start_game()
+	main._launch_or_restart()
+	var ball: RigidBody2D = main.balls[0]
+	ball.reset_ball(Vector2(540, 1500), false)
+	ball.launch_ready = false
+	ball.ball_save_used = true
+	ball.freeze = false
+	ball.linear_velocity = Vector2(0, 120)
+	Input.action_press(&"flipper_left")
+	Input.action_press(&"flipper_right")
+	for _frame in 360:
+		await physics_frame
+		if main.remaining_balls < 3:
+			break
+	Input.action_release(&"flipper_left")
+	Input.action_release(&"flipper_right")
+	_expect_equal(main.remaining_balls, 2, "A legitimate centre drain still consumes exactly one ball")
+	_expect_equal(main.playtest_recorder.ball_saves, 0, "Centre drain does not use an invisible rescue")
+	main.free()
+	await process_frame
+
+
+func _sample_flipper_control(start_position: Vector2, velocity: Vector2, action: StringName) -> Dictionary:
+	var scene := load("res://scenes/app/Main.tscn") as PackedScene
+	var main := scene.instantiate()
+	root.add_child(main)
+	await physics_frame
+	main.start_game()
+	main._launch_or_restart()
+	var ball: RigidBody2D = main.balls[0]
+	ball.reset_ball(start_position, false)
+	ball.launch_ready = false
+	ball.ball_save_used = true
+	ball.freeze = false
+	ball.linear_velocity = velocity
+	var flipper: Node2D = main.get_node("LeftFlipper" if action == &"flipper_left" else "RightFlipper")
+	var contacted := false
+	var returned := false
+	var activated := false
+	for _frame in 360:
+		await physics_frame
+		if ball.global_position.y >= 1660.0 and not activated:
+			Input.action_press(action)
+			activated = true
+		if flipper in ball.get_colliding_bodies():
+			contacted = true
+		if contacted and ball.global_position.y < 1550.0 and ball.linear_velocity.y < 0.0:
+			returned = true
+			break
+		if ball.drain_locked or main.remaining_balls != 3:
+			break
+	Input.action_release(action)
+	var result := {"contacted": contacted, "returned": returned, "end": ball.global_position}
+	main.free()
+	await process_frame
+	return result
 
 
 func _complete_cue_stack(main: Node) -> void:

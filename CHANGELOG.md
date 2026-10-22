@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Reprise de jouabilité — PR 30
+
+- Bouton GO lorsque la bille est prête ; suppression du lancement par toucher
+  dans le haut du plateau, avec Espace et A manette conservés.
+- Couloir de lancement physique continu, courbe de déviation et sortie inclinée.
+- Flippers rapprochés, guides latéraux collecteurs et jonctions jusqu'aux pivots.
+- Neuf lancements suivis jusqu'au premier renvoi par un flipper, six essais de
+  retour et une perte centrale légitime simulés sans sauvetage.
+- Correction d'un polygone de tablier qui se croisait ; les erreurs de rendu
+  Godot font désormais échouer l'analyse des logs CI.
+- Icône de playtest originale configurée pour supprimer l'erreur d'export Android.
+- Qualification Alpha suspendue au playtest et aux reprises physique/artistique.
+
 ### Alpha 0.1.0 candidate
 
 - Version applicative harmonisée à `0.1.0-alpha.1` dans le projet et les exports.
