@@ -195,7 +195,8 @@ ou invalide.
 
 ## P1 — UX
 
-T046 How to Play ✅; T047 effets lumineux accessibles ✅.
+T046 How to Play ✅; T047 effets lumineux accessibles ✅; T048 stabilisation
+Alpha 0.1.0 ✅.
 
 T046 ajoute un guide en quatre pages accessible depuis le menu. Des schémas
 vectoriels expliquent les zones tactiles, les six familles du Rig, la Cue Stack,
@@ -206,6 +207,11 @@ T047 ajoute dans Réglages les modes Complets, Réduits et Désactivés. Le choi
 est sauvegardé localement et pilote les flashes d'impact, les pulsations des
 objectifs, les chases, les faisceaux et le Blackout sans supprimer les repères
 textuels ou statiques nécessaires au gameplay.
+
+T048 harmonise la version candidate `0.1.0-alpha.1`, les consignes d'action en
+français et les noms canoniques des systèmes. Un test comportemental rejoue le
+parcours complet du menu à la fin de partie, avec Rig, Cue Stack, Final Show à
+trois billes et Blackout, avant la validation finale sur tablette.
 
 ## P2 — Final
 

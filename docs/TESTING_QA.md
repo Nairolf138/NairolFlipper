@@ -73,7 +73,7 @@ toucher, les collisions inactives et la récupération hors limites.
 - vérifier que la bille circule entre les rails sans rester piégée ;
 - confirmer que les deux slingshots renvoient nettement la bille vers le haut ;
 - allumer les six cibles et voir le compteur passer de `RIG 0 / 6` à `RIG 6 / 6` ;
-- vérifier le message `RIG READY — HIT CONSOLE` et le bonus ;
+- vérifier le message `RIG PRÊT — TERMINEZ LA CUE STACK` ou l'armement du Final Show selon la progression ;
 - traverser l'Universe Orbit et confirmer score, Flow et feedback ;
 - noter les tirs trop faciles, impossibles ou masqués par les doigts.
 
@@ -112,7 +112,7 @@ toucher, les collisions inactives et la récupération hors limites.
 ### Table 2.3 — checklist Cue Stack
 
 - vérifier que seules les rampes Warm et Cold sont mises en évidence au début ;
-- toucher chaque rampe une fois, puis confirmer `CUE READY — HIT CONSOLE` ;
+- toucher chaque rampe une fois, puis confirmer `CUE PRÊTE — VISEZ LA CONSOLE` ;
 - toucher la Console et vérifier le passage à Universe Chase ;
 - traverser l'Universe Orbit deux fois, exécuter la cue, puis toucher quatre
   bumpers pour préparer Rhythm Drop ;
@@ -182,6 +182,22 @@ toucher, les collisions inactives et la récupération hors limites.
 - fermer puis relancer l'application et confirmer que le choix est conservé ;
 - utiliser `VALEURS PAR DÉFAUT` et confirmer le retour à `COMPLETS` et aux trois
   niveaux audio à 100 %.
+
+### Alpha 0.1.0 candidate — parcours complet tablette
+
+- vérifier que l'écran d'accueil affiche `ALPHA 0.1.0` et que les consignes
+  d'action sont en français, sans ancien numéro de table visible ;
+- ouvrir Réglages et Comment jouer, puis revenir au menu sans démarrer de partie ;
+- jouer exactement trois billes et confirmer que Reset, Safety et la fin de
+  partie ne créent jamais de quatrième bille ;
+- compléter les trois cues et les six familles du Rig, puis déclencher le Final
+  Show via la Console ;
+- confirmer la présence de trois billes pendant le Final Show, le passage par
+  Blackout et le retour en Flow avec une bille survivante ;
+- terminer la partie et vérifier l'arrêt de la musique, le score final et les
+  actions Rejouer/Menu ;
+- noter la version, le modèle Android et toute étape impossible à terminer dans
+  le rapport de validation.
 
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 

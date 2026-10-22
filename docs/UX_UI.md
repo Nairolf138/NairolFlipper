@@ -38,11 +38,15 @@ Main Menu
 └── Quit (desktop only)
 ```
 
-Le menu de playtest fournit Play, How to Play, Quit et un premier écran Settings
-dédié à l'audio. Trois sliders tactiles règlent Master, Musique et Effets de 0 à
-100 %, avec application immédiate, retour aux valeurs par défaut et sauvegarde
-locale. Graphics, Controls, Accessibility et Credits restent à compléter dans
-l'interface finale.
+Le menu de playtest fournit Jouer, Comment jouer, Réglages et Quitter. Trois
+sliders tactiles règlent Général, Musique et Effets de 0 à 100 %, et le même
+panneau propose les effets lumineux Complets, Réduits ou Désactivés. Les
+changements sont immédiats, réinitialisables et sauvegardés localement. Graphics,
+Controls et Credits restent à compléter dans l'interface finale.
+
+Les consignes d'action sont rédigées en français pour l'Alpha. Les noms de
+systèmes qui constituent l'identité du jeu restent canoniques : Rig, Cue,
+Cue Stack, Flow, Sync, Final Show, Blackout et Safety.
 
 ## Tutoriel
 

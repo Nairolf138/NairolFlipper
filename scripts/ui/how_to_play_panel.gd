@@ -15,7 +15,7 @@ const PAGES: Array[Dictionary] = [
 	{
 		"eyebrow": "GUIDE RAPIDE  //  2 / 4",
 		"title": "CONSTRUISEZ LE RIG",
-		"body": "Touchez les six cibles FACE, WASH, BEAM, PIXEL, BLIND et PRACT pour allumer les familles de projecteurs.",
+		"body": "Touchez les six cibles FACE, WASH, BEAM, PIXEL, BLIND et PRAT. pour allumer les familles de projecteurs.",
 		"objective": "OBJECTIF  •  Faites passer le compteur de RIG 0 / 6 à RIG 6 / 6.",
 	},
 	{

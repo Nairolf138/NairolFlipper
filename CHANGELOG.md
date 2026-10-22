@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Alpha 0.1.0 candidate
+
+- Version applicative harmonisée à `0.1.0-alpha.1` dans le projet et les exports.
+- Parcours joueur complet couvert du menu jusqu'à la fin de partie, en passant
+  par le Rig, la Cue Stack, le Final Show à trois billes et le Blackout.
+- Consignes d'action harmonisées en français sans traduire les noms des systèmes
+  de jeu : Rig, Cue Stack, Flow, Final Show, Sync, Blackout et Safety.
+- Libellés de table obsolètes retirés des écrans joueur.
+
 ### Added
 
 - Documentation initiale de cadrage du projet.

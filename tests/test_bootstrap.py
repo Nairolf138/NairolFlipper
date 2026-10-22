@@ -151,7 +151,7 @@ def test_ball_save_safety_is_armed_on_launch_and_consumed_at_drain():
     assert "func try_ball_save() -> bool" in ball_script
     assert "body.try_ball_save()" in main_script
     assert "body.reset_ball(body.spawn_position, false)" in main_script
-    assert 'status_label.text = "SAFETY — SAME BALL — TOUCH TOP"' in main_script
+    assert 'status_label.text = "SAFETY — MÊME BILLE — TOUCHEZ EN HAUT"' in main_script
 
 
 def test_main_scene_declares_three_rhythmic_bumpers():
@@ -769,6 +769,39 @@ def test_flashing_effects_setting_is_persistent_and_keeps_readable_feedback():
     assert "_test_flashing_effects_accessibility" in runner_text
     assert "Off mode suppresses the hit flash" in runner_text
     assert "Off mode keeps the readable Sync clock contract" in runner_text
+
+
+def test_alpha_candidate_has_consistent_version_and_french_action_copy():
+    version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+    project_text = PROJECT.read_text(encoding="utf-8")
+    export_text = (ROOT / "export_presets.cfg").read_text(encoding="utf-8")
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    main_text = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    runner_text = (ROOT / "tests" / "godot" / "test_runner.gd").read_text(encoding="utf-8")
+
+    assert version == "0.1.0-alpha.1"
+    assert 'config/version="0.1.0-alpha.1"' in project_text
+    assert 'package/version="0.1.0-alpha.1"' in export_text
+    assert 'application/file_version="0.1.0.0"' in export_text
+    assert 'application/product_version="0.1.0-alpha.1"' in export_text
+    assert "greybox" not in export_text.lower()
+    assert "ALPHA 0.1.0" in scene_text
+    assert "TABLE 2.3" not in scene_text
+    assert "TABLE 2.4" not in scene_text
+
+    for expected_copy in (
+        "BILLE RÉCUPÉRÉE",
+        "TOUCHEZ EN HAUT POUR LANCER",
+        "CUE PRÊTE — VISEZ LA CONSOLE",
+        "RIG PRÊT — TERMINEZ LA CUE STACK",
+        "FINAL SHOW ARMÉ — VISEZ LA CONSOLE",
+        "PARTIE TERMINÉE",
+    ):
+        assert expected_copy in main_text
+    for stale_copy in ("TOUCH TOP", "HIT CONSOLE", "GAME OVER", "3 BALLS"):
+        assert stale_copy not in main_text
+
+    assert "_test_alpha_candidate_player_journey" in runner_text
 
 
 def test_how_to_play_explains_the_complete_show_loop_visually():

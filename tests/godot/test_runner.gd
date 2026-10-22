@@ -3,6 +3,7 @@ extends SceneTree
 const CueDefinitionResource = preload("res://scripts/show/cue_definition.gd")
 const CueManagerNode = preload("res://scripts/show/cue_manager.gd")
 const FlowManagerNode = preload("res://scripts/show/flow_manager.gd")
+const MainNode = preload("res://scripts/app/main.gd")
 const SettingsStoreNode = preload("res://scripts/app/settings_store.gd")
 const ShowFlowManagerNode = preload("res://scripts/show/show_flow_manager.gd")
 const SyncBonusManagerNode = preload("res://scripts/show/sync_bonus_manager.gd")
@@ -34,12 +35,13 @@ func _run() -> void:
 	await _test_audio_settings_menu()
 	await _test_flashing_effects_accessibility()
 	await _test_how_to_play_menu()
+	await _test_alpha_candidate_player_journey()
 	# Give the audio server and deferred frees time to release stream references.
 	await process_frame
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 19 passed")
+		print("Godot behavioral tests: 20 passed")
 		quit(0)
 		return
 
@@ -307,7 +309,7 @@ func _test_android_playtest_regressions() -> void:
 	_expect(is_equal_approx(rad_to_deg(right_flipper.rotation), -20.0), "Right flipper mirrors the left resting angle (got %.2f)" % rad_to_deg(right_flipper.rotation))
 
 	Input.action_press(&"flipper_left")
-	for frame in 12:
+	for _frame in 12:
 		await physics_frame
 	Input.action_release(&"flipper_left")
 	_expect(rad_to_deg(left_flipper.rotation) < 0.0, "Left flipper moves upward when activated")
@@ -362,7 +364,7 @@ func _test_three_ball_game_over_and_recovery() -> void:
 		main._resolve_ball_drain(ball)
 		await process_frame
 		if drain_index < 2:
-			for frame in 20:
+			for _frame in 20:
 				if main.balls[main.active_ball_index].visible and main.balls[main.active_ball_index].launch_ready:
 					break
 				await physics_frame
@@ -404,7 +406,7 @@ func _test_three_ball_game_over_and_recovery() -> void:
 	_expect_equal(main.remaining_balls, 3, "Out-of-bounds recovery does not consume a ball")
 	_expect(recovered_ball.freeze and recovered_ball.launch_ready, "Out-of-bounds ball returns ready to the launcher")
 	_expect_equal(recovered_ball.global_position, recovered_ball.spawn_position, "Recovered ball returns to the configured launcher")
-	_expect(main.status_label.text.begins_with("BALL RECOVERED"), "Recovery explains how to relaunch")
+	_expect(main.status_label.text.begins_with("BILLE RÉCUPÉRÉE"), "Recovery explains how to relaunch")
 
 	main.free()
 	await process_frame
@@ -439,7 +441,7 @@ func _test_table_2_objectives_and_routes() -> void:
 		main._on_rig_target_hit(target, target.family_id, target.display_name, target.score_value, target.flow_value)
 	_expect_equal(main._active_rig_family_count(), 6, "Every Rig family can be activated from the table")
 	_expect_equal(main.rig_progress_label.text, "RIG 6 / 6", "Rig objective reports complete progress")
-	_expect_equal(main.status_label.text, "RIG READY — COMPLETE CUE STACK", "Rig completion keeps the remaining objective explicit")
+	_expect_equal(main.status_label.text, "RIG PRÊT — TERMINEZ LA CUE STACK", "Rig completion keeps the remaining objective explicit")
 	_expect(not main.show_flow.can_start_final_show(), "Rig completion alone cannot skip the Cue Stack")
 	_expect(main.score_manager.score > starting_score + 1500, "Rig targets and completion award score")
 	for target in rig_targets:
@@ -471,7 +473,7 @@ func _test_table_2_objectives_and_routes() -> void:
 	main.cue_manager.complete_current_cue()
 	_expect(main.cue_manager.is_stack_completed(), "Three Console executions complete the Cue Stack")
 	_expect(main.show_flow.can_start_final_show(), "Cue Stack and Rig together arm Final Show")
-	_expect_equal(main.status_label.text, "FINAL SHOW ARMED — HIT CONSOLE", "Final Show exposes its Console trigger")
+	_expect_equal(main.status_label.text, "FINAL SHOW ARMÉ — VISEZ LA CONSOLE", "Final Show exposes its Console trigger")
 
 	var route_score: int = main.score_manager.score
 	main._on_lane_completed(&"universe_orbit", "UNIVERSE ORBIT", 600, 90)
@@ -899,6 +901,81 @@ func _test_how_to_play_menu() -> void:
 	panel.show_next_page()
 	_expect(not panel.visible and main.start_menu.visible, "Finishing the guide returns to the menu")
 	_expect(not main.gameplay_active, "Closing the guide still leaves gameplay stopped")
+
+	main.free()
+	await process_frame
+
+
+func _test_alpha_candidate_player_journey() -> void:
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Alpha candidate loads for the complete player journey")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	main.respawn_delay = 0.01
+	main.blackout_duration = 0.01
+	root.add_child(main)
+	await process_frame
+	await physics_frame
+
+	_expect(main.start_menu.visible, "Complete journey starts on the main menu")
+	_expect(not main.audio_service.transport_playing, "Main menu remains silent before Play")
+	main.start_game()
+	_expect_equal(main.session_state, MainNode.SessionState.READY, "Play starts on a ready first ball")
+	_expect(main.status_label.text.begins_with("BILLE 1 / 3"), "First-ball instruction uses final French copy")
+	main._launch_or_restart()
+	_expect_equal(main.session_state, MainNode.SessionState.PLAYING, "Launch enters active gameplay")
+	_expect_equal(main.show_flow.state, ShowFlowManagerNode.State.BUILD, "Launch begins the Build")
+
+	_complete_cue_stack(main)
+	var rig_targets := main.get_tree().get_nodes_in_group("rig_targets")
+	for target in rig_targets:
+		main._on_rig_target_hit(
+			target,
+			target.family_id,
+			target.display_name,
+			target.score_value,
+			target.flow_value
+		)
+	_expect(main.cue_manager.is_stack_completed(), "Complete journey finishes the Cue Stack")
+	_expect_equal(main._active_rig_family_count(), 6, "Complete journey lights all six Rig families")
+	_expect_equal(main.show_flow.state, ShowFlowManagerNode.State.FLOW, "Rig plus Cue Stack arms Flow")
+	_expect_equal(
+		main.status_label.text,
+		"FINAL SHOW ARMÉ — VISEZ LA CONSOLE",
+		"Armed Final Show exposes one clear action"
+	)
+
+	main.show_flow.final_show_duration = 60.0
+	main._on_scoop_completed(&"console_scoop", 500, 80)
+	await process_frame
+	_expect(main.multiball_active, "Complete journey reaches the three-ball Final Show")
+	_expect("3 BILLES" in main.final_show_label.text, "Final Show banner uses consistent ball terminology")
+	main._finish_final_show("FINAL SHOW TERMINÉ")
+	_expect_equal(main.show_flow.state, ShowFlowManagerNode.State.BLACKOUT, "Complete journey reaches Blackout")
+	for frame in 12:
+		await physics_frame
+	_expect_equal(main.show_flow.state, ShowFlowManagerNode.State.FLOW, "Blackout returns to playable Flow")
+
+	for drain_index in 3:
+		var ball: RigidBody2D = main.balls[main.active_ball_index]
+		ball.ball_save_used = true
+		if main.session_state == MainNode.SessionState.READY:
+			main._launch_or_restart()
+		main._resolve_ball_drain(ball)
+		await process_frame
+		if drain_index < 2:
+			for frame in 20:
+				if main.session_state == MainNode.SessionState.READY:
+					break
+				await physics_frame
+
+	_expect_equal(main.remaining_balls, 0, "Complete journey consumes exactly three numbered balls")
+	_expect_equal(main.session_state, MainNode.SessionState.GAME_OVER, "Complete journey ends in Game Over state")
+	_expect(main.game_over_overlay.visible, "Complete journey exposes the final score overlay")
+	_expect_equal(main.status_label.text, "PARTIE TERMINÉE", "End state uses final French copy")
+	_expect(not main.audio_service.transport_playing, "Game over stops the music transport")
 
 	main.free()
 	await process_frame

@@ -55,7 +55,8 @@ La première refonte greybox matérialise la promesse « construire le show » :
 - deux slingshots actifs pour accélérer le bas du plateau ;
 - des rails physiques qui dessinent deux outlanes, deux retours et séparent le launcher ;
 - un bonus de complétion quand les six familles sont allumées ;
-- l'instruction suivante, **RIG READY — HIT CONSOLE**, qui évite de laisser le joueur sans objectif.
+- une instruction contextuelle : **RIG PRÊT — TERMINEZ LA CUE STACK** ou
+  **FINAL SHOW ARMÉ — VISEZ LA CONSOLE**, selon la progression restante.
 
 Cette version reste vectorielle et sans art final : elle valide d'abord les
 trajectoires, la compréhension des objectifs et le rythme sur tablette.
