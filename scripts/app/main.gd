@@ -11,6 +11,20 @@ const ShowFlowManagerNode = preload("res://scripts/show/show_flow_manager.gd")
 const StageVisualControllerNode = preload("res://scripts/show/stage_visual_controller.gd")
 const SyncBonusManagerNode = preload("res://scripts/show/sync_bonus_manager.gd")
 
+const FLASHING_EFFECTS_LABELS: Array[String] = ["COMPLETS", "RÉDUITS", "DÉSACTIVÉS"]
+const FLASHING_EFFECTS_MODES: Array[StringName] = [
+	SettingsStoreNode.FLASHING_FULL,
+	SettingsStoreNode.FLASHING_REDUCED,
+	SettingsStoreNode.FLASHING_OFF,
+]
+const FLASHING_EFFECT_GROUPS: Array[StringName] = [
+	&"score_bumpers",
+	&"show_ramps",
+	&"rig_targets",
+	&"table_lanes",
+	&"slingshots",
+]
+
 enum SessionState {
 	MENU,
 	READY,
@@ -51,6 +65,7 @@ enum SessionState {
 @onready var master_value_label: Label = $Interface/StartOverlay/SettingsPanel/Menu/MasterValue
 @onready var music_value_label: Label = $Interface/StartOverlay/SettingsPanel/Menu/MusicValue
 @onready var sfx_value_label: Label = $Interface/StartOverlay/SettingsPanel/Menu/SFXValue
+@onready var flashing_effects_option: OptionButton = $Interface/StartOverlay/SettingsPanel/Menu/FlashingEffectsOption
 @onready var audio_defaults_button: Button = $Interface/StartOverlay/SettingsPanel/Menu/DefaultsButton
 @onready var audio_back_button: Button = $Interface/StartOverlay/SettingsPanel/Menu/BackButton
 @onready var how_to_play_panel: HowToPlayPanelNode = $Interface/StartOverlay/HowToPlayPanel
@@ -84,6 +99,7 @@ var _sync_feedback_tween: Tween
 
 
 func _ready() -> void:
+	_configure_visual_settings()
 	for ball in balls:
 		ball.ball_drained.connect(_on_ball_drained)
 		ball.input_enabled = false
@@ -123,6 +139,7 @@ func _ready() -> void:
 	master_slider.drag_ended.connect(_on_audio_slider_drag_ended)
 	music_slider.drag_ended.connect(_on_audio_slider_drag_ended)
 	sfx_slider.drag_ended.connect(_on_audio_slider_drag_ended)
+	flashing_effects_option.item_selected.connect(_on_flashing_effects_selected)
 	audio_defaults_button.pressed.connect(_on_audio_defaults_pressed)
 	audio_back_button.pressed.connect(_close_audio_settings)
 	how_to_play_panel.closed.connect(_close_how_to_play)
@@ -132,6 +149,8 @@ func _ready() -> void:
 	game_over_menu_button.pressed.connect(_show_start_menu)
 	_sync_audio_sliders_from_store()
 	_apply_audio_settings()
+	_sync_visual_setting_from_store()
+	_apply_visual_settings()
 	restart_game()
 	_show_start_menu()
 
@@ -260,6 +279,7 @@ func _on_quit_pressed() -> void:
 
 func _open_audio_settings() -> void:
 	_sync_audio_sliders_from_store()
+	_sync_visual_setting_from_store()
 	start_menu.hide()
 	settings_panel.show()
 	master_slider.grab_focus()
@@ -295,12 +315,11 @@ func _on_audio_slider_drag_ended(value_changed: bool) -> void:
 
 
 func _on_audio_defaults_pressed() -> void:
-	master_slider.set_value_no_signal(SettingsStoreNode.DEFAULT_MASTER_PERCENT)
-	music_slider.set_value_no_signal(SettingsStoreNode.DEFAULT_MUSIC_PERCENT)
-	sfx_slider.set_value_no_signal(SettingsStoreNode.DEFAULT_SFX_PERCENT)
-	_update_audio_value_labels()
-	_apply_audio_settings_from_sliders()
-	_store_audio_settings()
+	settings_store.restore_defaults()
+	_sync_audio_sliders_from_store()
+	_sync_visual_setting_from_store()
+	_apply_audio_settings()
+	_apply_visual_settings()
 
 
 func _sync_audio_sliders_from_store() -> void:
@@ -308,6 +327,33 @@ func _sync_audio_sliders_from_store() -> void:
 	music_slider.set_value_no_signal(settings_store.music_percent)
 	sfx_slider.set_value_no_signal(settings_store.sfx_percent)
 	_update_audio_value_labels()
+
+
+func _configure_visual_settings() -> void:
+	flashing_effects_option.clear()
+	for label in FLASHING_EFFECTS_LABELS:
+		flashing_effects_option.add_item(label)
+
+
+func _sync_visual_setting_from_store() -> void:
+	var selected_index := FLASHING_EFFECTS_MODES.find(settings_store.flashing_effects)
+	flashing_effects_option.select(maxi(selected_index, 0))
+
+
+func _on_flashing_effects_selected(index: int) -> void:
+	if index < 0 or index >= FLASHING_EFFECTS_MODES.size():
+		return
+	settings_store.set_flashing_effects(FLASHING_EFFECTS_MODES[index])
+	_apply_visual_settings()
+
+
+func _apply_visual_settings() -> void:
+	var mode := settings_store.flashing_effects
+	stage_visuals.set_flashing_effects(mode)
+	for group_name in FLASHING_EFFECT_GROUPS:
+		for visual_node in get_tree().get_nodes_in_group(group_name):
+			if visual_node.has_method("set_flashing_effects"):
+				visual_node.set_flashing_effects(mode)
 
 
 func _update_audio_value_labels() -> void:
@@ -752,10 +798,22 @@ func _finish_final_show(message: String) -> void:
 	final_show_label.hide()
 	sync_feedback_label.hide()
 	cue_progress_label.show()
-	blackout_overlay.show()
+	_show_blackout_feedback()
 	status_label.text = "BLACKOUT — %s" % message
 	audio_service.request_sfx(&"drain")
 	_run_blackout_timer(show_generation)
+
+
+func _show_blackout_feedback() -> void:
+	match settings_store.flashing_effects:
+		SettingsStoreNode.FLASHING_OFF:
+			blackout_overlay.hide()
+		SettingsStoreNode.FLASHING_REDUCED:
+			blackout_overlay.color = Color(0.0, 0.0, 0.0, 0.38)
+			blackout_overlay.show()
+		_:
+			blackout_overlay.color = Color(0.0, 0.0, 0.0, 0.88)
+			blackout_overlay.show()
 
 
 func _run_blackout_timer(generation: int) -> void:

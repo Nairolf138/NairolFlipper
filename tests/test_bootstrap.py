@@ -738,6 +738,39 @@ def test_audio_settings_are_accessible_persistent_and_platform_local():
     assert "_test_audio_settings_menu" in runner_text
 
 
+def test_flashing_effects_setting_is_persistent_and_keeps_readable_feedback():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    main_text = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    settings_text = (ROOT / "scripts" / "app" / "settings_store.gd").read_text(encoding="utf-8")
+    runner_text = (ROOT / "tests" / "godot" / "test_runner.gd").read_text(encoding="utf-8")
+
+    assert "SCHEMA_VERSION := 2" in settings_text
+    assert "visual_settings_changed" in settings_text
+    assert "func set_flashing_effects" in settings_text
+    assert '"accessibility"' in settings_text
+    assert 'name="FlashingEffectsOption"' in scene_text
+    assert "COMPLETS" in main_text
+    assert "RÉDUITS" in main_text
+    assert "DÉSACTIVÉS" in main_text
+    assert "func _apply_visual_settings" in main_text
+    assert "func _show_blackout_feedback" in main_text
+
+    reactive_scripts = (
+        ROOT / "scripts" / "show" / "stage_visual_controller.gd",
+        ROOT / "scripts" / "gameplay" / "bumper.gd",
+        ROOT / "scripts" / "gameplay" / "lane_trigger.gd",
+        ROOT / "scripts" / "gameplay" / "slingshot.gd",
+        ROOT / "scripts" / "show" / "ramp.gd",
+        ROOT / "scripts" / "show" / "rig_target.gd",
+    )
+    for script_path in reactive_scripts:
+        assert "func set_flashing_effects" in script_path.read_text(encoding="utf-8")
+
+    assert "_test_flashing_effects_accessibility" in runner_text
+    assert "Off mode suppresses the hit flash" in runner_text
+    assert "Off mode keeps the readable Sync clock contract" in runner_text
+
+
 def test_how_to_play_explains_the_complete_show_loop_visually():
     scene_text = MAIN_SCENE.read_text(encoding="utf-8")
     main_text = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")

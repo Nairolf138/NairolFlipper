@@ -32,13 +32,14 @@ func _run() -> void:
 	await _test_stagecraft_visual_language()
 	await _test_sync_bonus_integration()
 	await _test_audio_settings_menu()
+	await _test_flashing_effects_accessibility()
 	await _test_how_to_play_menu()
 	# Give the audio server and deferred frees time to release stream references.
 	await process_frame
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 18 passed")
+		print("Godot behavioral tests: 19 passed")
 		quit(0)
 		return
 
@@ -144,7 +145,9 @@ func _test_audio_settings_persistence() -> void:
 	settings.save_path = save_path
 	_expect(not settings.load_settings(), "Missing audio settings use safe defaults")
 	_expect_equal(settings.master_percent, 100.0, "Master defaults to 100 percent")
-	_expect(settings.set_audio_levels(65.0, 40.0, 0.0), "Audio settings can be persisted locally")
+	_expect_equal(settings.flashing_effects, &"full", "Flashing effects default to Full")
+	settings.set_audio_levels(65.0, 40.0, 0.0, false)
+	_expect(settings.set_flashing_effects(&"reduced"), "Audio and visual settings can be persisted locally")
 
 	var reloaded := SettingsStoreNode.new()
 	reloaded.save_path = save_path
@@ -152,13 +155,34 @@ func _test_audio_settings_persistence() -> void:
 	_expect_equal(reloaded.master_percent, 65.0, "Master volume survives a reload")
 	_expect_equal(reloaded.music_percent, 40.0, "Music volume survives a reload")
 	_expect_equal(reloaded.sfx_percent, 0.0, "Muted SFX survive a reload")
+	_expect_equal(reloaded.flashing_effects, &"reduced", "Reduced flashing survives a reload")
+	reloaded.set_flashing_effects(&"invalid", false)
+	_expect_equal(reloaded.flashing_effects, &"full", "Invalid flashing values fall back to Full")
 	_expect(is_equal_approx(SettingsStoreNode.percent_to_db(0.0), -60.0), "Zero percent maps to silence")
 	_expect(
 		is_equal_approx(SettingsStoreNode.percent_to_db(50.0), linear_to_db(0.5)),
 		"Percent levels use a perceptual audio conversion"
 	)
+	var legacy_file := FileAccess.open(save_path, FileAccess.WRITE)
+	_expect(legacy_file != null, "Legacy settings fixture can be written")
+	if legacy_file != null:
+		legacy_file.store_string(JSON.stringify({
+			"schema_version": 1,
+			"audio": {
+				"master_percent": 55.0,
+				"music_percent": 45.0,
+				"sfx_percent": 35.0,
+			},
+		}))
+		legacy_file.close()
+	var legacy := SettingsStoreNode.new()
+	legacy.save_path = save_path
+	_expect(legacy.load_settings(), "Version 1 audio settings remain compatible")
+	_expect_equal(legacy.master_percent, 55.0, "Legacy audio values survive the schema migration")
+	_expect_equal(legacy.flashing_effects, &"full", "Legacy saves receive the safe visual default")
 	settings.free()
 	reloaded.free()
+	legacy.free()
 	_remove_test_file(save_path)
 
 
@@ -753,7 +777,10 @@ func _test_audio_settings_menu() -> void:
 
 	_expect(main.settings_button.visible, "Audio settings are available from the main menu")
 	main._open_audio_settings()
-	_expect(main.settings_panel.visible and not main.start_menu.visible, "Audio settings open without leaving the menu")
+	_expect(
+		main.settings_panel.visible and not main.start_menu.visible,
+		"Audio settings open without leaving the menu"
+	)
 	main.master_slider.value = 65.0
 	main.music_slider.value = 40.0
 	main.sfx_slider.value = 20.0
@@ -776,6 +803,65 @@ func _test_audio_settings_menu() -> void:
 		is_equal_approx(main.audio_service.sfx_volume_db, SettingsStoreNode.percent_to_db(20.0)),
 		"Restart keeps the player's audio mix"
 	)
+
+	reloaded.free()
+	main.free()
+	await process_frame
+	_remove_test_file(save_path)
+
+
+func _test_flashing_effects_accessibility() -> void:
+	var save_path := "user://tests/flashing_effects_settings.json"
+	_remove_test_file(save_path)
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Main scene loads for flashing effects accessibility")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	main.get_node("SettingsStore").save_path = save_path
+	root.add_child(main)
+	await process_frame
+
+	_expect_equal(main.flashing_effects_option.item_count, 3, "Settings expose Full, Reduced and Off")
+	main._on_flashing_effects_selected(1)
+	_expect_equal(main.settings_store.flashing_effects, &"reduced", "Reduced mode applies immediately")
+	_expect_equal(main.stage_visuals.flashing_effects, &"reduced", "Stage visuals receive Reduced mode")
+	main.stage_visuals.trigger_hit(Color.WHITE)
+	_expect(main.stage_visuals.hit_flash <= 0.3, "Reduced mode limits the full-screen hit flash")
+
+	var visual_groups: Array[StringName] = [
+		&"score_bumpers",
+		&"show_ramps",
+		&"rig_targets",
+		&"table_lanes",
+		&"slingshots",
+	]
+	for group_name in visual_groups:
+		for visual_node in main.get_tree().get_nodes_in_group(group_name):
+			if visual_node.has_method("set_flashing_effects"):
+				_expect_equal(
+					visual_node.flashing_effects,
+					&"reduced",
+					"Reduced mode reaches each reactive playfield element"
+				)
+
+	main._show_blackout_feedback()
+	_expect(
+		main.blackout_overlay.visible and main.blackout_overlay.color.a <= 0.38,
+		"Reduced mode softens Blackout without removing its label"
+	)
+	main._on_flashing_effects_selected(2)
+	main.stage_visuals.trigger_hit(Color.WHITE)
+	_expect_equal(main.stage_visuals.hit_flash, 0.0, "Off mode suppresses the hit flash")
+	main._show_blackout_feedback()
+	_expect(not main.blackout_overlay.visible, "Off mode suppresses the full-screen Blackout")
+	_expect(main.stage_visuals.has_method("set_beat_position"), "Off mode keeps the readable Sync clock contract")
+
+	var reloaded := SettingsStoreNode.new()
+	reloaded.save_path = save_path
+	_expect(reloaded.load_settings(), "Flashing effects choice reloads from local storage")
+	_expect_equal(reloaded.flashing_effects, &"off", "Off mode survives a reload")
 
 	reloaded.free()
 	main.free()

@@ -2,7 +2,8 @@
 
 - Information importante jamais uniquement par couleur.
 - UI suffisamment grande.
-- Réduction des flashes.
+- Effets lumineux réglables sur `Complets`, `Réduits` ou `Désactivés`, avec
+  persistance locale.
 - Réduction du screen shake.
 - Master/Music/SFX séparés.
 - Réglages audio accessibles au tactile, exprimés en pourcentage et mémorisés
@@ -15,9 +16,16 @@
 
 ## Photosensibilité
 
-Réglage obligatoire avant release : `Flashing Effects: Full / Reduced / Off`.
+Le menu Réglages propose `Effets lumineux : Complets / Réduits / Désactivés`.
 
-Reduced/Off remplace les strobes rapides par glow, pulse ou changement de palette sans perdre d'information.
+- `Complets` conserve toute l'énergie scénique.
+- `Réduits` ralentit et atténue les pulsations, flashes d'impact, chases et
+  Blackout plein écran.
+- `Désactivés` supprime les flashes et les variations rapides. Les objectifs
+  restent signalés par texte, chevrons, taille fixe, état allumé et palette ;
+  l'horloge Sync conserve son pas actif sans pulsation.
+
+Le choix est sauvegardé dans `user://settings.json` et s'applique immédiatement.
 
 ## Motion
 

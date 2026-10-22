@@ -9,6 +9,10 @@ signal target_hit(
 	flow_value: int
 )
 
+const FLASHING_FULL: StringName = &"full"
+const FLASHING_REDUCED: StringName = &"reduced"
+const FLASHING_OFF: StringName = &"off"
+
 @export var family_id: StringName = &"front_wash"
 @export var display_name: String = "WASH"
 @export var score_value: int = 250
@@ -24,6 +28,7 @@ signal target_hit(
 var lit: bool = false
 var _armed: bool = true
 var _flash_tween: Tween
+var flashing_effects: StringName = FLASHING_FULL
 
 
 func _ready() -> void:
@@ -41,6 +46,13 @@ func reset() -> void:
 func set_lit(value: bool) -> void:
 	lit = value
 	_apply_visual_state()
+
+
+func set_flashing_effects(mode: StringName) -> void:
+	flashing_effects = mode if mode in [FLASHING_FULL, FLASHING_REDUCED, FLASHING_OFF] else FLASHING_FULL
+	if is_instance_valid(_flash_tween):
+		_flash_tween.kill()
+	core.modulate = Color.WHITE
 
 
 func _apply_visual_state() -> void:
@@ -64,6 +76,15 @@ func _on_body_entered(body: Node) -> void:
 func _flash() -> void:
 	if is_instance_valid(_flash_tween):
 		_flash_tween.kill()
-	core.modulate = Color(1.8, 1.8, 1.8, 1.0)
+	if flashing_effects == FLASHING_OFF:
+		core.modulate = Color.WHITE
+		return
+	var flash_energy := 1.2 if flashing_effects == FLASHING_REDUCED else 1.8
+	core.modulate = Color(flash_energy, flash_energy, flash_energy, 1.0)
 	_flash_tween = create_tween()
-	_flash_tween.tween_property(core, "modulate", Color.WHITE, 0.16)
+	_flash_tween.tween_property(
+		core,
+		"modulate",
+		Color.WHITE,
+		0.35 if flashing_effects == FLASHING_REDUCED else 0.16
+	)
