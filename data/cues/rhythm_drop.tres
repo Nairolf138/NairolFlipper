@@ -6,7 +6,7 @@
 script = ExtResource("1")
 cue_id = &"rhythm_drop"
 display_name = "RHYTHM DROP"
-objective_text = "RHYTHM BUMPERS x4"
+objective_text = "BUMPERS RYTHMIQUES x4"
 conditions = [&"bumper_hit"]
 condition_repetitions = 4
 bonus_points = 2000

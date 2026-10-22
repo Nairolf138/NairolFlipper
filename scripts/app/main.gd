@@ -171,14 +171,14 @@ func _physics_process(delta: float) -> void:
 	if ball.freeze or ball.drain_locked:
 		return
 	if _is_ball_outside_playfield(ball.global_position):
-		_recover_active_ball("BALL RECOVERED — TOUCH TOP")
+		_recover_active_ball("BILLE RÉCUPÉRÉE — TOUCHEZ EN HAUT")
 		return
 	if ball.linear_velocity.length() <= stuck_speed_threshold:
 		stalled_ball_time += delta
 	else:
 		stalled_ball_time = 0.0
 	if stalled_ball_time >= ball_recovery_delay:
-		_recover_active_ball("BALL RECOVERED — TOUCH TOP")
+		_recover_active_ball("BILLE RÉCUPÉRÉE — TOUCHEZ EN HAUT")
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -218,7 +218,7 @@ func start_game() -> void:
 	game_controls.show()
 	cue_progress_label.show()
 	restart_game()
-	status_label.text = "BALL 1 / %d — TOUCH TOP TO LAUNCH" % balls.size()
+	status_label.text = "BILLE 1 / %d — TOUCHEZ EN HAUT POUR LANCER" % balls.size()
 
 
 func _show_start_menu() -> void:
@@ -260,7 +260,7 @@ func _show_game_over() -> void:
 	blackout_overlay.hide()
 	final_show_label.hide()
 	sync_feedback_label.hide()
-	status_label.text = "GAME OVER"
+	status_label.text = "PARTIE TERMINÉE"
 
 
 func _on_reset_pressed() -> void:
@@ -268,7 +268,7 @@ func _on_reset_pressed() -> void:
 		return
 	playtest_recorder.record_restart()
 	restart_game()
-	status_label.text = "BALL 1 / %d — TOUCH TOP TO LAUNCH" % balls.size()
+	status_label.text = "BILLE 1 / %d — TOUCHEZ EN HAUT POUR LANCER" % balls.size()
 
 
 func _on_quit_pressed() -> void:
@@ -357,7 +357,7 @@ func _apply_visual_settings() -> void:
 
 
 func _update_audio_value_labels() -> void:
-	master_value_label.text = "MASTER  %d%%" % roundi(master_slider.value)
+	master_value_label.text = "GÉNÉRAL  %d%%" % roundi(master_slider.value)
 	music_value_label.text = "MUSIQUE  %d%%" % roundi(music_slider.value)
 	sfx_value_label.text = "EFFETS  %d%%" % roundi(sfx_slider.value)
 
@@ -442,7 +442,7 @@ func _on_ramp_completed(ramp_id: StringName, score_value: int, flow_value: int) 
 	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
 	cue_manager.add_condition(ramp_id)
-	status_label.text = "CUE READY — HIT CONSOLE" if cue_manager.current_cue_ready() else "RAMP HIT"
+	status_label.text = "CUE PRÊTE — VISEZ LA CONSOLE" if cue_manager.current_cue_ready() else "RAMPE TOUCHÉE"
 	audio_service.request_sfx(&"ramp")
 	stage_visuals.trigger_hit(Color("ffb14a") if ramp_id == &"warm_ramp" else Color("00e5ff"))
 	_register_sync_hit()
@@ -466,10 +466,10 @@ func _on_rig_target_hit(
 			_add_score_with_flow(1500)
 			flow_manager.add_flow(200)
 			if not _try_arm_final_show():
-				status_label.text = "RIG READY — COMPLETE CUE STACK"
+				status_label.text = "RIG PRÊT — TERMINEZ LA CUE STACK"
 			audio_service.request_sfx(&"cue")
 		else:
-			status_label.text = "%s ONLINE — %d / 6" % [display_name.to_upper(), active_count]
+			status_label.text = "%s ACTIF — %d / 6" % [display_name.to_upper(), active_count]
 	_update_rig_progress()
 	_register_sync_hit()
 
@@ -484,7 +484,7 @@ func _on_lane_completed(
 	flow_manager.add_flow(flow_value)
 	cue_manager.add_condition(lane_id)
 	status_label.text = (
-		"CUE READY — HIT CONSOLE"
+		"CUE PRÊTE — VISEZ LA CONSOLE"
 		if cue_manager.current_cue_ready()
 		else "%s +%d" % [display_name.to_upper(), score_value]
 	)
@@ -532,12 +532,12 @@ func _on_scoop_completed(_scoop_id: StringName, score_value: int, flow_value: in
 	if cue_manager.start_current_cue():
 		return
 	if cue_manager.active_cue != null:
-		status_label.text = "CUE RUNNING"
+		status_label.text = "CUE EN COURS"
 	elif cue_manager.is_stack_completed():
-		status_label.text = "CUE STACK READY — COMPLETE RIG"
+		status_label.text = "CUE STACK PRÊTE — COMPLÉTEZ LE RIG"
 	else:
 		var cue = cue_manager.current_cue()
-		status_label.text = "CUE INCOMPLETE — %s" % cue.objective_text
+		status_label.text = "CUE INCOMPLÈTE — %s" % cue.objective_text
 
 
 func _on_cue_started(_cue_id: StringName) -> void:
@@ -551,7 +551,7 @@ func _on_cue_started(_cue_id: StringName) -> void:
 
 
 func _on_cue_completed(_cue_id: StringName) -> void:
-	status_label.text = "CUE COMPLETE"
+	status_label.text = "CUE TERMINÉE"
 	stage_visuals.trigger_hit(Color("7c4dff"))
 
 
@@ -564,7 +564,7 @@ func _on_cue_stack_progress_changed(
 	required_shots: int,
 	ready: bool
 ) -> void:
-	var instruction := "HIT CONSOLE" if ready else objective_text
+	var instruction := "VISEZ LA CONSOLE" if ready else objective_text
 	cue_progress_label.text = "CUE %d / %d  •  %s\n%s  %d / %d" % [
 		cue_number,
 		total_cues,
@@ -574,16 +574,16 @@ func _on_cue_stack_progress_changed(
 		required_shots,
 	]
 	if ready:
-		status_label.text = "CUE READY — HIT CONSOLE"
+		status_label.text = "CUE PRÊTE — VISEZ LA CONSOLE"
 	_update_cue_shot_highlights()
 
 
 func _on_cue_stack_completed() -> void:
 	var cue_count := cue_manager.cues.size()
-	cue_progress_label.text = "CUE STACK  %d / %d  •  COMPLETE" % [cue_count, cue_count]
+	cue_progress_label.text = "CUE STACK  %d / %d  •  TERMINÉE" % [cue_count, cue_count]
 	_update_cue_shot_highlights()
 	if not _try_arm_final_show():
-		status_label.text = "CUE STACK READY — COMPLETE RIG"
+		status_label.text = "CUE STACK PRÊTE — COMPLÉTEZ LE RIG"
 
 
 func _try_arm_final_show() -> bool:
@@ -594,7 +594,7 @@ func _try_arm_final_show() -> bool:
 		return true
 	if not show_flow.arm_final_show():
 		return false
-	status_label.text = "FINAL SHOW ARMED — HIT CONSOLE"
+	status_label.text = "FINAL SHOW ARMÉ — VISEZ LA CONSOLE"
 	audio_service.request_sfx(&"cue")
 	return true
 
@@ -730,7 +730,7 @@ func _start_final_show() -> void:
 	show_generation += 1
 	var generation := show_generation
 	stalled_ball_time = 0.0
-	final_show_label.text = "FINAL SHOW  •  3 BALLS  •  SCORE x%d" % show_flow.final_show_score_multiplier
+	final_show_label.text = "FINAL SHOW  •  3 BILLES  •  SCORE x%d" % show_flow.final_show_score_multiplier
 	cue_progress_label.hide()
 	final_show_label.show()
 	blackout_overlay.hide()
@@ -751,14 +751,14 @@ func _start_final_show() -> void:
 		ball.freeze = false
 		ball.apply_central_impulse(launch_directions[index].normalized() * ball.launch_force)
 	active_ball_index = 0
-	status_label.text = "FINAL SHOW — KEEP 2+ BALLS ALIVE"
+	status_label.text = "FINAL SHOW — GARDEZ AU MOINS 2 BILLES"
 	_run_final_show_timer(generation)
 
 
 func _run_final_show_timer(generation: int) -> void:
 	await get_tree().create_timer(show_flow.final_show_duration).timeout
 	if generation == show_generation and multiball_active:
-		_finish_final_show("FINAL SHOW COMPLETE")
+		_finish_final_show("FINAL SHOW TERMINÉ")
 
 
 func _active_multiball_balls() -> Array[Node]:
@@ -772,9 +772,9 @@ func _active_multiball_balls() -> Array[Node]:
 func _on_multiball_ball_drained(_ball: RigidBody2D) -> void:
 	var active := _active_multiball_balls()
 	if active.size() <= 1:
-		_finish_final_show("FINAL SHOW COMPLETE")
+		_finish_final_show("FINAL SHOW TERMINÉ")
 	else:
-		status_label.text = "FINAL SHOW — %d BALLS" % active.size()
+		status_label.text = "FINAL SHOW — %d BILLES" % active.size()
 
 
 func _finish_final_show(message: String) -> void:
@@ -823,9 +823,9 @@ func _run_blackout_timer(generation: int) -> void:
 	blackout_overlay.hide()
 	show_flow.finish_blackout()
 	if session_state == SessionState.READY:
-		status_label.text = "SHOW COMPLETE — TOUCH TOP"
+		status_label.text = "SHOW TERMINÉ — TOUCHEZ EN HAUT"
 	else:
-		status_label.text = "SHOW COMPLETE — KEEP PLAYING"
+		status_label.text = "SHOW TERMINÉ — CONTINUEZ"
 
 
 func _on_score_changed(new_score: int) -> void:
@@ -865,7 +865,7 @@ func _resolve_ball_drain(body: Node) -> void:
 		body.reset_ball(body.spawn_position, false)
 		session_state = SessionState.READY
 		stalled_ball_time = 0.0
-		status_label.text = "SAFETY — SAME BALL — TOUCH TOP"
+		status_label.text = "SAFETY — MÊME BILLE — TOUCHEZ EN HAUT"
 		return
 	playtest_recorder.record_drain()
 	audio_service.request_sfx(&"drain")
@@ -890,13 +890,13 @@ func _on_ball_drained(ball: RigidBody2D) -> void:
 		_show_game_over()
 		return
 	active_ball_index = balls.size() - remaining_balls
-	status_label.text = "BALL %d / %d" % [active_ball_index + 1, balls.size()]
+	status_label.text = "BILLE %d / %d" % [active_ball_index + 1, balls.size()]
 	var generation := session_generation
 	await get_tree().create_timer(respawn_delay).timeout
 	if generation == session_generation and session_state == SessionState.RESPAWNING:
 		balls[active_ball_index].reset_ball(balls[active_ball_index].spawn_position)
 		session_state = SessionState.READY
-		status_label.text = "BALL %d / %d — TOUCH TOP" % [active_ball_index + 1, balls.size()]
+		status_label.text = "BILLE %d / %d — TOUCHEZ EN HAUT" % [active_ball_index + 1, balls.size()]
 
 
 func restart_game() -> void:
@@ -937,7 +937,7 @@ func restart_game() -> void:
 	_update_rig_progress()
 	_deactivate_all_balls()
 	balls[active_ball_index].reset_ball(balls[active_ball_index].spawn_position)
-	status_label.text = "BALL 1 / %d" % balls.size()
+	status_label.text = "BILLE 1 / %d" % balls.size()
 	if gameplay_active:
 		audio_service.start_transport()
 		_update_stage_identity()

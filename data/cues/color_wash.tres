@@ -6,7 +6,7 @@
 script = ExtResource("1")
 cue_id = &"color_wash"
 display_name = "COLOR WASH"
-objective_text = "WARM + COLD RAMPS"
+objective_text = "RAMPES WARM + COLD"
 conditions = [&"warm_ramp", &"cold_ramp"]
 bonus_points = 1000
 duration_seconds = 1.2

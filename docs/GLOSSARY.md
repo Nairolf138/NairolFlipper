@@ -4,7 +4,7 @@
 - **Show** : séquence audiovisuelle construite pendant une partie.
 - **Showflow** : progression dramaturgique globale.
 - **Rig** : ensemble des familles lumineuses progressées.
-- **Fixture Family** : Face, Wash, Beam, Gobo, Strobe, Blinder.
+- **Fixture Family** : Face, Wash, Beam, Pixel, Blinder, Pratique.
 - **Cue** : étape de conduite structurée.
 - **Cue Stack** : suite de cues.
 - **Flow** : multiplicateur d'enchaînement.

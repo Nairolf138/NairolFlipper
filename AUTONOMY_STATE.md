@@ -3,17 +3,17 @@
 ## Dernière exécution
 
 - Date : 2026-10-22
-- Cycle : T047 — Effets lumineux accessibles
-- Statut : 41 contrats Python et 19 groupes Godot préparés, build CI à valider
+- Cycle : T048 — Stabilisation Alpha 0.1.0
+- Statut : 42 contrats Python et 20 groupes Godot préparés, build CI à valider
 
 ## Dépôt
 
-- Branche : `feat/reduced-flashes`
-- Base : `532e262` (fusion de la PR #27 sur `origin/main`)
-- Validation : modes Complets/Réduits/Désactivés persistants et propagation aux effets du plateau ; CI à exécuter
+- Branche : `feat/alpha-1-polish`
+- Base : `08c1b1b` (fusion de la PR #28 sur `origin/main`)
+- Validation : version Alpha cohérente, textes joueur harmonisés et parcours complet automatisé ; CI à exécuter
 - CI de la branche : à valider par la pull request
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` auditée : `532e262`
+- Branche `main` auditée : `08c1b1b`
 
 ## État actuel
 
@@ -193,16 +193,16 @@ T012 complète le premier filet de livraison cross-platform :
 
 - `export_presets.cfg` avec presets Web, Android debug et Windows Desktop.
 - `.github/workflows/godot.yml` avec import propre, tests comportementaux, smoke et exports P0.
-- `tests/test_bootstrap.py` avec 41 contrats de structure.
-- `tests/godot/test_runner.gd` avec 19 groupes de validations comportementales.
+- `tests/test_bootstrap.py` avec 42 contrats de structure.
+- `tests/godot/test_runner.gd` avec 20 groupes de validations comportementales.
 - `docs/BACKLOG.md` mis à jour.
 - Ce journal `AUTONOMY_STATE.md`.
 
 ## Prochaine exécution
 
-Faire valider sur tablette les modes Réduits/Désactivés, la lisibilité du panneau
-Réglages et la conservation du choix après relance. Ensuite, préparer la revue
-des textes et le parcours complet de non-régression de l'Alpha 1.0.
+Installer l'APK Alpha candidate sur tablette et rejouer le parcours complet :
+menu, Réglages, How to Play, trois billes, Rig, Cue Stack, Final Show, Blackout
+et fin de partie. Relever séparément tout défaut bloquant l'Alpha 0.1.0.
 
 ### T045 — Réglages audio persistants
 

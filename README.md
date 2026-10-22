@@ -103,12 +103,12 @@ La première étape de développement est définie dans [`docs/BACKLOG.md`](docs
 
 ## État
 
-**Pré-alpha jouable / préparation de l'Alpha 1.0.**
+**Candidate Alpha 0.1.0 (`0.1.0-alpha.1`).**
 
 Le prototype dispose désormais d'une partie à trois billes, d'une Cue Stack, du
 Rig en six familles, du Final Show multiball, d'une musique en stems et d'une
 première identité visuelle Stagecraft. Les builds Web, Android et Windows servent
-à affiner le plateau avant le jalon Alpha 1.0.
+maintenant à valider le parcours complet avant la publication de l'Alpha 0.1.0.
 
 ## Licence
 
