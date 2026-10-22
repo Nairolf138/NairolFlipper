@@ -38,15 +38,24 @@ Main Menu
 └── Quit (desktop only)
 ```
 
-Le menu de playtest fournit Play, Quit et un premier écran Settings dédié à
-l'audio. Trois sliders tactiles règlent Master, Musique et Effets de 0 à 100 %,
-avec application immédiate, retour aux valeurs par défaut et sauvegarde locale.
-How to Play, Graphics, Controls, Accessibility et Credits restent à compléter
-dans l'interface finale.
+Le menu de playtest fournit Play, How to Play, Quit et un premier écran Settings
+dédié à l'audio. Trois sliders tactiles règlent Master, Musique et Effets de 0 à
+100 %, avec application immédiate, retour aux valeurs par défaut et sauvegarde
+locale. Graphics, Controls, Accessibility et Credits restent à compléter dans
+l'interface finale.
 
 ## Tutoriel
 
-Toucher gauche/droite, lancer, montrer un objectif, laisser jouer.
+Le guide accessible depuis le menu tient en quatre pages illustrées :
+
+1. lancer dans la zone haute et contrôler les flippers dans les zones basses ;
+2. toucher les six familles pour construire le Rig ;
+3. suivre les tirs demandés puis passer par la Console pour exécuter les Cues ;
+4. compléter Rig + Cue Stack et déclencher le Final Show.
+
+Chaque page contient une seule intention, un schéma vectoriel du plateau et un
+objectif court. La navigation fonctionne au tactile, au clavier et à la manette,
+et quitter le guide ne démarre jamais implicitement une partie.
 
 ## Feedback
 

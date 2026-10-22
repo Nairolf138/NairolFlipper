@@ -32,12 +32,13 @@ func _run() -> void:
 	await _test_stagecraft_visual_language()
 	await _test_sync_bonus_integration()
 	await _test_audio_settings_menu()
+	await _test_how_to_play_menu()
 	# Give the audio server and deferred frees time to release stream references.
 	await process_frame
 	await process_frame
 
 	if _failures.is_empty():
-		print("Godot behavioral tests: 17 passed")
+		print("Godot behavioral tests: 18 passed")
 		quit(0)
 		return
 
@@ -780,6 +781,41 @@ func _test_audio_settings_menu() -> void:
 	main.free()
 	await process_frame
 	_remove_test_file(save_path)
+
+
+func _test_how_to_play_menu() -> void:
+	var packed_scene := load("res://scenes/app/Main.tscn") as PackedScene
+	_expect(packed_scene != null, "Main scene loads for How to Play")
+	if packed_scene == null:
+		return
+
+	var main := packed_scene.instantiate()
+	root.add_child(main)
+	await process_frame
+
+	_expect(main.how_to_play_button.visible, "How to Play is available from the main menu")
+	main._open_how_to_play()
+	var panel = main.how_to_play_panel
+	_expect(panel.visible and not main.start_menu.visible, "How to Play opens above the main menu")
+	_expect(not main.gameplay_active, "Opening the guide never starts gameplay")
+	_expect_equal(panel.current_page, 0, "The guide always opens on controls")
+	_expect(panel.previous_button.disabled, "The first page cannot navigate backward")
+	_expect_equal(panel.diagram.page, 0, "The controls diagram matches the first page")
+
+	panel.show_next_page()
+	_expect("RIG" in panel.title_label.text, "The second page explains the Rig")
+	panel.show_next_page()
+	_expect("CUES" in panel.title_label.text, "The third page explains the Cue Stack")
+	panel.show_next_page()
+	_expect("FINAL SHOW" in panel.title_label.text, "The fourth page explains the Final Show")
+	_expect_equal(panel.next_button.text, "TERMINER", "The final action clearly closes the guide")
+	_expect_equal(panel.diagram.page, 3, "The Final Show diagram matches the final page")
+	panel.show_next_page()
+	_expect(not panel.visible and main.start_menu.visible, "Finishing the guide returns to the menu")
+	_expect(not main.gameplay_active, "Closing the guide still leaves gameplay stopped")
+
+	main.free()
+	await process_frame
 
 
 func _complete_cue_stack(main: Node) -> void:

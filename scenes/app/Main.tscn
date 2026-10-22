@@ -1,4 +1,4 @@
-[gd_scene load_steps=45 format=3]
+[gd_scene load_steps=46 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Ball.tscn" id="1_ball"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Flipper.tscn" id="2_flipper"]
@@ -37,6 +37,7 @@
 [ext_resource type="Theme" path="res://data/ui/StageTheme.tres" id="34_stage_theme"]
 [ext_resource type="Script" path="res://scripts/show/sync_bonus_manager.gd" id="35_sync_bonus"]
 [ext_resource type="Script" path="res://scripts/app/settings_store.gd" id="36_settings"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HowToPlayPanel.tscn" id="37_how_to_play"]
 
 [sub_resource type="RectangleShape2D" id="LeftWallShape"]
 size = Vector2(40, 1840)
@@ -505,9 +506,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -340.0
-offset_top = -370.0
+offset_top = -420.0
 offset_right = 340.0
-offset_bottom = 370.0
+offset_bottom = 420.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 24
@@ -542,6 +543,12 @@ custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 theme_override_font_sizes/font_size = 34
 text = "JOUER"
+
+[node name="HowToPlayButton" type="Button" parent="Interface/StartOverlay/Menu"]
+custom_minimum_size = Vector2(0, 82)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "COMMENT JOUER"
 
 [node name="SettingsButton" type="Button" parent="Interface/StartOverlay/Menu"]
 custom_minimum_size = Vector2(0, 82)
@@ -663,6 +670,8 @@ custom_minimum_size = Vector2(0, 82)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "RETOUR"
+
+[node name="HowToPlayPanel" parent="Interface/StartOverlay" instance=ExtResource("37_how_to_play")]
 
 [node name="GameOverOverlay" type="ColorRect" parent="Interface"]
 visible = false

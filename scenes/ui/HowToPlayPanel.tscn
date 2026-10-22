@@ -1,0 +1,105 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/how_to_play_panel.gd" id="1_panel"]
+[ext_resource type="Script" path="res://scripts/ui/how_to_play_diagram.gd" id="2_diagram"]
+[ext_resource type="Theme" path="res://data/ui/StageTheme.tres" id="3_theme"]
+
+[node name="HowToPlayPanel" type="ColorRect"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_theme")
+color = Color(0.008, 0.015, 0.03, 0.985)
+script = ExtResource("1_panel")
+
+[node name="Menu" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -730.0
+offset_right = 400.0
+offset_bottom = 730.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 22
+alignment = 1
+
+[node name="Eyebrow" type="Label" parent="Menu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.898, 1, 0.9)
+theme_override_font_sizes/font_size = 21
+text = "GUIDE RAPIDE  //  1 / 4"
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Menu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 45
+text = "LANCEZ ET JOUEZ"
+horizontal_alignment = 1
+
+[node name="Diagram" type="Control" parent="Menu"]
+custom_minimum_size = Vector2(0, 570)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("2_diagram")
+
+[node name="Body" type="Label" parent="Menu"]
+custom_minimum_size = Vector2(0, 135)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.965, 1, 1)
+theme_override_font_sizes/font_size = 26
+text = "Touchez la zone haute pour lancer la bille. Maintenez le bas gauche ou droit pour actionner chaque flipper."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Objective" type="Label" parent="Menu"]
+custom_minimum_size = Vector2(0, 105)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.36, 1, 0.68, 1)
+theme_override_font_sizes/font_size = 22
+text = "OBJECTIF  •  Gardez la bille en jeu et visez les éléments éclairés."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Progress" type="Label" parent="Menu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.169, 0.839, 1)
+theme_override_font_sizes/font_size = 30
+text = "●  ○  ○  ○"
+horizontal_alignment = 1
+
+[node name="Navigation" type="HBoxContainer" parent="Menu"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="PreviousButton" type="Button" parent="Menu/Navigation"]
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+disabled = true
+text = "PRÉCÉDENT"
+
+[node name="NextButton" type="Button" parent="Menu/Navigation"]
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "SUIVANT"
+
+[node name="BackButton" type="Button" parent="Menu"]
+custom_minimum_size = Vector2(0, 82)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "RETOUR AU MENU"

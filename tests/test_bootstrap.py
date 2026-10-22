@@ -736,3 +736,28 @@ def test_audio_settings_are_accessible_persistent_and_platform_local():
     assert "audio_service.set_mix" in main_text
     assert "_test_audio_settings_persistence" in runner_text
     assert "_test_audio_settings_menu" in runner_text
+
+
+def test_how_to_play_explains_the_complete_show_loop_visually():
+    scene_text = MAIN_SCENE.read_text(encoding="utf-8")
+    main_text = (ROOT / "scripts" / "app" / "main.gd").read_text(encoding="utf-8")
+    panel_scene = ROOT / "scenes" / "ui" / "HowToPlayPanel.tscn"
+    panel_script = ROOT / "scripts" / "ui" / "how_to_play_panel.gd"
+    diagram_script = ROOT / "scripts" / "ui" / "how_to_play_diagram.gd"
+    runner_text = (ROOT / "tests" / "godot" / "test_runner.gd").read_text(encoding="utf-8")
+
+    for path in (panel_scene, panel_script, diagram_script):
+        assert path.is_file()
+    assert 'name="HowToPlayButton"' in scene_text
+    assert 'name="HowToPlayPanel"' in scene_text
+    assert "func _open_how_to_play" in main_text
+    assert "func _close_how_to_play" in main_text
+    panel_text = panel_script.read_text(encoding="utf-8")
+    for concept in ("LANCEZ ET JOUEZ", "CONSTRUISEZ LE RIG", "EXÉCUTEZ LES CUES", "LANCEZ LE FINAL SHOW"):
+        assert concept in panel_text
+    assert "const PAGES: Array[Dictionary]" in panel_text
+    assert "func show_next_page" in panel_text
+    diagram_text = diagram_script.read_text(encoding="utf-8")
+    for drawing_method in ("_draw_controls", "_draw_rig", "_draw_cues", "_draw_final_show"):
+        assert drawing_method in diagram_text
+    assert "_test_how_to_play_menu" in runner_text

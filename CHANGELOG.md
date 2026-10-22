@@ -38,6 +38,8 @@
   comparer les futurs playtests sans télémétrie réseau.
 - Menu de réglages audio Master/Musique/Effets, avec application immédiate,
   valeurs par défaut et persistance locale multiplateforme.
+- Guide How to Play en quatre pages illustrées pour les commandes, le Rig, la
+  Cue Stack et le Final Show, navigable au tactile, au clavier et à la manette.
 
 ### Fixed
 
