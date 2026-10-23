@@ -1,4 +1,4 @@
-[gd_scene load_steps=48 format=3]
+[gd_scene load_steps=51 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Ball.tscn" id="1_ball"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/Flipper.tscn" id="2_flipper"]
@@ -38,6 +38,9 @@
 [ext_resource type="Script" path="res://scripts/show/sync_bonus_manager.gd" id="35_sync_bonus"]
 [ext_resource type="Script" path="res://scripts/app/settings_store.gd" id="36_settings"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HowToPlayPanel.tscn" id="37_how_to_play"]
+[ext_resource type="Resource" path="res://data/routes/WarmRoute.tres" id="40_warm_route"]
+[ext_resource type="Resource" path="res://data/routes/ColdRoute.tres" id="41_cold_route"]
+[ext_resource type="Resource" path="res://data/routes/OrbitRoute.tres" id="42_orbit_route"]
 [ext_resource type="Script" path="res://scripts/gameplay/rail_path.gd" id="38_rail_path"]
 [ext_resource type="PhysicsMaterial" path="res://data/tuning/LaunchGuideMaterial.tres" id="39_launch_surface"]
 
@@ -298,14 +301,17 @@ display_name = "UNIVERSE ORBIT"
 score_value = 600
 flow_value = 90
 lane_color = Color(0.52, 0.4, 1, 1)
+route_definition = ExtResource("42_orbit_route")
 
 [node name="WarmRamp" parent="." instance=ExtResource("19_ramp")]
-position = Vector2(250, 1080)
+position = Vector2(350, 1080)
 definition = ExtResource("20_warm_ramp")
+route_definition = ExtResource("40_warm_route")
 
 [node name="ColdRamp" parent="." instance=ExtResource("19_ramp")]
-position = Vector2(830, 1080)
+position = Vector2(730, 1080)
 definition = ExtResource("21_cold_ramp")
+route_definition = ExtResource("41_cold_route")
 
 [node name="ConsoleScoop" parent="." instance=ExtResource("22_console_scoop")]
 position = Vector2(540, 1285)

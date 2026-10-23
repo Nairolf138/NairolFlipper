@@ -461,7 +461,7 @@ func _on_ramp_completed(ramp_id: StringName, score_value: int, flow_value: int) 
 	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
 	cue_manager.add_condition(ramp_id)
-	status_label.text = "CUE PRÊTE — VISEZ LA CONSOLE" if cue_manager.current_cue_ready() else "RAMPE TOUCHÉE"
+	status_label.text = "CUE PRÊTE — VISEZ LA CONSOLE" if cue_manager.current_cue_ready() else "RAMPE TERMINÉE"
 	audio_service.request_sfx(&"ramp")
 	stage_visuals.trigger_hit(Color("ffb14a") if ramp_id == &"warm_ramp" else Color("00e5ff"))
 	_register_sync_hit()

@@ -19,6 +19,11 @@ libre et habillage encore abstrait.
 Chaque étape demande son playtest avant de conclure sur la jouabilité. Les
 tests de règles par appels directs ne remplacent pas ces observations.
 
+PR 30 à 32 implémentées : la PR 32 couvre les parcours sur de vrais corps Godot,
+dont des tirs de flipper, les retours, les demi-tours et le multiball. Les plans
+logiques restent une approximation de hauteur 2D. La prochaine étape est la
+refonte artistique PR 33 ; la qualification Alpha demande toujours le playtest.
+
 ## M0 — Repository Ready
 
 Cadrage présent, projet Godot ouvrable, conventions, backlog.

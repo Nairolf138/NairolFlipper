@@ -21,7 +21,7 @@ const PAGES: Array[Dictionary] = [
 	{
 		"eyebrow": "GUIDE RAPIDE  //  3 / 4",
 		"title": "EXÉCUTEZ LES CUES",
-		"body": "Suivez la route mise en évidence, réalisez les tirs demandés, puis envoyez la bille dans la Console pour jouer la Cue.",
+		"body": "Suivez le parcours éclairé jusqu’à sa sortie : une entrée ou un demi-tour ne suffit pas. Après les tirs demandés, visez la Console pour jouer la Cue.",
 		"objective": "OBJECTIF  •  Terminez les trois étapes de la CUE STACK.",
 	},
 	{

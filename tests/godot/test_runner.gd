@@ -17,6 +17,18 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	if "--scan-routes" in OS.get_cmdline_user_args():
+		for action in [&"flipper_left", &"flipper_right"]:
+			for distance in range(75, 166, 5):
+				print("AIM ", action, " ", distance, " ", await _sample_cradle_shot(action, float(distance), true))
+		quit(0)
+		return
+	if "--routes-only" in OS.get_cmdline_user_args():
+		await _test_physical_routes()
+		await _test_route_isolation_and_lifecycle()
+		await _test_routes_from_flippers()
+		_finish()
+		return
 	_test_flow_decay_and_multiplier()
 	_test_cue_stack_progression()
 	_test_show_flow_state_machine()
@@ -41,12 +53,19 @@ func _run() -> void:
 	await _test_flipper_return_control()
 	await _test_rolling_dynamics()
 	await _test_flipper_motor_and_cradle_shots()
+	await _test_physical_routes()
+	await _test_route_isolation_and_lifecycle()
+	await _test_routes_from_flippers()
 	# Give the audio server and deferred frees time to release stream references.
 	await process_frame
 	await process_frame
 
+	_finish()
+
+
+func _finish() -> void:
 	if _failures.is_empty():
-		print("Godot behavioral tests: 24 passed")
+		print("Godot behavioral tests: %s passed" % ("routes" if "--routes-only" in OS.get_cmdline_user_args() else "27"))
 		quit(0)
 		return
 
@@ -54,6 +73,216 @@ func _run() -> void:
 		printerr("FAILED: %s" % failure)
 	printerr("Godot behavioral tests: %d failure(s)" % _failures.size())
 	quit(1)
+
+
+func _test_physical_routes() -> void:
+	for route_name in ["WarmRamp", "ColdRamp", "UniverseOrbit"]:
+		var directions := [1, -1] if route_name == "UniverseOrbit" else [1]
+		for direction in directions:
+			var speeds := [1800.0, 2000.0] if route_name == "UniverseOrbit" else [1700.0, 2100.0]
+			for speed in speeds:
+				var result := await _sample_physical_route(route_name, direction, speed)
+				_expect(result.entered and result.contacted, "Real ball enters and contacts route rails (%s/%d/%.0f): %s" % [route_name, direction, speed, result])
+				_expect_equal(result.completed, 1, "Complete route awards exactly once (%s/%d/%.0f): %s" % [route_name, direction, speed, result])
+				_expect(result.restored and not result.recovered, "Route exit restores the deck without a safety recovery (%s): %s" % [route_name, result])
+				_expect(result.returned, "Route output can be played back with a real flipper (%s/%d): %s" % [route_name, direction, result])
+	for route_name in ["WarmRamp", "ColdRamp"]:
+		var weak := await _sample_physical_route(route_name, 1, 650.0, false)
+		_expect(weak.entered and weak.rolled_back and not weak.recovered, "Weak ramp shot rolls back through its mouth (%s): %s" % [route_name, weak])
+		_expect_equal(weak.completed, 0, "An incomplete ramp cannot advance a cue (%s)" % route_name)
+
+
+func _sample_physical_route(route_name: String, direction: int, speed: float, play_return: bool = true) -> Dictionary:
+	Input.action_release(&"flipper_left")
+	Input.action_release(&"flipper_right")
+	var scene := load("res://scenes/app/Main.tscn") as PackedScene
+	var main := scene.instantiate()
+	main.ball_recovery_delay = 60.0
+	root.add_child(main)
+	await physics_frame
+	main.start_game()
+	main.session_state = MainNode.SessionState.PLAYING
+	var route: Node2D = main.get_node(route_name + "/PhysicalRoute")
+	var line: PackedVector2Array = route.centerline
+	var endpoint: int = route.entry_index if direction == 1 else route.reverse_entry_index
+	var tangent: Vector2 = route._endpoint_tangent(endpoint) * float(direction)
+	var ball: RigidBody2D = main.balls[0]
+	var start := route.to_global(line[endpoint]) - tangent * 80.0
+	ball.reset_ball(start, false)
+	await physics_frame
+	await physics_frame
+	ball.launch_ready = false
+	ball.ball_save_used = true
+	ball.freeze = false
+	ball.linear_velocity = tangent * speed
+	var counts := {"completed": 0}
+	route.traversed.connect(func(_ball: RigidBody2D) -> void: counts.completed += 1)
+	var entered := false
+	var contacted := false
+	var rolled_back := false
+	var restored := false
+	var recovered := false
+	# A repeatable ramp return can be anticipated, caught, then replayed.
+	var output_index := line.size() - 1 if direction == 1 else 0
+	var output_action: StringName = &"flipper_left" if route.to_global(line[output_index]).x < 540.0 else &"flipper_right"
+	if play_return:
+		Input.action_press(output_action)
+	for frame in 1200:
+		await physics_frame
+		entered = entered or ball.route_owner == route
+		if ball.route_owner == route:
+			for body in ball.get_colliding_bodies():
+				if body.get_parent() == route:
+					contacted = true
+		if "--trace-routes" in OS.get_cmdline_user_args() and frame % 60 == 0:
+			print("ROUTE ", route_name, " ", direction, " ", speed, " f=", frame, " p=", ball.global_position, " v=", ball.linear_velocity, " riding=", ball.route_owner == route, " count=", counts.completed)
+		if entered and ball.route_owner == null:
+			rolled_back = counts.completed == 0
+			recovered = ball.launch_ready or ball.freeze
+			restored = ball.collision_layer == 1 and ball.collision_mask == 1 and ball.z_index == 0
+			break
+	var returned := false
+	if play_return and counts.completed == 1:
+		var played := await _play_physical_return(main, ball, &"", 1200)
+		returned = played.returned
+	var result := {"entered": entered, "contacted": contacted, "completed": counts.completed, "restored": restored, "rolled_back": rolled_back, "returned": returned, "recovered": recovered, "end": ball.global_position}
+	Input.action_release(&"flipper_left")
+	Input.action_release(&"flipper_right")
+	main.free()
+	await process_frame
+	return result
+
+
+func _test_route_isolation_and_lifecycle() -> void:
+	var scene := load("res://scenes/app/Main.tscn") as PackedScene
+	var main := scene.instantiate()
+	main.ball_recovery_delay = 60.0
+	root.add_child(main)
+	await physics_frame
+	main.start_game()
+	main.session_state = MainNode.SessionState.PLAYING
+	var warm: Node2D = main.get_node("WarmRamp/PhysicalRoute")
+	var cold: Node2D = main.get_node("ColdRamp/PhysicalRoute")
+	var counts := {"warm": 0, "cold": 0, "orbit": 0}
+	var completed_balls: Array[int] = []
+	warm.traversed.connect(func(_ball: RigidBody2D) -> void: counts.warm += 1)
+	warm.traversed.connect(func(rider: RigidBody2D) -> void: completed_balls.append(rider.get_instance_id()))
+	cold.traversed.connect(func(_ball: RigidBody2D) -> void: counts.cold += 1)
+	main.get_node("UniverseOrbit/PhysicalRoute").traversed.connect(func(_ball: RigidBody2D) -> void: counts.orbit += 1)
+	var ball: RigidBody2D = main.balls[0]
+	# Cross under a raised track, without ever passing its entry gate.
+	ball.reset_ball(Vector2(270, 930), false)
+	await physics_frame
+	await physics_frame
+	ball.launch_ready = false
+	ball.ball_save_used = true
+	ball.freeze = false
+	ball.linear_velocity = Vector2(800, 0)
+	for _frame in 24:
+		await physics_frame
+	_expect(ball.route_owner == null and ball.collision_mask == 1, "Crossing a track sideways stays on the base deck")
+	_expect_equal(counts, {"warm": 0, "cold": 0, "orbit": 0}, "Underpasses and side touches cannot score routes")
+	ball.reset_ball(Vector2(350, 1070), false)
+	await physics_frame
+	await physics_frame
+	ball.launch_ready = false
+	ball.freeze = false
+	ball.linear_velocity = Vector2(0, 600)
+	for _frame in 24:
+		await physics_frame
+	_expect(ball.route_owner == null, "Crossing a ramp entrance backwards cannot board its track")
+	_expect_equal(counts.warm, 0, "A backwards mouth crossing cannot award a ramp")
+
+	# Two balls may use the same ramp while a third uses the other one.
+	for index in 3:
+		var rider: RigidBody2D = main.balls[index]
+		var route: Node2D = warm if index < 2 else cold
+		var start: Vector2 = route.to_global(route.centerline[route.entry_index]) - route._endpoint_tangent(route.entry_index) * float(35 + (100 if index == 1 else 0))
+		rider.reset_ball(start, false)
+		rider.ball_save_used = true
+	await physics_frame
+	await physics_frame
+	for index in main.balls.size():
+		var rider: RigidBody2D = main.balls[index]
+		rider.launch_ready = false
+		rider.freeze = false
+		var route: Node2D = warm if index < 2 else cold
+		rider.linear_velocity = route._endpoint_tangent(route.entry_index) * (1772.0 if index == 1 else 1700.0)
+	var simultaneous := false
+	var base_leak := false
+	for _frame in 840:
+		await physics_frame
+		if main.balls[0].route_owner == warm and main.balls[1].route_owner == warm and main.balls[2].route_owner == cold:
+			simultaneous = true
+		for rider in main.balls:
+			if rider.route_owner != null and rider.collision_layer == 1:
+				base_leak = true
+		if counts.warm >= 2 and counts.cold >= 1:
+			break
+	_expect(simultaneous and not base_leak, "Three physical balls keep independent route ownership and planes")
+	_expect(counts.warm >= 1 and counts.warm <= 2, "Concurrent balls may complete or roll back, without phantom awards")
+	var unique_ids: Dictionary = {}
+	for identity in completed_balls:
+		unique_ids[identity] = true
+	_expect_equal(completed_balls.size(), unique_ids.size(), "Each concurrent ball scores at most one full traversal")
+	_expect_equal(counts.cold, 1, "A third ball completes the opposite ramp concurrently")
+	_expect_equal(counts.orbit, 0, "Overlapping route drawings do not award unrelated orbit passes")
+	_expect(main.cue_manager.current_cue_ready(), "Physical Warm and Cold completions arm Color Wash through scene signals")
+
+	main.restart_game()
+	main.session_state = MainNode.SessionState.PLAYING
+	ball.reset_ball(Vector2(350, 1145), false)
+	await physics_frame
+	await physics_frame
+	ball.launch_ready = false
+	ball.freeze = false
+	ball.linear_velocity = Vector2(0, -1800)
+	for _frame in 30:
+		await physics_frame
+		if ball.route_owner == warm:
+			break
+	_expect(ball.route_owner == warm, "Reset fixture starts with a real ball riding a ramp")
+	main.restart_game()
+	var before_reset: Dictionary = counts.duplicate()
+	_expect(ball.route_owner == null and ball.collision_layer == 1 and ball.collision_mask == 1 and ball.z_index == 0, "Restart restores route collision and drawing state")
+	for _frame in 60:
+		await physics_frame
+	_expect_equal(counts, before_reset, "An interrupted traversal cannot complete later after restart")
+	_expect_equal(main.score_manager.score, 0, "Restart clears all route awards")
+	_expect_equal(main.remaining_balls, 3, "Route cancellation preserves the three-ball session")
+	main.session_state = MainNode.SessionState.PLAYING
+	ball.reset_ball(Vector2(350, 1145), false)
+	await physics_frame
+	await physics_frame
+	ball.launch_ready = false
+	ball.freeze = false
+	ball.linear_velocity = Vector2(0, -1800)
+	for _frame in 30:
+		await physics_frame
+		if ball.route_owner == warm:
+			break
+	_expect(ball.route_owner == warm, "Menu fixture starts with a ball riding a ramp")
+	main._show_start_menu()
+	_expect(ball.route_owner == null and not ball.visible and ball.collision_layer == 1, "Returning to menu cancels and hides a routed ball")
+	main.free()
+	await process_frame
+
+
+func _test_routes_from_flippers() -> void:
+	for action in [&"flipper_left", &"flipper_right"]:
+		for orbit in [true, false]:
+			var distances := [74.0, 78.0, 82.0, 86.0] if orbit else [145.0, 147.0, 150.0]
+			var expected := "UniverseOrbit" if orbit else ("ColdRamp" if action == &"flipper_left" else "WarmRamp")
+			var completed := false
+			var samples: Array[Dictionary] = []
+			for distance in distances:
+				var result := await _sample_cradle_shot(action, distance, true)
+				samples.append(result)
+				_expect(result.held and result.shot, "A route attempt starts from a physically held and released ball")
+				if result.routes == [expected]:
+					completed = true
+					break
+			_expect(completed, "Timed physical flipper shots can complete the aimed route (%s/%s): %s" % [action, expected, samples])
 
 
 func _test_flow_decay_and_multiplier() -> void:
@@ -590,6 +819,8 @@ func _test_weighted_pinball_feel() -> void:
 
 	ball.input_enabled = false
 	ball.reset_ball(Vector2(540, 900))
+	await physics_frame
+	await physics_frame
 	ball.freeze = false
 	var fall_frames := 0
 	while ball.global_position.y < 1300.0 and fall_frames < 140:
@@ -1291,7 +1522,9 @@ func _test_flipper_motor_and_cradle_shots() -> void:
 	await process_frame
 
 
-func _sample_cradle_shot(action: StringName, fire_distance: float) -> Dictionary:
+func _sample_cradle_shot(action: StringName, fire_distance: float, follow_routes: bool = false) -> Dictionary:
+	Input.action_release(&"flipper_left")
+	Input.action_release(&"flipper_right")
 	var scene := load("res://scenes/app/Main.tscn") as PackedScene
 	var main := scene.instantiate()
 	main.ball_recovery_delay = 0.35
@@ -1322,22 +1555,34 @@ func _sample_cradle_shot(action: StringName, fire_distance: float) -> Dictionary
 	var fired := false
 	var shot := false
 	var crossing_x := -1.0
-	for frame in 480:
+	var routes: Array[String] = []
+	var entered: Array[String] = []
+	for route_name in ["WarmRamp", "ColdRamp", "UniverseOrbit"]:
+		var route: Node = main.get_node(route_name + "/PhysicalRoute")
+		route.traversed.connect(func(_ball: RigidBody2D) -> void: routes.append(route_name))
+	for frame in (1440 if follow_routes else 480):
 		await physics_frame
+		if ball.route_owner != null:
+			var route_name: String = ball.route_owner.get_parent().name
+			if route_name not in entered:
+				entered.append(route_name)
 		var local_distance := (ball.global_position - flipper.global_position).rotated(-flipper.rotation).x * mirror
 		if not fired and local_distance >= fire_distance:
 			Input.action_press(action)
 			fired = true
 		if "--trace-physics" in OS.get_cmdline_user_args() and frame % 30 == 0:
 			print("CRADLE ", action, " at ", fire_distance, " f=", frame, " pos=", ball.global_position, " velocity=", ball.linear_velocity, " fired=", fired)
-		if fired and ball.global_position.y <= 1400.0 and ball.linear_velocity.y < 0.0:
+		if fired and not shot and ball.global_position.y <= 1400.0 and ball.linear_velocity.y < 0.0:
 			shot = true
 			crossing_x = ball.global_position.x
+			if not follow_routes:
+				break
+		if follow_routes and not routes.is_empty():
 			break
 		if main.remaining_balls != 3:
 			break
 	Input.action_release(action)
-	var result := {"held": held, "shot": shot, "crossing_x": crossing_x, "end": ball.global_position}
+	var result := {"held": held, "shot": shot, "crossing_x": crossing_x, "routes": routes, "entered": entered, "end": ball.global_position}
 	main.free()
 	await process_frame
 	return result

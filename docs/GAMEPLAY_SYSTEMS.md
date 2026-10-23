@@ -45,6 +45,20 @@ Six familles de Rig. Une famille complétée change visuellement le plateau, dé
 - Cold Ramp : Face froide / cyan.
 - Universe Orbit : continuité.
 
+Depuis la PR 32, ces objectifs exigent un parcours complet. Une entrée orientée
+admet la bille sur un guide à rails continus ; trois jalons ordonnés puis la
+sortie valident le tir et émettent les signaux de score/Flow/Cue existants.
+Un tir trop faible redescend par l'entrée sans progression. Les retours Warm et
+Cold vont vers leur flipper ; l'orbite se joue dans les deux sens et rejoint
+l'inlane opposée. Anticiper le retour en levant le flipper permet de retenir
+puis de rejouer la bille.
+
+Les guides utilisent des plans de collision propres pour laisser circuler une
+bille au-dessous. La bille reste un corps physique mobile, sans suivi de chemin.
+Chaque bille possède son état de parcours, y compris en multiball ; reset et
+menu rétablissent son plan initial. Les points, largeurs, matériaux et entrées
+sont configurés dans `data/routes/`. Limites du modèle 2D : voir ADR 0006.
+
 ## Console / Scoop
 
 Élément central représentant la régie : validation de cue, choix de show futur, lock pour Final Show.

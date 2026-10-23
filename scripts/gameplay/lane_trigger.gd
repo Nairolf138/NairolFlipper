@@ -1,6 +1,8 @@
 class_name LaneTrigger
 extends Area2D
 
+const RouteDefinition = preload("res://scripts/gameplay/physical_route_definition.gd")
+
 signal lane_completed(lane_id: StringName, display_name: String, score_value: int, flow_value: int)
 
 const FLASHING_FULL: StringName = &"full"
@@ -12,12 +14,11 @@ const FLASHING_OFF: StringName = &"off"
 @export var score_value: int = 500
 @export var flow_value: int = 70
 @export var lane_color: Color = Color(0.42, 0.72, 1.0, 1.0)
-@export var rearm_delay: float = 0.45
+@export var route_definition: RouteDefinition
 
 @onready var visual: Polygon2D = $Visual
 @onready var label: Label = $Label
 
-var _armed: bool = true
 var _flash_tween: Tween
 var _pulse_time: float = 0.0
 var _objective_highlight: bool = false
@@ -25,7 +26,8 @@ var flashing_effects: StringName = FLASHING_FULL
 
 
 func _ready() -> void:
-	body_entered.connect(_on_body_entered)
+	$PhysicalRoute.configure(route_definition)
+	$PhysicalRoute.traversed.connect(_on_route_traversed)
 	visual.color = Color(lane_color.r, lane_color.g, lane_color.b, 0.42)
 	label.text = display_name
 	label.modulate = lane_color
@@ -41,7 +43,6 @@ func _process(delta: float) -> void:
 
 
 func reset() -> void:
-	_armed = true
 	set_objective_highlight(false)
 
 
@@ -61,14 +62,9 @@ func set_flashing_effects(mode: StringName) -> void:
 	set_objective_highlight(_objective_highlight)
 
 
-func _on_body_entered(body: Node) -> void:
-	if not _armed or not body.is_in_group("balls"):
-		return
-	_armed = false
+func _on_route_traversed(_body: RigidBody2D) -> void:
 	lane_completed.emit(lane_id, display_name, score_value, flow_value)
 	_flash()
-	await get_tree().create_timer(rearm_delay).timeout
-	_armed = true
 
 
 func _flash() -> void:
