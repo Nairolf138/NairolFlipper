@@ -50,8 +50,8 @@ Casse canonique : **NairolFlipper**. Peut évoquer trajectoire de bille, faiscea
 Le plateau affiche un truss de six fixtures, des faisceaux géométriques, une
 grille technique et un runway animé. Chaque famille active durablement sa
 fixture ; Flow augmente l'énergie et Final Show lance une chase plus rapide.
-Blackout coupe les faisceaux. Le renderer reste vectoriel, sans texture ni shader
-plein écran, pour préserver la lisibilité et les performances mobiles.
+Blackout coupe les faisceaux. Les effets utilisent des primitives Canvas 2D,
+sans shader plein écran, pour préserver la lisibilité mobile.
 
 ## Table 2.4 — langage Stagecraft
 
@@ -67,6 +67,31 @@ techniques et signalétique lumineuse. Chaque pièce garde une silhouette propre
 - **Console** : faceplate et strip `GO`, distincte d'une simple cible de score.
 
 La couleur guide mais ne porte jamais seule l'information : différences de
-forme, largeur, position et contraste restent visibles. Toute la passe utilise
-les primitives Canvas 2D de Godot ; aucun asset tiers, texture HD, système de
-particules ou shader plein écran n'est ajouté.
+forme, largeur, position et contraste restent visibles.
+
+## PR 33 — matériaux et pièces scéniques
+
+La passe précédente restait trop abstraite au playtest. Le nouveau vocabulaire
+est matériel : sol de scène mat, profilés acier, caoutchouc crème, verre avec
+reflets et console équipée de faders. Six silhouettes originales distinguent
+Fresnel à volets, wash LED, tête mobile, barre pixel, blinder double et pratique
+protégée. La lumière d'objectif ne doit pas gonfler le corps mécanique.
+
+Les SVG originaux sont importés comme petites textures partagées ; provenance,
+licence et tailles dans `assets/textures/stagecraft/README.md`. Pas de marque,
+image tierce, shader plein écran ni plugin. Le sol est plafonné à 1024 × 1536.
+Le reflet de la bille chromée reste fixe dans le repère du plateau.
+
+Les rampes utilisent les arêtes physiques déjà calculées : montée en acrylique
+translucide, retour en wireform ouvert, traverses, colonnes et semelles. Le tri
+visuel Warm 2 / Cold 4 / Orbit 6 réserve à chaque bille le plan juste au-dessus
+de sa route. Cela reste une approximation 2D, pas une simulation de hauteur 3D.
+Les anciennes grandes bandes néon disparaissent. Les pièces basses restent
+visibles sous les retours ouverts ; aucun décor ne crée un obstacle fictif.
+Les noms et témoins de progression sont des annotations au premier plan : ils
+ne disparaissent pas sous un rail, contrairement aux corps matériels des pièces.
+
+Les captures GL en CI servent à inspecter le menu, le départ, le plateau éclairé,
+le mode sans effets et les trois plans de bille en 540 × 960 / 1080 × 1920.
+Les poses ne prouvent ni la jouabilité ni les performances sur tablette : le
+playtest PR 33 reste obligatoire avant la qualification Alpha PR 34.

@@ -1,21 +1,10 @@
 [gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/show/console_scoop.gd" id="1_scoop"]
+[ext_resource type="Texture2D" path="res://assets/textures/stagecraft/console.svg" id="2_art"]
 
 [sub_resource type="RectangleShape2D" id="ScoopShape"]
 size = Vector2(300, 150)
-
-[sub_resource type="StyleBoxFlat" id="ScoopLabelStyle"]
-bg_color = Color(0.04, 0.08, 0.16, 0.9)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.3, 0.85, 1, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
 
 [node name="ConsoleScoop" type="Area2D" groups=["console_scoops"]]
 script = ExtResource("1_scoop")
@@ -23,46 +12,29 @@ collision_layer = 0
 collision_mask = 1
 monitoring = true
 
-[node name="Shadow" type="Polygon2D" parent="."]
-z_index = -1
-position = Vector2(0, 11)
-polygon = PackedVector2Array(-158, 82, -126, -82, 126, -82, 158, 82)
-color = Color(0, 0, 0, 0.58)
+[node name="Visual" type="Node2D" parent="."]
 
-[node name="Visual" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(-158, 82, -126, -82, 126, -82, 158, 82)
-color = Color(0.025, 0.09, 0.15, 1)
-
-[node name="Faceplate" type="Polygon2D" parent="Visual"]
-polygon = PackedVector2Array(-138, 65, -108, -64, 108, -64, 138, 65)
-color = Color(0.08, 0.16, 0.24, 1)
-
-[node name="FaderTrackLeft" type="Polygon2D" parent="Visual"]
-polygon = PackedVector2Array(-92, -45, -84, -45, -84, 44, -92, 44)
-color = Color(0, 0.898, 1, 0.34)
-
-[node name="FaderTrackRight" type="Polygon2D" parent="Visual"]
-polygon = PackedVector2Array(84, -45, 92, -45, 92, 44, 84, 44)
-color = Color(1, 0.169, 0.839, 0.34)
+[node name="Faceplate" type="Sprite2D" parent="Visual"]
+texture = ExtResource("2_art")
 
 [node name="GoStrip" type="Polygon2D" parent="Visual"]
-polygon = PackedVector2Array(-105, 48, 105, 48, 112, 59, -112, 59)
+polygon = PackedVector2Array(69, 48, 122, 48, 122, 63, 69, 63)
 color = Color(0, 0.898, 1, 0.6)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("ScoopShape")
 
 [node name="Label" type="Label" parent="."]
-offset_left = -125.0
-offset_top = -28.0
-offset_right = 125.0
-offset_bottom = 28.0
+z_index = 8
+offset_left = -128.0
+offset_top = 45.0
+offset_right = 50.0
+offset_bottom = 65.0
 theme_override_colors/font_color = Color(0.7, 0.95, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 26
-theme_override_styles/normal = SubResource("ScoopLabelStyle")
+theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 text = "CONSOLE"

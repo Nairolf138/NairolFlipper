@@ -43,6 +43,22 @@ jobs:
           set -o pipefail
           godot --headless --display-driver headless --audio-driver Dummy --path . --quit-after 5 2>&1 | tee build/logs/smoke.log
           bash .github/scripts/assert_clean_godot_log.sh build/logs/smoke.log
+      - name: Render playfield inspection captures
+        env:
+          LIBGL_ALWAYS_SOFTWARE: "1"
+        run: |
+          set -o pipefail
+          xvfb-run -a -s "-screen 0 1200x2100x24" godot --display-driver x11 --rendering-method gl_compatibility --rendering-driver opengl3 --audio-driver Dummy --path . --fixed-fps 60 --script res://tests/godot/capture_playfield.gd 2>&1 | tee build/logs/visuals.log
+          bash .github/scripts/assert_clean_godot_log.sh build/logs/visuals.log
+      - name: Upload playfield inspection captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nairolflipper-playfield-captures
+          path: |
+            build/visuals/
+            build/logs/visuals.log
+          if-no-files-found: error
       - name: Export Web
         run: |
           set -o pipefail

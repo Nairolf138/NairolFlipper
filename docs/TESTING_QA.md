@@ -201,6 +201,20 @@ toucher, les collisions inactives et la récupération hors limites.
 
 Tout bug automatisable corrigé devrait recevoir un test raisonnable.
 
+### PR 33 — contrôle du rendu scénique
+
+- Comparer les captures GL de l'artifact, puis le rendu réel Android. Reconnaître
+  les six types de projecteur et la console, même avant leur activation.
+- Suivre une bille sur chaque rampe : au-dessus de sa propre route, sous les
+  rails des routes plus hautes aux croisements, retour au plateau à la sortie.
+- Vérifier que les retours wireform restent ouverts et que les cibles basses
+  ne disparaissent pas sous un grand ruban opaque.
+- En effets réduits / désactivés, conserver témoins de progression, contraste
+  du verre / métal et lisibilité de la bille. Aucun bumper ne change de taille.
+- Jouer 10 minutes, dont un Final Show : noter modèle, FPS / saccades, chauffe
+  et toute trajectoire masquée. Les captures posées et les compteurs du runner
+  logiciel ne remplacent pas cette mesure sur tablette.
+
 ### PR 30 — validation prioritaire sur tablette
 
 - Depuis Jouer, vérifier GO en bas à droite et l'absence de lancement au toucher

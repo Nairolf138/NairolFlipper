@@ -14,4 +14,12 @@ Stems compressés raisonnablement, preload des sons essentiels, stream pour musi
 
 ## Profiling
 
+PR 33 : huit SVG originaux, atlas partagé, source du sol limitée à 1024 × 1536,
+empreinte RGBA native de ces assets inférieure à 7 MiB (hors overhead import).
+Les rampes préparent leurs tableaux une fois et le dessin statique est mis en
+cache par CanvasItem. Pas de géométrie de rampe reconstruite par frame ou hit.
+La CI archive les draw calls et mémoire texture de chaque pose ; ces valeurs
+ne sont pas des FPS de tablette. Le budget 60 FPS exige toujours une mesure
+Android réelle avant PR 34.
+
 Optimiser sur mesure réelle. Jalons : premier plateau complet, Final Show, première release Web, première release mobile.

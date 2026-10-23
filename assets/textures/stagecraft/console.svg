@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="-160 -90 320 180">
+  <defs>
+    <linearGradient id="case" x2=".1" y2="1"><stop stop-color="#5e666d"/><stop offset=".12" stop-color="#252e37"/><stop offset=".75" stop-color="#111923"/><stop offset="1" stop-color="#060b11"/></linearGradient>
+    <linearGradient id="screen" x2=".4" y2="1"><stop stop-color="#6a8993"/><stop offset=".12" stop-color="#142d38"/><stop offset="1" stop-color="#07131c"/></linearGradient>
+    <g id="fader"><rect x="-2" y="-12" width="4" height="39" rx="2" fill="#060a10"/><path d="M-7-10h3m-3 9h3m-3 9h3m-3 9h3" stroke="#66747b"/><rect x="-6" y="4" width="12" height="7" rx="1" fill="#acb8bb"/><path d="M-5 6h10" stroke="#f6f2d9"/></g>
+  </defs>
+  <path d="M-158-69h316v143l-15 13h-286l-15-13Z" fill="#070c12"/>
+  <rect x="-155" y="-83" width="310" height="158" rx="12" fill="url(#case)" stroke="#7b8388" stroke-width="2"/>
+  <path d="M-141-69v130M141-69v130" stroke="#929b9f" stroke-width="3"/>
+  <rect x="-130" y="-66" width="260" height="52" rx="4" fill="#070c12" stroke="#424f5b" stroke-width="2"/>
+  <rect x="-125" y="-61" width="123" height="42" rx="2" fill="url(#screen)"/><rect x="3" y="-61" width="123" height="42" rx="2" fill="url(#screen)"/>
+  <g fill="none" stroke="#63c0c9" opacity=".65"><path d="M-116-27v-24h28v24Zm36 0v-15h28v15Zm36 0v-20h28v20Z"/><path d="M13-29h100M13-39h71M13-49h91"/></g>
+  <g><use href="#fader" x="-116"/><use href="#fader" x="-91"/><use href="#fader" x="-66"/><use href="#fader" x="-41"/><use href="#fader" x="-16"/><use href="#fader" x="9"/></g>
+  <g fill="#778991" stroke="#111923" stroke-width="2"><circle cx="49" cy="3" r="9"/><circle cx="76" cy="3" r="9"/><circle cx="103" cy="3" r="9"/></g>
+  <g fill="#abc7c5"><rect x="38" y="23" width="18" height="12" rx="2"/><rect x="65" y="23" width="18" height="12" rx="2"/><rect x="92" y="23" width="18" height="12" rx="2"/></g>
+  <rect x="-130" y="48" width="183" height="15" rx="3" fill="#111d27" stroke="#5e6f78"/><rect x="65" y="45" width="60" height="20" rx="3" fill="#537e73" stroke="#a2c5b0"/>
+  <g fill="#bdc3c2"><circle cx="-146" cy="-72" r="2"/><circle cx="146" cy="-72" r="2"/><circle cx="-146" cy="65" r="2"/><circle cx="146" cy="65" r="2"/></g>
+</svg>

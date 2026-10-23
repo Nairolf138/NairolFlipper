@@ -121,8 +121,9 @@ def test_weighted_feel_uses_distinct_passive_and_flipper_surfaces():
     assert "table_slope_degrees = 6.5" in tuning_text
     assert "bounce = 0.1" in tuning_text
     assert "launch_force = 2700.0" in tuning_text
-    for node_name in ("ContactShadow", "Rim", "Highlight"):
+    for node_name in ("ContactShadow", "Visual"):
         assert f'name="{node_name}"' in ball_scene
+    assert "assets/textures/stagecraft/ball.svg" in ball_scene
     assert "PassiveSurfaceMaterial.tres" in guide_scene
     assert "FlipperMaterial.tres" in flipper_scene
     assert "_test_weighted_pinball_feel" in runner_text
@@ -666,9 +667,9 @@ def test_stagecraft_visual_pass_is_layered_and_mobile_safe():
     assert "_draw_footlights" in stage_script.read_text(encoding="utf-8")
 
     visual_parts = {
-        "GuideRail.tscn": ("MetalFace", "EdgeLight"),
-        "Flipper.tscn": ("TopFace", "MetalSpine", "PivotCap"),
-        "Bumper.tscn": ("Bezel", "Lens", "LensHighlight"),
+        "GuideRail.tscn": ("MetalFace", "Shadow"),
+        "Flipper.tscn": ("MetalSpine", "ContactShadow"),
+        "Bumper.tscn": ("Bezel", "Lens"),
         "RigTarget.tscn": ("MetalFrame", "Indicator"),
         "Ramp.tscn": ("Deck", "EntryEdge"),
         "ConsoleScoop.tscn": ("Faceplate", "GoStrip"),
@@ -678,9 +679,30 @@ def test_stagecraft_visual_pass_is_layered_and_mobile_safe():
         for node_name in node_names:
             assert f'name="{node_name}"' in content
 
-    # The pass remains vector-only and does not add a costly full-screen shader.
+    # Imported original SVGs do not add a costly full-screen shader.
     assert "shader_type" not in art_script.read_text(encoding="utf-8")
     assert "_test_stagecraft_visual_language" in runner_text
+
+
+def test_original_stage_assets_are_bounded_and_self_contained():
+    import xml.etree.ElementTree as ET
+
+    directory = ROOT / "assets" / "textures" / "stagecraft"
+    assets = list(directory.glob("*.svg"))
+    assert len(assets) == 8
+    rgba_bytes = 0
+    for asset in assets:
+        svg = ET.parse(asset).getroot()
+        width, height = int(svg.attrib["width"]), int(svg.attrib["height"])
+        assert width <= 1024 and height <= 1536
+        rgba_bytes += width * height * 4
+        for element in svg.iter():
+            assert element.tag.split("}")[-1] not in {"script", "image", "filter", "text"}
+            for key, value in element.attrib.items():
+                if key.split("}")[-1] == "href":
+                    assert value.startswith("#"), "SVG assets must not load external resources"
+    assert rgba_bytes < 7 * 1024 * 1024
+    assert "MIT" in (directory / "README.md").read_text(encoding="utf-8")
 
 
 def test_sync_bonus_rewards_timing_without_punishing_normal_shots():

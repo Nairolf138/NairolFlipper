@@ -1,6 +1,10 @@
 class_name PhysicalRouteDefinition
 extends Resource
 
+## Presentation only; independent of collision planes and trajectory tuning.
+@export var draw_layer: int = 2
+@export var wire_start_point_index: int = 6
+
 ## Centerline, collision and deck drawing share the same authored geometry.
 @export var points: PackedVector2Array
 @export var width: float = 112.0

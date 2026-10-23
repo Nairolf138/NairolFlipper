@@ -10,7 +10,8 @@ const FLASHING_OFF: StringName = &"off"
 @export var score_value: int = 100
 @export var flash_color: Color = Color(1.0, 0.75, 0.2, 1.0)
 
-@onready var visual: Polygon2D = $Visual
+@onready var visual: Node2D = $Visual
+@onready var lens: Polygon2D = $Visual/Lens
 
 var _flash_tween: Tween
 var _pulse_time: float = 0.0
@@ -28,21 +29,22 @@ func _process(delta: float) -> void:
 	var energy := 1.05 + (sin(_pulse_time * 6.0) + 1.0) * 0.14
 	if flashing_effects == FLASHING_REDUCED:
 		energy = 1.08 + (sin(_pulse_time * 2.0) + 1.0) * 0.03
-	visual.scale = Vector2.ONE * energy
+	# Optical energy changes, never the mechanical silhouette / hit radius.
+	lens.modulate = Color(energy, energy, energy, 1.0)
 
 
 func set_objective_highlight(enabled: bool) -> void:
 	_objective_highlight = enabled
 	_pulse_time = 0.0
 	set_process(enabled and flashing_effects != FLASHING_OFF)
-	visual.scale = Vector2.ONE * (1.1 if enabled and flashing_effects == FLASHING_OFF else 1.0)
+	lens.modulate = Color(1.3, 1.3, 1.3) if enabled else Color.WHITE
 
 
 func set_flashing_effects(mode: StringName) -> void:
 	flashing_effects = _normalize_flashing_effects(mode)
 	if is_instance_valid(_flash_tween):
 		_flash_tween.kill()
-	visual.modulate = Color.WHITE
+	lens.modulate = Color.WHITE
 	set_objective_highlight(_objective_highlight)
 
 
@@ -63,16 +65,16 @@ func flash() -> void:
 	if is_instance_valid(_flash_tween):
 		_flash_tween.kill()
 	if flashing_effects == FLASHING_OFF:
-		visual.modulate = Color.WHITE
+		lens.modulate = Color.WHITE
 		return
-	visual.modulate = (
+	lens.modulate = (
 		Color.WHITE.lerp(flash_color, 0.35)
 		if flashing_effects == FLASHING_REDUCED
 		else flash_color
 	)
 	_flash_tween = create_tween()
 	_flash_tween.tween_property(
-		visual,
+		lens,
 		"modulate",
 		Color.WHITE,
 		0.32 if flashing_effects == FLASHING_REDUCED else 0.12

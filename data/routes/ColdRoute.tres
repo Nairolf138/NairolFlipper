@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1")
+draw_layer = 4
 points = PackedVector2Array(0, 30, 40, -130, 30, -280, 0, -380, 15, -450, 60, -500, 120, -520, 180, -500, 225, -450, 240, -380, 240, -30, 200, 160, 110, 330, 45, 450, -25, 530)
 width = 96.0
 collision_layer = 8

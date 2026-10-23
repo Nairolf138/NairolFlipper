@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="112" viewBox="0 0 960 112">
+  <defs>
+    <linearGradient id="steel" x2=".2" y2="1"><stop stop-color="#d6d9da"/><stop offset=".25" stop-color="#68717a"/><stop offset=".52" stop-color="#20262d"/><stop offset=".78" stop-color="#4d565e"/><stop offset="1" stop-color="#11161c"/></linearGradient>
+    <linearGradient id="body" x2=".2" y2="1"><stop stop-color="#50565a"/><stop offset=".3" stop-color="#252c33"/><stop offset="1" stop-color="#0a0f15"/></linearGradient>
+    <radialGradient id="amber" cx=".35" cy=".26" r=".75"><stop stop-color="#fff0b4"/><stop offset=".25" stop-color="#eeb64d"/><stop offset=".7" stop-color="#734a1e"/><stop offset="1" stop-color="#201b17"/></radialGradient>
+    <radialGradient id="ice" cx=".3" cy=".25" r=".8"><stop stop-color="#e0faff"/><stop offset=".28" stop-color="#6fb8cb"/><stop offset=".75" stop-color="#23505f"/><stop offset="1" stop-color="#101d28"/></radialGradient>
+    <radialGradient id="violet" cx=".3" cy=".25" r=".8"><stop stop-color="#f0e5ff"/><stop offset=".3" stop-color="#a792d5"/><stop offset=".8" stop-color="#443460"/><stop offset="1" stop-color="#171925"/></radialGradient>
+    <g id="bolt"><circle r="2.4" fill="#aaaeb0"/><path d="M-1.5 0h3" stroke="#10171d"/></g>
+    <g id="led"><circle r="8" fill="url(#ice)" stroke="#788b95" stroke-width="1.4"/><path d="M-4-4h5" stroke="#d9f2fa" stroke-opacity=".7"/></g>
+  </defs>
+  <!-- FACE: Fresnel and four barn doors. No manufacturer reference. -->
+  <g transform="translate(80 47)">
+    <ellipse cy="40" rx="64" ry="10" fill="#000" opacity=".5"/>
+    <path d="M-51-18v51h102v-51" fill="none" stroke="#070a0e" stroke-width="11"/><path d="M-51-18v51h102v-51" fill="none" stroke="url(#steel)" stroke-width="6"/>
+    <rect x="-40" y="-33" width="80" height="73" rx="12" fill="url(#body)" stroke="#7e868b" stroke-width="2"/>
+    <path d="m-28-30-10-14h76L28-30M-33 26l-9 16h84l-9-16M-35-25l-21-8v62l21-8M35-25l21-8v62l-21-8" fill="url(#body)" stroke="#788086" stroke-width="1.4"/>
+    <circle r="29" fill="url(#amber)" stroke="url(#steel)" stroke-width="6"/>
+    <g fill="none" stroke="#f2ce83" opacity=".5"><circle r="23"/><circle r="18"/><circle r="13"/><circle r="8"/></g>
+    <path d="M-18-16Q-3-27 16-18" stroke="#fff3ca" stroke-width="3" fill="none" opacity=".75"/>
+    <use href="#bolt" x="-51" y="3"/><use href="#bolt" x="51" y="3"/>
+  </g>
+  <!-- WASH: seven LED cells, round head on a yoke. -->
+  <g transform="translate(240 45)">
+    <ellipse cy="42" rx="61" ry="10" fill="#000" opacity=".5"/>
+    <path d="M-47-12v40q0 13 13 13h68q13 0 13-13v-40" fill="none" stroke="url(#steel)" stroke-width="9"/>
+    <circle r="38" fill="url(#body)" stroke="#767f88" stroke-width="2"/>
+    <circle r="32" fill="#0c131b" stroke="#323e48" stroke-width="4"/>
+    <use href="#led"/><use href="#led" x="-19"/><use href="#led" x="19"/><use href="#led" x="-9.5" y="-17"/><use href="#led" x="9.5" y="-17"/><use href="#led" x="-9.5" y="17"/><use href="#led" x="9.5" y="17"/>
+    <use href="#bolt" x="-47"/><use href="#bolt" x="47"/>
+  </g>
+  <!-- BEAM: moving head, fork and motor base. -->
+  <g transform="translate(400 47)">
+    <ellipse cy="40" rx="55" ry="10" fill="#000" opacity=".5"/>
+    <rect x="-43" y="23" width="86" height="21" rx="5" fill="url(#steel)"/>
+    <path d="M-37-13v28q0 16 17 16h40q17 0 17-16v-28" fill="none" stroke="url(#steel)" stroke-width="11"/>
+    <path d="M-27-31q27-14 54 0l5 40q-32 22-64 0Z" fill="url(#body)" stroke="#777d86" stroke-width="2"/>
+    <ellipse cy="-16" rx="25" ry="19" fill="url(#violet)" stroke="#a7adb2" stroke-width="3"/>
+    <ellipse cy="-20" rx="14" ry="7" fill="#e7e2fa" opacity=".48"/>
+    <path d="M-17 10h34M-17 15h34M-17 20h34" stroke="#0a1119" stroke-width="2"/>
+    <rect x="-9" y="32" width="18" height="5" rx="1" fill="#78819a"/>
+    <use href="#bolt" x="-37" y="-3"/><use href="#bolt" x="37" y="-3"/>
+  </g>
+  <!-- PIXEL: individually lensed linear batten and mounting feet. -->
+  <g transform="translate(560 46)">
+    <ellipse cy="36" rx="67" ry="10" fill="#000" opacity=".5"/>
+    <path d="M-50 10v25h18M50 10v25H32" fill="none" stroke="url(#steel)" stroke-width="7"/>
+    <rect x="-67" y="-23" width="134" height="47" rx="5" fill="url(#body)" stroke="#959ba1" stroke-width="2"/>
+    <rect x="-61" y="-17" width="122" height="29" rx="2" fill="#070f15"/>
+    <use href="#led" x="-48" y="-2"/><use href="#led" x="-24" y="-2"/><use href="#led" y="-2"/><use href="#led" x="24" y="-2"/><use href="#led" x="48" y="-2"/>
+    <path d="M-58 18H58" stroke="#79858c"/><use href="#bolt" x="-64" y="20"/><use href="#bolt" x="64" y="20"/>
+  </g>
+  <!-- BLIND: two large warm reflector bowls. -->
+  <g transform="translate(720 46)">
+    <ellipse cy="39" rx="66" ry="10" fill="#000" opacity=".5"/>
+    <path d="M-57-13v46H57v-46" fill="none" stroke="url(#steel)" stroke-width="7"/>
+    <rect x="-63" y="-30" width="126" height="60" rx="9" fill="url(#body)" stroke="#737f86" stroke-width="2"/>
+    <g fill="url(#amber)" stroke="url(#steel)" stroke-width="5"><circle cx="-30" r="25"/><circle cx="30" r="25"/></g>
+    <g fill="none" stroke="#edcc88" stroke-opacity=".5"><circle cx="-30" r="18"/><circle cx="30" r="18"/></g>
+    <path d="M-43-11l26 22M-43 11l26-22M17-11l26 22M17 11l26-22" stroke="#d3b477" opacity=".45"/>
+    <g fill="#fbe3a1"><rect x="-34" y="-7" width="8" height="14" rx="3"/><rect x="26" y="-7" width="8" height="14" rx="3"/></g>
+  </g>
+  <!-- PRACT: protected tungsten worklight / practical bulb. -->
+  <g transform="translate(880 45)">
+    <ellipse cy="42" rx="49" ry="9" fill="#000" opacity=".5"/>
+    <path d="M-24 35h48l10 9h-68Z" fill="url(#steel)"/>
+    <rect x="-19" y="20" width="38" height="17" rx="4" fill="url(#body)" stroke="#7d8486"/>
+    <path d="M-10 22C-10 7-26 5-26-14a26 26 0 0 1 52 0C26 5 10 7 10 22Z" fill="url(#amber)" stroke="#9c967c" stroke-width="2"/>
+    <path d="M-8 19v-26l8 5 8-5v26" fill="none" stroke="#ffecaa" stroke-width="2.5"/>
+    <path d="M-34 26v-39q0-32 34-32t34 32v39Zm16 0v-39q0-30 18-32m18 71v-39q0-30-18-32M-34-14h68M-32 8h64" fill="none" stroke="url(#steel)" stroke-width="3"/>
+  </g>
+</svg>

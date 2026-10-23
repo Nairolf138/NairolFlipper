@@ -11,7 +11,7 @@ signal activated(action_name: StringName)
 @export var mirrored := false
 
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
-@onready var visual: Polygon2D = $Visual
+@onready var visual: Node2D = $Visual
 @onready var contact_shadow: Polygon2D = $ContactShadow
 
 var _was_pressed := false

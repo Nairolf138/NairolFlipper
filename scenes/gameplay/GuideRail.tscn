@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="PhysicsMaterial" path="res://data/tuning/PassiveSurfaceMaterial.tres" id="1_surface"]
+[ext_resource type="Texture2D" path="res://assets/textures/stagecraft/guide_rail.svg" id="2_art"]
 
 [sub_resource type="RectangleShape2D" id="RailShape"]
 size = Vector2(220, 18)
@@ -14,21 +15,10 @@ position = Vector2(0, 8)
 polygon = PackedVector2Array(-116, -12, 116, -12, 108, 16, -108, 16)
 color = Color(0, 0, 0, 0.52)
 
-[node name="Visual" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(-116, -13, 116, -13, 110, 13, -110, 13)
-color = Color(0.055, 0.105, 0.15, 1)
+[node name="Visual" type="Node2D" parent="."]
 
-[node name="MetalFace" type="Polygon2D" parent="Visual"]
-polygon = PackedVector2Array(-108, -7, 108, -7, 104, 7, -104, 7)
-color = Color(0.24, 0.34, 0.43, 0.94)
-
-[node name="EdgeLight" type="Polygon2D" parent="Visual"]
-polygon = PackedVector2Array(-106, -8, 106, -8, 104, -4, -104, -4)
-color = Color(0.58, 0.9, 1, 0.88)
-
-[node name="LowerEdge" type="Polygon2D" parent="Visual"]
-polygon = PackedVector2Array(-104, 5, 104, 5, 102, 8, -102, 8)
-color = Color(0.015, 0.03, 0.05, 0.9)
+[node name="MetalFace" type="Sprite2D" parent="Visual"]
+texture = ExtResource("2_art")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RailShape")
