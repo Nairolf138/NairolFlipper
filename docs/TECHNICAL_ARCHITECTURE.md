@@ -52,6 +52,11 @@ Zéro addon tiers par défaut. Toute dépendance doit résoudre un vrai problèm
 
 Tick initial : 120 Hz, à valider par profiling.
 
+La bille intègre un roulement projeté dans `_integrate_forces` ; Godot conserve
+les collisions et le CCD par forme. `PhysicsTuning` porte pente, échelle,
+résistance et impulsions ; `FlipperTuning` porte le moteur des palettes.
+Voir [ADR-0005](adr/0005-projected-rolling-physics.md) pour les hypothèses et limites.
+
 ## Renderer
 
 GL Compatibility par défaut. Toute feature avancée exige fallback.

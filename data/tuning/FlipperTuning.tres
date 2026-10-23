@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="FlipperTuning" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/gameplay/flipper_tuning.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+press_acceleration_degrees = 36000.0
+press_speed_degrees = 1050.0
+coil_ramp_seconds = 0.025
+return_acceleration_degrees = 14000.0
+return_speed_degrees = 500.0

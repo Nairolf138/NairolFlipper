@@ -6,26 +6,30 @@
 
 Paramètres : masse, gravité, restitution, friction, vitesse max, force launcher, force bumper.
 
-### Réglage Table 2.2
+### Roulement projeté — PR 31
 
-Le profil de playtest privilégie une descente franche et des contacts peu
-élastiques : masse `1.4`, gravité `1.55`, friction `0.48` et restitution `0.14`.
-Les rails et murs utilisent un matériau passif à faible rebond tandis que les
-flippers disposent d'une surface plus vive. Le lanceur, les bumpers et les
-slingshots compensent la masse supplémentaire afin de conserver leur portée.
+`PhysicsTuning` définit une pente de `6.5°`, une échelle de `1600 px/m` et une
+résistance au roulement de `0.002`. L'accélération d'une sphère pleine est
+projetée le long du plateau ; la gravité verticale et l'amortissement linéaire
+globaux de Godot ne s'ajoutent plus à ce calcul. La masse normalisée `1.4`
+intervient dans les contacts et les impulsions, pas dans l'accélération de pente.
 
-Ces valeurs forment une base mesurable, pas un réglage final. Le temps de chute
-est couvert automatiquement ; le contrôle, le plaisir et la perception du poids
-doivent être validés sur une tablette réelle.
+Le lanceur guidé GO est recalibré à `2700`, la restitution de la bille à `0.1`.
+Le CCD utilise la forme entière de la bille. Vitesse maximale et résistance sont
+appliquées dans le callback physique. Les slingshots renvoient vers l'intérieur.
 
-La PR 30 conserve ce profil de bille mais remplace le lancement diagonal par
-une impulsion verticale de `3300`, suivie d'un couloir physique courbe. La masse,
-la gravité et le roulement seront réévalués dans la PR 31 ; augmenter la masse
-ne suffit pas à simuler une bille roulant sur un plateau incliné.
+Ce modèle reste une approximation 2D sans hauteur ni rotation 3D complète.
+Voir [ADR-0005](adr/0005-projected-rolling-physics.md). Les mesures automatiques
+ne remplacent pas la validation humaine de la sensation de poids.
 
 ## Flippers
 
-Deux flippers MVP : activation instantanée, retour rapide, maintien levé, collision reproductible, mêmes actions pour clavier/tactile/manette.
+Deux flippers avec profil `FlipperTuning` partagé : montée de commande sur
+`25 ms`, accélération progressive jusqu'à `1050°/s`, maintien levé puis retour
+plafonné à `500°/s`. Le contour de collision suit la palette et son extrémité.
+La bille peut être retenue, laissée rouler puis frappée à un autre point pour
+changer de route. Le watchdog ne récupère pas une bille soutenue par un flipper
+maintenu ; il récupère toujours une bille coincée ailleurs.
 
 ## Bumpers
 

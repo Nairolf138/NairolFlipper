@@ -50,7 +50,7 @@ def test_main_scene_declares_resettable_ball_instance():
     assert 'ext_resource' in ball_scene.read_text(encoding="utf-8")
     assert 'Ball.tscn' in scene_text
     assert "reset_ball" in ball_script.read_text(encoding="utf-8")
-    assert "continuous_cd = 1" in ball_scene.read_text(encoding="utf-8")
+    assert "continuous_cd = 2" in ball_scene.read_text(encoding="utf-8")
 
 
 def test_main_scene_declares_two_pressable_flippers():
@@ -105,7 +105,7 @@ def test_ball_uses_shared_physics_tuning_resource():
     assert 'preload("res://scripts/gameplay/physics_tuning.gd")' in ball_script
     assert "@export var tuning: PhysicsTuningResource" in ball_script
     assert "_apply_tuning()" in ball_script
-    assert "limit_length(tuning.max_speed)" in ball_script
+    assert "func _integrate_forces" in ball_script
     assert 'path="res://data/tuning/PhysicsTuning.tres"' in ball_scene
 
 
@@ -118,9 +118,9 @@ def test_weighted_feel_uses_distinct_passive_and_flipper_surfaces():
 
     for material_name in ("PassiveSurfaceMaterial.tres", "FlipperMaterial.tres"):
         assert (ROOT / "data" / "tuning" / material_name).is_file()
-    assert "gravity_scale = 1.55" in tuning_text
-    assert "bounce = 0.14" in tuning_text
-    assert "launch_force = 3300.0" in tuning_text
+    assert "table_slope_degrees = 6.5" in tuning_text
+    assert "bounce = 0.1" in tuning_text
+    assert "launch_force = 2700.0" in tuning_text
     for node_name in ("ContactShadow", "Rim", "Highlight"):
         assert f'name="{node_name}"' in ball_scene
     assert "PassiveSurfaceMaterial.tres" in guide_scene
@@ -584,8 +584,8 @@ def test_playfield_geometry_closes_edges_and_separates_return_lanes():
         "RightReturnExtension",
     ):
         assert f'name="{node_name}"' in scene_text
-    assert "position = Vector2(665, 1495)" in scene_text
-    assert "position = Vector2(770, 1495)" in scene_text
+    assert "position = Vector2(682.5, 1452.5)" in scene_text
+    assert "position = Vector2(820, 1495)" in scene_text
     assert "_test_playfield_safe_trajectories" in runner_text
 
 

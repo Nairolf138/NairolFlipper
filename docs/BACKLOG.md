@@ -84,6 +84,17 @@ artistique finale et le Final Show restent hors de cette tâche.
 
 ## P1 — Feel
 
+### T055 — Roulement et contrôle des flippers
+
+Implémentation PR 31, validation tablette en attente : accélération de sphère
+roulant sur une pente, résistance constante, contacts moins rebondissants,
+moteur de palette progressif et retour plus lent. Maintenir une bille ne déclenche
+plus son sauvetage ; relâcher puis refrapper permet de varier la visée. Les
+collecteurs dégagent les palettes levées et les slingshots renvoient vers le jeu.
+Les mesures à 60/120 Hz et les tirs physiques complètent les régressions PR 30.
+Ce modèle 2D ne simule ni hauteur ni rotation complète d'une bille réelle.
+Poursuivre en PR 32 avec les vrais parcours de rampes et d'orbite.
+
 ### T049 — GO, lancement guidé et retours jouables
 
 Implémentation PR 30, validation tablette en attente : bouton GO contextuel,

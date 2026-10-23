@@ -6,10 +6,18 @@
 
 Le runner Godot n'utilise aucun addon externe.
 
+Il exécute 24 groupes. La PR 31 ajoute des mesures sur de vraies billes : pente,
+accélération indépendante de la masse, résistance constante, arrêt, vitesse
+plafonnée et comparaison 60/120 Hz. Les deux flippers sont testés en maintien
+puis relâchement/réactivation à deux positions de frappe avec visées distinctes.
+Le maintien légitime ne doit pas déclencher le watchdog, qui reste actif ailleurs.
+
 Les régressions de la PR 30 suivent de vrais corps physiques : neuf lancements
 (trois positions et trois forces), passage par la courbe puis premier retour
 frappé en jeu ; six retours latéraux/proches du centre et une perte centrale
 légitime. Les sauvetages sont désactivés pour les essais de retour.
+Le pilote peut retenir puis relâcher/refrapper une bille avec les actions d'entrée,
+sans modifier sa position ou sa vitesse pendant le jeu.
 GO est pressé via la GUI ; les deux touches flipper, Espace et A manette sont
 également vérifiés. Le parcours Showflow historique teste les règles par appels
 directs et ne constitue pas une preuve de jouabilité.
@@ -17,3 +25,4 @@ directs et ne constitue pas une preuve de jouabilité.
 Pour comparer rapidement les trajectoires : ajouter `--fixed-fps 120` avant
 `--path .`. Ajouter `-- --trace-launch` à la fin affiche positions et vitesses
 du lanceur. La CI conserve aussi un passage à cadence réelle.
+`-- --trace-physics` affiche les mesures de maintien et de frappe.

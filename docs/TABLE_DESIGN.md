@@ -42,8 +42,15 @@ cette reprise. Des guides latéraux collectent les retours et prolongent les
 rails jusqu'aux pivots. La perte centrale reste possible.
 
 Le prototype n'est pas encore une Alpha validée. Les éléments Warm/Cold sont
-encore des capteurs : leurs vrais parcours, la physique de roulement et la
-refonte artistique sont les étapes suivantes.
+encore des capteurs : leurs vrais parcours et la refonte artistique suivent.
+
+## Contrôle de bille — PR 31
+
+Les rails intérieurs s'arrêtent plus haut pour dégager la palette levée et les
+tirs depuis une bille retenue. Le retour droit reprend la géométrie du gauche,
+avec son collecteur adapté au couloir du lanceur. Les slingshots dirigent leurs
+impulsions vers l'intérieur. Les changements accompagnent le modèle de roulement
+et les essais de maintien/visée ; ils demandent toujours un playtest tablette.
 
 ## Principes
 

@@ -34,19 +34,29 @@ func _physics_process(_delta: float) -> void:
 	contact_shadow.position = SHADOW_OFFSET.rotated(-rotation)
 	highlight.position = HIGHLIGHT_OFFSET.rotated(-rotation)
 	ball_save_remaining = maxf(0.0, ball_save_remaining - _delta)
-	if tuning != null and linear_velocity.length() > tuning.max_speed:
-		linear_velocity = linear_velocity.limit_length(tuning.max_speed)
 	if input_enabled and Input.is_action_just_pressed("launch_ball"):
 		launch_ball()
+
+
+func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	if tuning == null or drain_locked:
+		return
+	state.linear_velocity = tuning.advance_velocity(state.linear_velocity, state.step)
+	state.angular_velocity *= exp(-tuning.spin_damping * state.step)
 
 
 func _apply_tuning() -> void:
 	if tuning == null:
 		return
 	mass = tuning.mass
-	gravity_scale = tuning.gravity_scale
-	linear_damp = tuning.linear_damp
-	angular_damp = tuning.angular_damp
+	# Replace the global free-fall/air-drag model; leave collisions to Godot.
+	custom_integrator = true
+	gravity_scale = 0.0
+	linear_damp_mode = RigidBody2D.DAMP_MODE_REPLACE
+	angular_damp_mode = RigidBody2D.DAMP_MODE_REPLACE
+	linear_damp = 0.0
+	angular_damp = 0.0
+	can_sleep = false
 	launch_force = tuning.launch_force
 	launch_direction = tuning.launch_direction
 	var material := PhysicsMaterial.new()
