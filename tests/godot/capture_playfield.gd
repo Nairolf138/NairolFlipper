@@ -26,7 +26,9 @@ func _run() -> void:
 	_main.set_physics_process(false)
 	_main.stage_visuals.set_process(false)
 	for size in [Vector2i(540, 960), Vector2i(1080, 1920)]:
-		DisplayServer.window_set_size(size)
+		# Window owns the root viewport; bypassing it through DisplayServer leaves
+		# its render size stale on X11 without a window manager.
+		root.size = size
 		_main._show_start_menu()
 		await _capture("menu", size)
 		_main.start_game()
@@ -35,6 +37,8 @@ func _run() -> void:
 		_main._launch_or_restart()
 		for target in get_nodes_in_group("rig_targets"):
 			_main._on_rig_target_hit(target, target.family_id, target.display_name, target.score_value, target.flow_value)
+		_main.stage_visuals.hit_flash = 0.0
+		_main.sync_feedback_label.hide()
 		_main.stage_visuals.set_beat_position(2.0, true)
 		_hold_ball(Vector2(540, 1030))
 		await _capture("lit_stage", size)
@@ -59,6 +63,10 @@ func _run() -> void:
 		"note": "Frozen art fixtures on CI software GL. Not tablet performance or physical trajectory evidence.",
 		"captures": _metrics,
 	}, "\t"))
+	# Let already scheduled gameplay coroutines release their resources before
+	# freeing the fixture. Returning to the menu invalidates their generations.
+	_main._show_start_menu()
+	await create_timer(_main.show_flow.final_show_duration + 0.1).timeout
 	_main.free()
 	await process_frame
 	await process_frame
@@ -83,7 +91,7 @@ func _capture(label: String, size: Vector2i) -> void:
 		await RenderingServer.frame_post_draw
 	var image := root.get_texture().get_image()
 	if image.is_empty() or image.get_size() != size:
-		push_error("Capture size / image invalid: " + label)
+		push_error("Capture invalid: %s expected %s, got %s (window %s)" % [label, size, image.get_size(), root.size])
 		_failed = true
 		return
 	var colors: Dictionary = {}

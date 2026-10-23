@@ -17,11 +17,12 @@ script = ExtResource("2_route")
 
 [node name="Shadow" type="Polygon2D" parent="."]
 z_index = -1
-position = Vector2(0, 8)
+position = Vector2(0, 158)
 polygon = PackedVector2Array(-130, -20, 130, -20, 130, 20, -130, 20)
 color = Color(0, 0, 0, 0.5)
 
 [node name="Visual" type="Polygon2D" parent="."]
+position = Vector2(0, 150)
 polygon = PackedVector2Array(-130, -20, 130, -20, 130, 20, -130, 20)
 color = Color(0.42, 0.72, 1, 0.28)
 
@@ -39,9 +40,9 @@ shape = SubResource("LaneShape")
 [node name="Label" type="Label" parent="."]
 z_index = 8
 offset_left = -155.0
-offset_top = -19.0
+offset_top = 135.0
 offset_right = 155.0
-offset_bottom = 19.0
+offset_bottom = 165.0
 theme_override_colors/font_color = Color(0.72, 0.9, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
 theme_override_constants/shadow_offset_x = 2

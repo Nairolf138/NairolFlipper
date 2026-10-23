@@ -71,13 +71,12 @@ func _draw() -> void:
 		draw_circle(foot, 7.0, Color("687177"), false, 2.0, true)
 		draw_line(foot, point, Color("131a20"), 8.0, true)
 		draw_line(foot - Vector2(2, 0), point - Vector2(2, 0), Color("8a9599"), 2.0, true)
+		draw_circle(point, 3.0, Color(_accent, 0.85))
 	if not _glass.is_empty():
 		draw_colored_polygon(_glass, Color(0.24, 0.38, 0.42, 0.16))
 	for tie in _ties:
 		draw_polyline(tie, Color(0, 0, 0, 0.42), 7.0, true)
 		draw_polyline(tie, Color("66757d"), 3.0, true)
-		draw_circle(tie[0], 4.0, Color("b9c6c9"))
-		draw_circle(tie[1], 4.0, Color("b9c6c9"))
 	for edge in [_left, _right]:
 		# Transform the draw, not the collider. The edge itself remains the datum.
 		draw_set_transform(Vector2(9, 16))
