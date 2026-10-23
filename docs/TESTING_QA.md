@@ -243,6 +243,31 @@ Les essais Godot mesurent aussi masse indépendante, pente, résistance constant
 arrêt sans inversion, limite de vitesse et cohérence à 60/120 Hz. Les rampes en
 hauteur, le glissement transitoire et le spin complet restent hors du modèle 2D.
 
+### PR 32 — parcours sur tablette
+
+- Refaire GO et plusieurs premiers retours sans sauvetage imprévu.
+- Depuis chaque flipper, comparer deux moments de frappe : tir croisé vers la
+  rampe opposée et tir d'orbite un peu plus précoce. Les flèches repèrent les entrées.
+- Suivre chaque bille jusqu'à la sortie de Warm et de Cold. Le score et l'objectif
+  doivent changer à la sortie, jamais au simple contact avec le panneau d'entrée.
+- Essayer des tirs faibles : la bille doit redescendre sans valider la rampe.
+- Réaliser l'orbite depuis les deux côtés et préparer le flipper de réception.
+- Retenir puis rejouer les retours des rampes ; noter tout retour inaccessible,
+  blocage ou perte répétée, avec côté et trajectoire.
+- Vérifier qu'une bille du plateau peut passer sous un guide et que le suivi
+  visuel reste compréhensible sur l'écran de la tablette.
+- Pendant un parcours, essayer Recommencer puis Menu : aucune bille fantôme,
+  aucun point tardif ni collision incohérente au lancement suivant.
+- En Final Show, vérifier plusieurs parcours simultanés et le décompte des vies.
+
+Tests Godot : huit traversées à deux vitesses, deux demi-tours faibles, contacts
+de rails puis retours joués, quatre parcours visés depuis des billes physiquement retenues,
+trois billes simultanées (dont deux sur une rampe), touches latérales, contresens,
+signaux vers Color Wash, reset et menu. Les positions/vitesses ne sont définies
+qu'au départ des fixtures ; le jeu utilise ensuite collisions et entrées normales.
+Les plans de hauteur sont logiques, sans simulation 3D. Le rendu reste provisoire
+avant la PR 33 ; ni ces essais ni les builds ne qualifient l'Alpha sur appareil.
+
 ## Instrumentation locale de playtest
 
 Le nœud `PlaytestRecorder` écrit `user://playtest/latest.json` avec la durée de

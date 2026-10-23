@@ -6,7 +6,7 @@
 [sub_resource type="CircleShape2D" id="BallShape"]
 radius = 22.0
 
-[node name="Ball" type="RigidBody2D"]
+[node name="Ball" type="RigidBody2D" groups=["balls"]]
 script = ExtResource("1_ball")
 spawn_position = Vector2(960, 1650)
 launch_force = 2700.0

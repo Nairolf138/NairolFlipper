@@ -57,6 +57,11 @@ les collisions et le CCD par forme. `PhysicsTuning` porte pente, échelle,
 résistance et impulsions ; `FlipperTuning` porte le moteur des palettes.
 Voir [ADR-0005](adr/0005-projected-rolling-physics.md) pour les hypothèses et limites.
 
+`PhysicalRoute` génère rails, deck et portes depuis `PhysicalRouteDefinition`.
+Les plans `1/4/8/16` isolent plateau/Warm/Cold/Orbit sans modifier le mouvement
+de la bille à l'admission. Les wrappers Ramp/Lane conservent les signaux de jeu,
+émis après une traversée complète. Voir [ADR-0006](adr/0006-physical-routes-on-separated-planes.md).
+
 ## Renderer
 
 GL Compatibility par défaut. Toute feature avancée exige fallback.

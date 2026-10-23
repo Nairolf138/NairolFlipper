@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PhysicalRouteDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/gameplay/physical_route_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+points = PackedVector2Array(-165, 1300, -130, 1040, -50, 690, -110, 490, -210, 340, -280, 210, -240, 110, -140, 50, 0, 30, 140, 50, 240, 110, 280, 210, 210, 340, 110, 490, 50, 690, 130, 1040, 165, 1300)
+width = 96.0
+entry_width = 100.0
+collision_layer = 16
+bidirectional = true
+entry_point_index = 2
+reverse_entry_point_index = 14
+route_color = Color(0.52, 0.4, 1, 1)

@@ -84,6 +84,17 @@ artistique finale et le Final Show restent hors de cette tâche.
 
 ## P1 — Feel
 
+### T056 — Rampes et orbite physiques
+
+Implémentation PR 32, validation tablette en attente : couloirs à rails générés
+depuis les profils de `data/routes/`, entrées orientées et sorties vers les
+flippers. Trois jalons ordonnés puis la sortie donnent seuls les points et la
+progression. Warm/Cold, les deux sens de l'orbite et quatre parcours visés depuis les flippers
+sont simulés ; les demi-tours, touches latérales, collisions en multiball et
+interruptions de session sont couverts. Les plans logiques permettent de jouer
+sous les guides sans simuler une hauteur 3D. PR 33 : refonte scénique et lecture
+des croisements, puis qualification humaine en PR 34.
+
 ### T055 — Roulement et contrôle des flippers
 
 Implémentation PR 31, validation tablette en attente : accélération de sphère

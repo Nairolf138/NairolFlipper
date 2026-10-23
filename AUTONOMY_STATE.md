@@ -2,25 +2,26 @@
 
 ## Dernière exécution
 
-- Date : 2026-10-22
-- Cycle : T055 — Roulement et contrôle des flippers
-- Statut : 42 contrats Python et 24 groupes Godot ; validation tablette requise
+- Date : 2026-10-23
+- Cycle : T056 — Rampes et orbite physiques
+- Statut : 42 contrats Python et 27 groupes Godot ; validation tablette requise
 
 ## Dépôt
 
-- Branche : `feat/rolling-pinball-physics`
-- Base : `13c588b` (fusion de la PR #30 sur `origin/main`)
-- Validation : roulement 60/120 Hz, maintien et visée sur deux flippers, neuf lancements et six retours ; CI à exécuter
+- Branche : `feat/physical-ramp-orbit-routes`
+- Base : `5a97387` (fusion de la PR #31 sur `origin/main`)
+- Validation : parcours, quatre visées de flipper, retours, multiball, reset/menu et régressions PR 30/31 ; CI à exécuter
 - CI de la branche : à valider par la pull request
 - Dépôt distant : `Nairolf138/NairolFlipper`
-- Branche `main` auditée : `13c588b`
+- Branche `main` auditée : `5a97387`
 
 ## État actuel
 
 Le playtest après PR 29 invalide le statut de candidate Alpha. Après le lanceur
 et les retours de T049, T055 remplace la chute amortie par un roulement projeté
 et des palettes permettant le maintien puis la visée. Les menus et règles sont
-acquis ; les vrais parcours et les graphismes restent les prochains jalons.
+acquis. T056 ajoute les vrais parcours à rails sur plans logiques 2D, validés par
+des tirs physiques. La refonte graphique PR 33 et le playtest restent nécessaires.
 
 T013 consolide l'état livré après T042 :
 
@@ -199,15 +200,15 @@ T012 complète le premier filet de livraison cross-platform :
 - `export_presets.cfg` avec presets Web, Android debug et Windows Desktop.
 - `.github/workflows/godot.yml` avec import propre, tests comportementaux, smoke et exports P0.
 - `tests/test_bootstrap.py` avec 42 contrats de structure.
-- `tests/godot/test_runner.gd` avec 24 groupes de validations comportementales.
+- `tests/godot/test_runner.gd` avec 27 groupes de validations comportementales.
 - `docs/BACKLOG.md` mis à jour.
 - Ce journal `AUTONOMY_STATE.md`.
 
 ## Prochaine exécution
 
-Valider sur tablette la descente, les contacts, le maintien et les tirs précoces/
-tardifs des deux côtés, en conservant GO et les retours PR 30. Puis poursuivre
-en PR 32 avec les vrais parcours de rampes et d'orbite, avant la refonte artistique.
+Valider sur tablette l'accès aux rampes, les deux sens de l'orbite, la lisibilité
+des passages dessus/dessous et les retours aux flippers. Poursuivre en PR 33 avec
+les pièces scéniques et le rendu, puis qualifier la jouabilité en PR 34.
 
 ### T045 — Réglages audio persistants
 
@@ -254,3 +255,15 @@ en PR 32 avec les vrais parcours de rampes et d'orbite, avant la refonte artisti
 - maintien sur palette exclu du watchdog ; récupération toujours active ailleurs ;
 - 42 contrats et 24 groupes, dont mesure à 60/120 Hz, maintien et deux visées par côté ;
 - aucune qualification Alpha avant playtest, parcours physiques et refonte artistique.
+
+### T056 — Rampes et orbite physiques
+
+- PhysicalRoute et profils Warm/Cold/Orbit : géométrie partagée entre rails,
+  deck et portes, plans logiques distincts sans mouvement de bille imposé ;
+- validation après trois jalons et la sortie ; demi-tours et touches simples sans points ;
+- groupe balls rétabli pour les capteurs réels ; Color Wash armé par des traversées physiques ;
+- huit parcours à deux vitesses, retours aux flippers, deux tirs faibles et quatre
+  visées de flipper complètent les régressions précédentes ;
+- trois billes simultanées, traversées sous les guides, contresens, reset et menu ;
+- 42 contrats et 27 groupes Godot ; exports à confirmer en CI ; aucun appareil réel testé ;
+- modèle de hauteur logique et limites documentés dans ADR 0006 ; art final en PR 33.

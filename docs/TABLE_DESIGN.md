@@ -41,8 +41,8 @@ au repos est d'environ 60 px pour une bille de 44 px, contre environ 130 px avan
 cette reprise. Des guides latéraux collectent les retours et prolongent les
 rails jusqu'aux pivots. La perte centrale reste possible.
 
-Le prototype n'est pas encore une Alpha validée. Les éléments Warm/Cold sont
-encore des capteurs : leurs vrais parcours et la refonte artistique suivent.
+Le prototype n'est pas encore une Alpha validée. Les parcours Warm/Cold sont
+repris en PR 32 et la refonte artistique suit en PR 33.
 
 ## Contrôle de bille — PR 31
 
@@ -58,6 +58,25 @@ et les essais de maintien/visée ; ils demandent toujours un playtest tablette.
 - Depuis les flippers : tir sûr, progression, score, risque.
 - Retours apprenables.
 - Densité visuelle croissante sans chaos illisible.
+
+## Parcours guidés — PR 32
+
+- Warm : entrée à `(350, 1110)`, boucle haute à gauche puis sortie à `(375, 1610)`.
+- Cold : géométrie réfléchie, entrée à `(730, 1110)` et sortie à `(705, 1610)`.
+- Orbit : entrées à proximité de `(490, 1000)` et `(590, 1000)`, tour par le haut
+  puis sorties vers `(375, 1610)` ou `(705, 1610)` selon le sens du tir.
+
+Les portes d'orbite se trouvent au-dessus des prolongements de sortie, afin de
+séparer le tir d'entrée du retour vers les inlanes. Les tirs croisés depuis les
+flippers peuvent viser une rampe ou l'orbite selon le moment de frappe.
+Une courbe commune dessine chaque deck et ses rails : les anciennes routes
+Warm/Cold purement peintes sont retirées. Les flèches indiquent les entrées et
+les lèvres blanches les sorties, indépendamment de la couleur.
+
+Les croisements utilisent des plans logiques de hauteur en 2D. Ils ne modélisent
+pas de saut ni de hauteur continue. Le rendu détaillé des pièces, supports et
+passages dessus/dessous reste le travail de la PR 33. Valider sur tablette les
+angles d'entrée, le suivi visuel de la bille et l'anticipation du retour.
 
 ## Mobile
 

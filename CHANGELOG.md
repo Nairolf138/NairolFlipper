@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+### Parcours physiques — PR 32
+
+- Warm/Cold et Universe Orbit remplacent leurs capteurs de contact par des
+  couloirs à rails continus, entrées orientées, jalons et sorties jouables.
+- Retours Warm/Cold sur leur côté ; orbite parcourable dans les deux sens.
+- Passage sous les guides possible grâce aux plans de collision séparés, sans
+  téléportation ni correction de vitesse pendant les parcours.
+- Points, Flow et progression uniquement après un parcours complet ; demi-tour,
+  toucher latéral ou franchissement à contresens ne valident rien.
+- Groupe `balls` rétabli sur les billes pour les capteurs qui l'exigent.
+- État indépendant en multiball, restauré au reset et au retour au menu.
+- Trois nouveaux groupes de tests physiques, dont quatre parcours visés depuis les flippers
+  vers les parcours ; playtest tablette et refonte artistique encore nécessaires.
+
 ### Roulement et contrôle — PR 31
 
 - Accélération calculée depuis une pente de 6,5°, résistance au roulement

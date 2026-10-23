@@ -358,6 +358,9 @@ def test_warm_and_cold_ramps_are_data_driven_and_feed_flow():
     assert "ramp_id" in definition_script.read_text(encoding="utf-8")
     assert "_on_ramp_completed" in main_script
     assert "flow_manager.add_flow(flow_value)" in main_script
+    assert 'groups=["balls"]' in (ROOT / "scenes/gameplay/Ball.tscn").read_text(encoding="utf-8")
+    for route in ("WarmRoute.tres", "ColdRoute.tres", "OrbitRoute.tres"):
+        assert (ROOT / "data/routes" / route).is_file()
     for ramp_file, ramp_id, color in (
         ("WarmRamp.tres", "warm_ramp", "1, 0.48, 0.12"),
         ("ColdRamp.tres", "cold_ramp", "0.12, 0.72, 1"),

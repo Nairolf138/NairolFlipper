@@ -22,6 +22,11 @@ var input_enabled: bool = true
 var drain_locked: bool = false
 var ball_save_remaining: float = 0.0
 var ball_save_used: bool = false
+var route_owner: Node
+var route_epoch: int = 0
+var _deck_collision_layer: int = 1
+var _deck_collision_mask: int = 1
+var _deck_z_index: int = 0
 
 
 func _ready() -> void:
@@ -66,6 +71,8 @@ func _apply_tuning() -> void:
 
 
 func reset_ball(target_position: Vector2, reset_ball_save: bool = true) -> void:
+	leave_route()
+	route_epoch += 1
 	global_position = target_position
 	linear_velocity = Vector2.ZERO
 	angular_velocity = 0.0
@@ -80,6 +87,8 @@ func reset_ball(target_position: Vector2, reset_ball_save: bool = true) -> void:
 
 
 func deactivate_ball() -> void:
+	leave_route()
+	route_epoch += 1
 	freeze = true
 	linear_velocity = Vector2.ZERO
 	angular_velocity = 0.0
@@ -93,12 +102,37 @@ func deactivate_ball() -> void:
 func mark_drained() -> void:
 	if drain_locked:
 		return
+	leave_route()
 	drain_locked = true
 	freeze = true
 	linear_velocity = Vector2.ZERO
 	visible = false
 	collision_shape.set_deferred("disabled", true)
 	ball_drained.emit(self)
+
+
+func enter_route(owner_node: Node, track_layer: int) -> bool:
+	if route_owner != null or freeze or drain_locked:
+		return false
+	_deck_collision_layer = collision_layer
+	_deck_collision_mask = collision_mask
+	_deck_z_index = z_index
+	route_owner = owner_node
+	# Separate planes allow a deck ball to pass beneath the raised guide.
+	# The rigid body keeps its position, velocity and normal force integration.
+	collision_layer = track_layer
+	collision_mask = track_layer
+	z_index = 4
+	return true
+
+
+func leave_route() -> void:
+	if route_owner == null:
+		return
+	route_owner = null
+	collision_layer = _deck_collision_layer
+	collision_mask = _deck_collision_mask
+	z_index = _deck_z_index
 
 
 func launch_ball() -> bool:

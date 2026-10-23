@@ -80,21 +80,15 @@ func _draw_deck_panels() -> void:
 
 
 func _draw_shot_routes() -> void:
-	_draw_route(
-		PackedVector2Array([Vector2(252, 1590), Vector2(205, 1305), Vector2(245, 1070), Vector2(350, 735), Vector2(225, 440)]),
-		AMBER
-	)
-	_draw_route(
-		PackedVector2Array([Vector2(700, 1590), Vector2(745, 1320), Vector2(830, 1080), Vector2(735, 730), Vector2(860, 440)]),
-		CYAN
-	)
+	# Raised routes draw their own deck from the collision centerline.
+	# Only the Console approach is painted on the base playfield.
 	_draw_route(
 		PackedVector2Array([Vector2(410, 1600), Vector2(540, 1260), Vector2(540, 890), Vector2(540, 350)]),
 		VIOLET
 	)
 
-	# Short luminous ticks act like road cases' tape marks and improve aiming.
-	for marker in [Vector2(218, 1210), Vector2(278, 930), Vector2(785, 1210), Vector2(795, 930)]:
+	# Short mouth marks guide cross-table shots into the real ramp entrances.
+	for marker in [Vector2(350, 1190), Vector2(730, 1190)]:
 		draw_line(marker - Vector2(18, 0), marker + Vector2(18, 0), Color("eaf6ff"), 3.0, true)
 
 

@@ -1,7 +1,7 @@
 class_name RampDefinition
 extends Resource
 
-## Data for one scoring ramp; visuals and collision live in Ramp.tscn.
+## Scoring and sign data; PhysicalRouteDefinition owns the traversable geometry.
 @export var ramp_id: StringName
 @export var display_name: String = ""
 @export var ramp_color: Color = Color.WHITE
