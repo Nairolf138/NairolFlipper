@@ -26,6 +26,11 @@ func _expect(value: bool, message: String) -> void:
 
 
 func _test_local_report() -> void:
+	var content := Image.create(4, 8, false, Image.FORMAT_RGBA8)
+	content.fill(Color.RED)
+	var framed: Image = preload("res://tests/godot/capture_frame.gd").with_black_margins(content, Vector2i(8, 8))
+	_expect(framed.get_size() == Vector2i(8, 8) and content.get_size() == Vector2i(4, 8), "Capture margins never rescale the original viewport pixels")
+	_expect(framed.get_pixel(0, 0) == Color.BLACK and framed.get_pixel(2, 0) == Color.RED and framed.get_pixel(5, 7) == Color.RED and framed.get_pixel(6, 7) == Color.BLACK, "KEEP capture centering preserves exact pixels with black bars")
 	var path := "user://tests/qualification_recorder.json"
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))

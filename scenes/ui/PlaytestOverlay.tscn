@@ -43,21 +43,25 @@ text = "Billes, musique et chronos suspendus.\nLa reprise reste manuelle."
 horizontal_alignment = 1
 
 [node name="ResumeButton" type="Button" parent="Panel/PauseMenu"]
+theme_override_font_sizes/font_size = 34
 layout_mode = 2
 custom_minimum_size = Vector2(0, 100)
 text = "REPRENDRE"
 
 [node name="ReportButton" type="Button" parent="Panel/PauseMenu"]
+theme_override_font_sizes/font_size = 30
 layout_mode = 2
 custom_minimum_size = Vector2(0, 90)
 text = "RAPPORT DE TEST"
 
 [node name="MenuButton" type="Button" parent="Panel/PauseMenu"]
+theme_override_font_sizes/font_size = 26
 layout_mode = 2
 custom_minimum_size = Vector2(0, 90)
 text = "TERMINER ET REVENIR AU MENU"
 
 [node name="QuitButton" type="Button" parent="Panel/PauseMenu"]
+theme_override_font_sizes/font_size = 28
 layout_mode = 2
 custom_minimum_size = Vector2(0, 90)
 text = "QUITTER L'APPLICATION"
@@ -79,6 +83,7 @@ size_flags_vertical = 3
 custom_minimum_size = Vector2(0, 660)
 theme_override_font_sizes/font_size = 24
 editable = false
+theme_override_colors/font_readonly_color = Color(0.88, 0.94, 0.98, 1)
 wrap_mode = 1
 
 [node name="Privacy" type="Label" parent="Panel/ReportMenu"]
@@ -88,11 +93,13 @@ text = "Rien n'est envoyé automatiquement.\nCopie et partage uniquement si tu l
 horizontal_alignment = 1
 
 [node name="CopyButton" type="Button" parent="Panel/ReportMenu"]
+theme_override_font_sizes/font_size = 28
 layout_mode = 2
 custom_minimum_size = Vector2(0, 90)
 text = "COPIER LE RAPPORT"
 
 [node name="BackButton" type="Button" parent="Panel/ReportMenu"]
+theme_override_font_sizes/font_size = 30
 layout_mode = 2
 custom_minimum_size = Vector2(0, 90)
 text = "RETOUR"

@@ -48,7 +48,12 @@ LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a -s "-screen 0 1200x2100x24" godot \
 Les images et `render_metrics.json` vont dans `build/visuals/`. Un rendu vide,
 une taille incorrecte ou une erreur Godot fait échouer la validation.
 
-PR 34 ajoute les formats tablette 768 × 1024, Pause et Rapport. La CI marque
+PR 34 ajoute le format tablette 768 × 1024, Pause et Rapport.
+Les captures tablette conservent le viewport 9:16 et ses bandes noires centrées
+selon le mode KEEP de la fenêtre ; aucun pixel de jeu n'est étiré. Les métriques
+distinguent dimensions du contenu et dimensions de fenêtre.
+
+La CI marque
 `data/build_info.json` avant l'import : SHA du checkout testé (merge de test sur
 une PR), SHA de la branche source, run et URL du workflow. Le menu et le rapport
 affichent le SHA source ; le JSON conserve aussi le merge testé. Un build local

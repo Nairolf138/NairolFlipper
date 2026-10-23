@@ -3,6 +3,7 @@ extends SceneTree
 ## Real GL Compatibility captures, not the headless dummy renderer.
 ## These frozen fixtures document art and draw order, not playability or FPS.
 const OUTPUT := "res://build/visuals"
+const CaptureFrame = preload("res://tests/godot/capture_frame.gd")
 var _failed := false
 var _main: Node2D
 var _metrics: Array[Dictionary] = []
@@ -99,8 +100,17 @@ func _capture(label: String, size: Vector2i) -> void:
 		await process_frame
 		await RenderingServer.frame_post_draw
 	var image := root.get_texture().get_image()
-	if image.is_empty() or image.get_size() != size:
-		push_error("Capture invalid: %s expected %s, got %s (window %s)" % [label, size, image.get_size(), root.size])
+	var content_size := image.get_size()
+	# KEEP renders a 9:16 viewport centered inside wider tablet windows. Do not
+	# stretch it to force the assertion; verify its expected size, then add bars.
+	if content_size != size and root.content_scale_aspect == Window.CONTENT_SCALE_ASPECT_KEEP:
+		var base := Vector2(root.content_scale_size)
+		var factor := minf(size.x / base.x, size.y / base.y)
+		var expected := Vector2i(roundi(base.x * factor), roundi(base.y * factor))
+		if content_size == expected:
+			image = CaptureFrame.with_black_margins(image, size)
+	if image == null or image.is_empty() or image.get_size() != size:
+		push_error("Capture invalid: %s expected %s, got content %s (window %s)" % [label, size, content_size, root.size])
 		_failed = true
 		return
 	var colors: Dictionary = {}
@@ -115,6 +125,8 @@ func _capture(label: String, size: Vector2i) -> void:
 		_failed = true
 	_metrics.append({
 		"image": path.get_file(),
+		"content_pixels": [content_size.x, content_size.y],
+		"window_pixels": [size.x, size.y],
 		"draw_calls": Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),
 		"texture_bytes": Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED),
 		"sampled_colors": colors.size(),
