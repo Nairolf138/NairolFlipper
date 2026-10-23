@@ -12,6 +12,10 @@ signal target_hit(
 const FLASHING_FULL: StringName = &"full"
 const FLASHING_REDUCED: StringName = &"reduced"
 const FLASHING_OFF: StringName = &"off"
+const FIXTURE_ATLAS = preload("res://assets/textures/stagecraft/fixture_atlas.svg")
+const FIXTURE_FAMILIES: Array[StringName] = [
+	&"front_wash", &"back_wash", &"beam", &"pixel", &"blinders", &"practical",
+]
 
 @export var family_id: StringName = &"front_wash"
 @export var display_name: String = "WASH"
@@ -20,7 +24,7 @@ const FLASHING_OFF: StringName = &"off"
 @export var target_color: Color = Color(1.0, 0.75, 0.3, 1.0)
 @export var rearm_delay: float = 0.3
 
-@onready var visual: Polygon2D = $Visual
+@onready var visual: Node2D = $Visual
 @onready var core: Polygon2D = $Core
 @onready var indicator: Polygon2D = $Indicator
 @onready var label: Label = $Label
@@ -33,6 +37,10 @@ var flashing_effects: StringName = FLASHING_FULL
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
+	var fixture := AtlasTexture.new()
+	fixture.atlas = FIXTURE_ATLAS
+	fixture.region = Rect2(maxi(0, FIXTURE_FAMILIES.find(family_id)) * 160, 0, 160, 112)
+	$Visual/MetalFrame.texture = fixture
 	label.text = display_name
 	_apply_visual_state()
 
@@ -56,7 +64,8 @@ func set_flashing_effects(mode: StringName) -> void:
 
 
 func _apply_visual_state() -> void:
-	visual.color = Color(target_color.r, target_color.g, target_color.b, 0.95 if lit else 0.28)
+	# Metal stays neutral and readable; only the optical witness carries colour.
+	visual.modulate = Color.WHITE if lit else Color(0.8, 0.82, 0.85)
 	core.color = target_color if lit else Color(0.08, 0.12, 0.18, 1.0)
 	indicator.color = Color(target_color.r, target_color.g, target_color.b, 1.0 if lit else 0.32)
 	label.modulate = Color.WHITE if lit else Color(0.68, 0.72, 0.8, 1.0)

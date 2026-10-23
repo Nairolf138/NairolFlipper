@@ -18,6 +18,7 @@ const AMBER := Color("ffb14a")
 const VIOLET := Color("7c4dff")
 const COLD_WHITE := Color("eaf6ff")
 const FIXTURE_COLORS: Array[Color] = [AMBER, CYAN, VIOLET, Color("42ffb8"), Color("ff5748"), COLD_WHITE]
+const FIXTURE_ATLAS = preload("res://assets/textures/stagecraft/fixture_atlas.svg")
 
 @export_range(0.0, 1.0, 0.05) var low_intensity: float = 0.08
 @export_range(0.0, 1.0, 0.05) var build_intensity: float = 0.34
@@ -91,7 +92,6 @@ func set_beat_position(position_beats: float, playing: bool) -> void:
 
 func _draw() -> void:
 	_draw_haze()
-	_draw_stage_grid()
 	_draw_truss()
 	_draw_fixture_beams()
 	_draw_runway()
@@ -118,18 +118,6 @@ func _draw_haze() -> void:
 	draw_circle(Vector2(540, 1180), 390.0, Color(VIOLET, energy * 0.7))
 
 
-func _draw_stage_grid() -> void:
-	var grid_color := Color(CYAN, 0.035 + flow_ratio * 0.025)
-	for x in range(120, 1000, 88):
-		var top_x := lerpf(440.0, 640.0, inverse_lerp(120.0, 1000.0, float(x)))
-		draw_line(Vector2(top_x, 390), Vector2(x, 1680), grid_color, 1.0)
-	for index in range(11):
-		var ratio := float(index) / 10.0
-		var y := lerpf(450.0, 1680.0, pow(ratio, 1.45))
-		var width := lerpf(150.0, 860.0, ratio)
-		draw_line(Vector2(540 - width * 0.5, y), Vector2(540 + width * 0.5, y), grid_color, 1.0)
-
-
 func _draw_truss() -> void:
 	draw_line(Vector2(135, 300), Vector2(945, 300), Color(0.36, 0.46, 0.62, 0.72), 10.0)
 	draw_line(Vector2(145, 268), Vector2(935, 268), Color(0.16, 0.22, 0.31, 0.95), 7.0)
@@ -141,12 +129,8 @@ func _draw_truss() -> void:
 		var active := index < rig_count or show_state == FINAL_SHOW
 		var fixture_color := FIXTURE_COLORS[index]
 		draw_line(fixture_position - Vector2(0, 27), fixture_position - Vector2(0, 18), Color(0.52, 0.62, 0.72, 0.8), 5.0)
-		draw_colored_polygon(PackedVector2Array([
-			fixture_position + Vector2(-27, -18), fixture_position + Vector2(27, -18),
-			fixture_position + Vector2(23, 22), fixture_position + Vector2(-23, 22),
-		]), Color(0.018, 0.03, 0.052, 1.0))
-		draw_circle(fixture_position + Vector2(0, 3), 16.0, Color(fixture_color, 0.95 if active else 0.12))
-		draw_arc(fixture_position + Vector2(0, 3), 20.0, 0.0, TAU, 24, Color(fixture_color, 0.85 if active else 0.22), 3.0)
+		draw_texture_rect_region(FIXTURE_ATLAS, Rect2(fixture_position - Vector2(40, 20), Vector2(80, 56)), Rect2(index * 160, 0, 160, 112))
+		draw_line(fixture_position + Vector2(-12, 36), fixture_position + Vector2(12, 36), Color(fixture_color, 0.95 if active else 0.16), 3.0, true)
 
 
 func _draw_fixture_beams() -> void:
@@ -176,7 +160,7 @@ func _draw_fixture_beams() -> void:
 		var intensity := base_intensity
 		if flashing_effects == FLASHING_FULL and show_state == FINAL_SHOW and (index + chase) % 3 == 0:
 			intensity = minf(1.0, intensity + 0.2)
-		var beam_color := Color(FIXTURE_COLORS[index], intensity * 0.16)
+		var beam_color := Color(FIXTURE_COLORS[index], intensity * 0.09)
 		draw_colored_polygon(PackedVector2Array([source - Vector2(8, 0), source + Vector2(8, 0), target + Vector2(width, 0), target - Vector2(width, 0)]), beam_color)
 		draw_circle(target, width, Color(FIXTURE_COLORS[index], intensity * 0.035))
 
@@ -189,11 +173,11 @@ func _draw_runway() -> void:
 		pulse_amplitude = 0.0
 	var pulse := 0.55 + sin(pulse_time * 2.0) * pulse_amplitude
 	var runway_color := Color(MAGENTA.lerp(CYAN, flow_ratio), (0.18 + flow_ratio * 0.25) * pulse)
-	draw_polyline(PackedVector2Array([Vector2(475, 430), Vector2(400, 1580), Vector2(680, 1580), Vector2(605, 430)]), runway_color, 4.0)
-	for step in 8:
-		var y := 560.0 + step * 125.0
-		var half_width := 52.0 + step * 10.0
-		draw_line(Vector2(540 - half_width, y), Vector2(540 + half_width, y), Color(runway_color, runway_color.a * 0.65), 2.0)
+	# Inset cue indicators, not full-height stripes competing with the ball.
+	for step in 4:
+		var y := 940.0 + step * 52.0
+		draw_circle(Vector2(540, y), 6.0, Color("060c12"))
+		draw_circle(Vector2(540, y), 3.0, runway_color)
 
 
 func _draw_sync_clock() -> void:

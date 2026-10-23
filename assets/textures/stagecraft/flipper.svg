@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210" height="52" viewBox="-26 -26 210 52">
+  <defs>
+    <linearGradient id="rubber" x2="0" y2="1"><stop stop-color="#f9eac4"/><stop offset=".22" stop-color="#fff9dd"/><stop offset=".55" stop-color="#d1c59e"/><stop offset="1" stop-color="#69644f"/></linearGradient>
+    <linearGradient id="metal" x2="0" y2="1"><stop stop-color="#d2d6d5"/><stop offset=".35" stop-color="#747f85"/><stop offset=".53" stop-color="#171f27"/><stop offset=".83" stop-color="#a6b2b6"/><stop offset="1" stop-color="#2c3740"/></linearGradient>
+  </defs>
+  <path d="M0-20h139q18 0 40 15 7 5 0 10-22 15-40 15H0a20 20 0 0 1 0-40Z" fill="url(#rubber)" stroke="#2a3032" stroke-width="2"/>
+  <path d="M4-13h135q14 0 32 13-18 13-32 13H4a13 13 0 0 1 0-26Z" fill="url(#metal)" stroke="#c5c6ba"/>
+  <path d="M23-7h106l14 7-14 7H23Z" fill="#2b343c"/>
+  <path d="M28-5h99l9 5H28Z" fill="#92533d"/>
+  <path d="M28-5h99" stroke="#e7b987"/>
+  <circle r="16" fill="url(#metal)" stroke="#10171e" stroke-width="2"/>
+  <circle r="7" fill="#c3cacc" stroke="#56616b"/><path d="M-4 0h8" stroke="#26313a" stroke-width="2"/>
+</svg>

@@ -4,6 +4,7 @@ extends Node2D
 signal traversed(ball: RigidBody2D)
 
 const RouteDefinition = preload("res://scripts/gameplay/physical_route_definition.gd")
+const RouteArt = preload("res://scripts/show/route_visual.gd")
 const BALL_RADIUS := 22.0
 
 var definition: RouteDefinition
@@ -12,7 +13,6 @@ var centerline := PackedVector2Array()
 var entry_index: int = 0
 var reverse_entry_index: int = 0
 var _offsets := PackedFloat32Array()
-var _deck := PackedVector2Array()
 var _previous: Dictionary = {}
 var _riders: Dictionary = {}
 
@@ -52,12 +52,6 @@ func configure(profile: RouteDefinition) -> void:
 			var width := _width_at(index)
 			edge.append(centerline[index] + normal * (width - definition.rail_thickness) * 0.5 * side)
 			visible_edge.append(centerline[index] + normal * width * 0.5 * side)
-		if side < 0.0:
-			_deck.append_array(visible_edge)
-		else:
-			visible_edge.reverse()
-			_deck.append_array(visible_edge)
-			visible_edge.reverse()
 		var rail := StaticBody2D.new()
 		rail.physics_material_override = material
 		rail.collision_layer = definition.collision_layer
@@ -74,8 +68,11 @@ func configure(profile: RouteDefinition) -> void:
 		rail.add_child(collider)
 		add_child(rail)
 		rail.set_meta("edge", visible_edge)
-	z_index = 2
-	queue_redraw()
+	z_index = definition.draw_layer
+	var art := RouteArt.new()
+	art.name = "RouteArt"
+	add_child(art)
+	art.configure(self)
 
 
 func _physics_process(_delta: float) -> void:
@@ -159,6 +156,10 @@ func _endpoint_tangent(index: int) -> Vector2:
 
 func _baked_point_index(control_index: int) -> int:
 	var point: Vector2 = definition.points[control_index]
+	return _baked_point_index_for_position(point)
+
+
+func _baked_point_index_for_position(point: Vector2) -> int:
 	var closest := 0
 	for index in centerline.size():
 		if centerline[index].distance_squared_to(point) < centerline[closest].distance_squared_to(point):
@@ -172,44 +173,3 @@ func _width_at(index: int) -> float:
 		distance = minf(distance, absf(_offsets[index] - _offsets[reverse_entry_index]))
 	var taper := smoothstep(0.0, definition.funnel_length, distance)
 	return lerpf(definition.entry_width, definition.width, taper)
-
-
-func _draw() -> void:
-	if centerline.size() < 2:
-		return
-	draw_polyline(centerline, Color(0, 0, 0, 0.7), definition.width + 22.0, true)
-	draw_colored_polygon(_deck, Color("152538"))
-	draw_polyline(centerline, Color(definition.route_color, 0.22), definition.width - 16.0, true)
-	for rail in get_children():
-		var edge: PackedVector2Array = rail.get_meta("edge")
-		draw_polyline(edge, Color("657889"), definition.rail_thickness, true)
-		draw_polyline(edge, definition.route_color, 3.0, true)
-	for offset in range(50, int(curve.get_baked_length()) - 40, 140):
-		var position_on_route := curve.sample_baked(float(offset))
-		var tangent := (curve.sample_baked(float(offset) + 4.0) - position_on_route).normalized()
-		var normal := tangent.orthogonal()
-		draw_line(position_on_route - normal * 25.0, position_on_route + normal * 25.0, Color("657889"), 2.0, true)
-	# Entry arrows and exit lips distinguish the ends without colour alone.
-	_draw_entry(entry_index, false)
-	_draw_exit(centerline.size() - 1)
-	if definition.bidirectional:
-		_draw_entry(reverse_entry_index, true)
-		_draw_exit(0)
-
-
-func _draw_entry(index: int, reverse: bool) -> void:
-	var entry := centerline[index]
-	var tangent := _endpoint_tangent(index) * (-1.0 if reverse else 1.0)
-	var side := tangent.orthogonal() * 16.0
-	var arrow := PackedVector2Array([
-		entry - tangent * 15.0 + side,
-		entry + tangent * 8.0,
-		entry - tangent * 15.0 - side,
-	])
-	draw_polyline(arrow, Color.WHITE, 4.0, true)
-
-
-func _draw_exit(index: int) -> void:
-	var exit := centerline[index]
-	var exit_normal := _endpoint_tangent(index).orthogonal() * definition.width * 0.4
-	draw_line(exit - exit_normal, exit + exit_normal, Color.WHITE, 5.0, true)

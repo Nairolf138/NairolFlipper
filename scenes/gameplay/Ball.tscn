@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/gameplay/ball.gd" id="1_ball"]
 [ext_resource type="Resource" path="res://data/tuning/PhysicsTuning.tres" id="2_tuning"]
+[ext_resource type="Texture2D" path="res://assets/textures/stagecraft/ball.svg" id="3_art"]
 
 [sub_resource type="CircleShape2D" id="BallShape"]
 radius = 22.0
@@ -26,15 +27,5 @@ position = Vector2(5, 7)
 polygon = PackedVector2Array(-23, 0, -16.26, -16.26, 0, -23, 16.26, -16.26, 23, 0, 16.26, 16.26, 0, 23, -16.26, 16.26)
 color = Color(0, 0, 0, 0.52)
 
-[node name="Rim" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(-22, 0, -15.56, -15.56, 0, -22, 15.56, -15.56, 22, 0, 15.56, 15.56, 0, 22, -15.56, 15.56)
-color = Color(0.34, 0.4, 0.5, 1)
-
-[node name="Visual" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(-19, 0, -13.43, -13.43, 0, -19, 13.43, -13.43, 19, 0, 13.43, 13.43, 0, 19, -13.43, 13.43)
-color = Color(0.82, 0.87, 0.95, 1)
-
-[node name="Highlight" type="Polygon2D" parent="."]
-position = Vector2(-7, -8)
-polygon = PackedVector2Array(-5, 0, -3.54, -3.54, 0, -5, 3.54, -3.54, 5, 0, 3.54, 3.54, 0, 5, -3.54, 3.54)
-color = Color(1, 1, 1, 0.88)
+[node name="Visual" type="Sprite2D" parent="."]
+texture = ExtResource("3_art")

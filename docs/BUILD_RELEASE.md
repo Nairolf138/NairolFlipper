@@ -34,4 +34,18 @@ Pré-alpha : `0.0.x`. Alpha : `0.1.0+`. SemVer pour releases.
 
 ## Artifacts
 
+Les PR produisent aussi `nairolflipper-playfield-captures` : PNG de la scène
+réellement rendue en GL Compatibility et mesures de draw calls / mémoire texture.
+Le runner Ubuntu utilise son Xvfb préinstallé et Mesa logiciel ; ce n'est pas un
+benchmark Android. Reproduction avec un serveur graphique disponible :
+
+```text
+LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a -s "-screen 0 1200x2100x24" godot \
+  --display-driver x11 --rendering-method gl_compatibility --rendering-driver opengl3 \
+  --audio-driver Dummy --path . --fixed-fps 60 --script res://tests/godot/capture_playfield.gd
+```
+
+Les images et `render_metrics.json` vont dans `build/visuals/`. Un rendu vide,
+une taille incorrecte ou une erreur Godot fait échouer la validation.
+
 `nairolflipper-web-<version>`, `nairolflipper-android-debug-<sha>.apk`, `nairolflipper-windows-<version>.zip`, etc.

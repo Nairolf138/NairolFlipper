@@ -809,7 +809,7 @@ func _test_weighted_pinball_feel() -> void:
 	_expect(ball.custom_integrator and is_zero_approx(ball.gravity_scale), "Ball rolls on the deck without global free-fall gravity")
 	_expect(ball_material != null and ball_material.bounce <= 0.15, "Ball no longer rebounds like rubber")
 	_expect(ball_material != null and ball_material.friction >= 0.45, "Ball keeps traction on contacts")
-	_expect(ball.has_node("ContactShadow") and ball.has_node("Highlight"), "Ball has readable table contact and volume")
+	_expect(ball.has_node("ContactShadow") and ball.get_node("Visual").texture != null, "Ball has readable table contact and chrome volume")
 
 	var guide := main.get_node("UpperLeftGuide") as StaticBody2D
 	var flipper := main.get_node("LeftFlipper") as AnimatableBody2D
@@ -953,6 +953,37 @@ func _test_stagecraft_visual_language() -> void:
 	_expect(main.get_node_or_null("FrontWashTarget/Indicator") != null, "Rig targets expose a persistent status indicator")
 	_expect(main.get_node_or_null("WarmRamp/Visual/Deck") != null, "Ramps expose a distinct physical deck")
 	_expect(main.get_node_or_null("ConsoleScoop/Visual/GoStrip") != null, "The Console exposes a dedicated GO strip")
+	var regions: Dictionary = {}
+	for target in get_nodes_in_group("rig_targets"):
+		var texture: AtlasTexture = target.get_node("Visual/MetalFrame").texture
+		_expect(texture != null and texture.atlas.get_size() == Vector2(960, 112), "Fixture atlas imports at its bounded size")
+		regions[texture.region] = true
+	_expect_equal(regions.size(), 6, "Six rig families have distinct original fixture silhouettes")
+	var warm: Node2D = main.get_node("WarmRamp/PhysicalRoute")
+	var cold: Node2D = main.get_node("ColdRamp/PhysicalRoute")
+	var orbit: Node2D = main.get_node("UniverseOrbit/PhysicalRoute")
+	_expect(warm.z_index + 1 < cold.z_index and cold.z_index + 1 < orbit.z_index, "Crossings reserve a separate visual height for every deck and rider")
+	var ball: RigidBody2D = main.balls[0]
+	main.start_game()
+	for route in [warm, cold, orbit]:
+		var art := route.get_node("RouteArt") as RouteVisual
+		_expect(art._left.size() == route.centerline.size() and art._right.size() == route.centerline.size(), "Art keeps every baked physical rail point")
+		ball.freeze = false
+		var velocity := Vector2(315, -721)
+		ball.linear_velocity = velocity
+		_expect(ball.enter_route(route, route.definition.collision_layer), "Rider accepts its visual height")
+		_expect_equal(ball.z_index, route.z_index + 1, "Rider draws above its own deck and below higher decks")
+		_expect_equal(ball.linear_velocity, velocity, "Presentation does not change physical velocity")
+		ball.leave_route()
+		_expect_equal(ball.z_index, 0, "Leaving every route restores the base visual plane")
+	ball.freeze = true
+	var bumper := main.get_node("KickBumper")
+	bumper.set_objective_highlight(true)
+	bumper._process(0.4)
+	_expect_equal(bumper.visual.scale, Vector2.ONE, "Objective light never inflates a mechanical bumper")
+	bumper.set_flashing_effects(&"off")
+	_expect(not bumper.is_processing(), "Off mode keeps the fixture static")
+	_expect(bumper.get_node("Visual/Bezel").texture != null, "Original lens artwork imports in Godot")
 
 	var right_flipper := main.get_node("RightFlipper")
 	_expect(right_flipper.get_node("ContactShadow").scale.x < 0.0, "Right flipper art and contact shadow mirror together")

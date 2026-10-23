@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210" height="120" viewBox="-105 -60 210 120">
+  <defs><linearGradient id="plate" x2=".4" y2="1"><stop stop-color="#b0b8b9"/><stop offset=".17" stop-color="#57636b"/><stop offset=".5" stop-color="#28343d"/><stop offset="1" stop-color="#101b23"/></linearGradient><linearGradient id="rubber" x2="0" y2="1"><stop stop-color="#fff5d3"/><stop offset=".4" stop-color="#cbc3a4"/><stop offset="1" stop-color="#746e5d"/></linearGradient></defs>
+  <path d="M-101 56-66-56 101 18 78 56Z" fill="#0a1017" stroke="#060a0e" stroke-width="3"/>
+  <path d="M-92 49-61-46 91 21 73 49Z" fill="url(#plate)" stroke="#869094" stroke-width="2"/>
+  <path d="M-85 39-58-36 79 23" fill="none" stroke="#080e14" stroke-width="13" stroke-linecap="round"/>
+  <path d="M-85 39-58-36 79 23" fill="none" stroke="url(#rubber)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M-54-20-2 4-17 30H-70Z" fill="#1a2730" stroke="#69777c"/>
+  <path d="M-57 4h26M-61 12h26M-65 20h26" stroke="#080f16" stroke-width="3"/>
+  <g fill="#bac2c0" stroke="#23303a" stroke-width="2"><circle cx="-58" cy="-34" r="7"/><circle cx="-83" cy="39" r="7"/><circle cx="77" cy="24" r="7"/></g>
+  <path d="M-61-34h6M-86 39h6M74 24h6" stroke="#303d43" stroke-width="1.5"/>
+  <path d="M-5 35h58" stroke="#c6a25f" stroke-width="2"/>
+</svg>

@@ -66,6 +66,13 @@ de la bille à l'admission. Les wrappers Ramp/Lane conservent les signaux de jeu
 
 GL Compatibility par défaut. Toute feature avancée exige fallback.
 
+`RouteVisual` prépare une fois le matériau depuis les arêtes de `PhysicalRoute` ;
+il ne modifie ni points, ni corps, ni vitesses. `draw_layer` et
+`wire_start_point_index` sont exclusivement des données de présentation. La bille
+prend `route.z_index + 1` puis restaure son plan initial à la sortie. Les plans
+de collision restent indépendants du tri visuel. Les SVG scéniques originaux
+sont rasterisés à l'import ; aucune dépendance graphique native n'est ajoutée.
+
 ## Plateforme
 
 `Gameplay → PlatformService → implémentation native/web/no-op` pour les capacités optionnelles.

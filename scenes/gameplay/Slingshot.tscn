@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/gameplay/slingshot.gd" id="1_slingshot"]
+[ext_resource type="Texture2D" path="res://assets/textures/stagecraft/slingshot.svg" id="2_art"]
 
 [sub_resource type="RectangleShape2D" id="SlingshotShape"]
 size = Vector2(190, 100)
@@ -17,17 +18,10 @@ position = Vector2(0, 9)
 polygon = PackedVector2Array(-101, 56, -66, -56, 101, 18, 78, 56)
 color = Color(0, 0, 0, 0.54)
 
-[node name="Visual" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(-101, 56, -66, -56, 101, 18, 78, 56)
-color = Color(0.24, 0.035, 0.14, 1)
+[node name="Visual" type="Node2D" parent="."]
 
-[node name="Rubber" type="Polygon2D" parent="Visual"]
-polygon = PackedVector2Array(-88, 43, -58, -40, 83, 22, 70, 40)
-color = Color(1, 0.17, 0.52, 1)
-
-[node name="EdgeLight" type="Polygon2D" parent="Visual"]
-polygon = PackedVector2Array(-58, -40, 83, 22, 78, 27, -61, -34)
-color = Color(1, 0.65, 0.86, 0.8)
+[node name="Rubber" type="Sprite2D" parent="Visual"]
+texture = ExtResource("2_art")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("SlingshotShape")

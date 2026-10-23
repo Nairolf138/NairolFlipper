@@ -14,7 +14,7 @@ const FLASHING_OFF: StringName = &"off"
 @export var flash_color: Color = Color(1.0, 0.28, 0.65, 1.0)
 @export var rearm_delay: float = 0.2
 
-@onready var visual: Polygon2D = $Visual
+@onready var visual: Node2D = $Visual
 
 var _armed: bool = true
 var _flash_tween: Tween

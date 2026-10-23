@@ -21,8 +21,10 @@ tests de règles par appels directs ne remplacent pas ces observations.
 
 PR 30 à 32 implémentées : la PR 32 couvre les parcours sur de vrais corps Godot,
 dont des tirs de flipper, les retours, les demi-tours et le multiball. Les plans
-logiques restent une approximation de hauteur 2D. La prochaine étape est la
-refonte artistique PR 33 ; la qualification Alpha demande toujours le playtest.
+logiques restent une approximation de hauteur 2D. La PR 33 ajoute les pièces
+scéniques originales, les matériaux des routes et leur tri visuel, avec captures
+GL reproductibles. La prochaine étape est le playtest artistique / performance,
+puis la qualification Alpha PR 34 ; elle n'est pas acquise par les tests CI.
 
 ## M0 — Repository Ready
 

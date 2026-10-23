@@ -4,6 +4,8 @@
 
 [resource]
 script = ExtResource("1")
+draw_layer = 6
+wire_start_point_index = 0
 points = PackedVector2Array(-165, 1300, -130, 1040, -50, 690, -110, 490, -210, 340, -280, 210, -240, 110, -140, 50, 0, 30, 140, 50, 240, 110, 280, 210, 210, 340, 110, 490, 50, 690, 130, 1040, 165, 1300)
 width = 96.0
 entry_width = 100.0

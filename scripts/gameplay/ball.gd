@@ -12,10 +12,8 @@ signal ball_drained(ball: RigidBody2D)
 
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var contact_shadow: Polygon2D = $ContactShadow
-@onready var highlight: Polygon2D = $Highlight
 
 const SHADOW_OFFSET := Vector2(5, 7)
-const HIGHLIGHT_OFFSET := Vector2(-7, -8)
 
 var launch_ready: bool = true
 var input_enabled: bool = true
@@ -37,7 +35,7 @@ func _ready() -> void:
 func _physics_process(_delta: float) -> void:
 	# Keep the table contact and light direction stable while the rigid body spins.
 	contact_shadow.position = SHADOW_OFFSET.rotated(-rotation)
-	highlight.position = HIGHLIGHT_OFFSET.rotated(-rotation)
+	$Visual.rotation = -rotation
 	ball_save_remaining = maxf(0.0, ball_save_remaining - _delta)
 	if input_enabled and Input.is_action_just_pressed("launch_ball"):
 		launch_ball()
@@ -122,7 +120,7 @@ func enter_route(owner_node: Node, track_layer: int) -> bool:
 	# The rigid body keeps its position, velocity and normal force integration.
 	collision_layer = track_layer
 	collision_mask = track_layer
-	z_index = 4
+	z_index = owner_node.z_index + 1
 	return true
 
 

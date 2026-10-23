@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="-72 -72 144 144">
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2=".35" y2="1"><stop stop-color="#dce1e0"/><stop offset=".2" stop-color="#717d86"/><stop offset=".45" stop-color="#1c242c"/><stop offset=".68" stop-color="#6a7982"/><stop offset="1" stop-color="#12181f"/></linearGradient>
+    <radialGradient id="glass" cx=".34" cy=".25" r=".8"><stop stop-color="#ffe8b9"/><stop offset=".2" stop-color="#e8b35d"/><stop offset=".52" stop-color="#926232"/><stop offset=".82" stop-color="#302921"/><stop offset="1" stop-color="#101820"/></radialGradient>
+    <radialGradient id="rubber"><stop offset=".7" stop-color="#272a2c"/><stop offset=".88" stop-color="#5b6061"/><stop offset="1" stop-color="#090e13"/></radialGradient>
+  </defs>
+  <ellipse cy="10" rx="68" ry="61" fill="#000" opacity=".42"/>
+  <circle r="64" fill="url(#metal)"/>
+  <circle r="58" fill="url(#rubber)" stroke="#242b31" stroke-width="2"/>
+  <circle r="49" fill="url(#metal)"/>
+  <circle r="42" fill="url(#glass)" stroke="#111b25" stroke-width="3"/>
+  <g fill="none" stroke="#ffe2a0" stroke-opacity=".25"><circle r="35"/><circle r="27"/><circle r="19"/></g>
+  <path d="M-32-19Q-7-44 23-27L17-19Q-8-30-28-12Z" fill="#fff7dc" opacity=".56"/>
+  <path d="M-28 28Q0 44 28 25" fill="none" stroke="#a5ccdc" stroke-opacity=".45" stroke-width="3"/>
+  <g fill="#aeb6ba" stroke="#111923" stroke-width="1.5"><circle cy="-54" r="4"/><circle cx="54" r="4"/><circle cy="54" r="4"/><circle cx="-54" r="4"/></g>
+  <path d="M-2-54h4M52 0h4M-2 54h4M-56 0h4" stroke="#141c23"/>
+</svg>

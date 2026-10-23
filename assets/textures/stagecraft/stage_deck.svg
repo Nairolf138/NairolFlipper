@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">
+  <defs>
+    <linearGradient id="floor" x2=".8" y2="1"><stop stop-color="#272b2d"/><stop offset=".32" stop-color="#171c20"/><stop offset="1" stop-color="#0a0f15"/></linearGradient>
+    <radialGradient id="spill"><stop stop-color="#8c6c3b" stop-opacity=".14"/><stop offset="1" stop-color="#8c6c3b" stop-opacity="0"/></radialGradient>
+    <pattern id="seams" width="256" height="192" patternUnits="userSpaceOnUse"><path d="M0 0H256V192H0Z" fill="none" stroke="#070c11" stroke-width="3"/><path d="M2 3H254M3 4V190" stroke="#73746b" stroke-opacity=".13"/><path d="M9 27h190M28 31h211M18 71h90M97 75h136M34 129h170M58 133h171M17 168h125" stroke="#a7ada6" stroke-opacity=".025"/><g fill="#5a6163" fill-opacity=".4"><circle cx="10" cy="10" r="2"/><circle cx="246" cy="10" r="2"/><circle cx="10" cy="182" r="2"/><circle cx="246" cy="182" r="2"/></g></pattern>
+  </defs>
+  <rect width="1024" height="1536" fill="url(#floor)"/><rect width="1024" height="1536" fill="url(#seams)"/>
+  <ellipse cx="270" cy="450" rx="390" ry="480" fill="url(#spill)"/>
+  <path d="M60 0V1536M964 0V1536" stroke="#090e14" stroke-width="16"/><path d="M69 0V1536M955 0V1536" stroke="#5a6267" stroke-width="2"/>
+  <g fill="none" stroke="#77817d" stroke-opacity=".18" stroke-width="2"><circle cx="512" cy="640" r="205"/><circle cx="512" cy="640" r="212"/><path d="M290 640h42m360 0h42M512 420v42m0 356v42"/></g>
+  <g fill="none" stroke="#04090e" stroke-width="6"><path d="M79 1060q100-10 93-90V720q0-55-60-70M945 1060q-100-10-93-90V720q0-55 60-70"/></g>
+  <path d="M79 1060q100-10 93-90V720q0-55-60-70M945 1060q-100-10-93-90V720q0-55 60-70" fill="none" stroke="#40474a" stroke-width="2"/>
+</svg>

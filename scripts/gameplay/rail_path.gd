@@ -23,6 +23,12 @@ func _ready() -> void:
 func _draw() -> void:
 	if points.size() < 2:
 		return
-	draw_polyline(points, Color("02050a"), thickness + 8.0, true)
-	draw_polyline(points, Color("52677b"), thickness, true)
-	draw_polyline(points, edge_color, 3.0, true)
+	draw_set_transform(Vector2(4, 7))
+	draw_polyline(points, Color(0, 0, 0, 0.42), thickness + 8.0, true)
+	draw_set_transform(Vector2.ZERO)
+	draw_polyline(points, Color("0b1219"), thickness + 3.0, true)
+	draw_polyline(points, Color("5a656d"), thickness, true)
+	draw_polyline(points, Color("c1c9c9"), thickness * 0.38, true)
+	draw_set_transform(Vector2(-1, -1))
+	draw_polyline(points, Color("f0f1e4"), 1.5, true)
+	draw_set_transform(Vector2.ZERO)
