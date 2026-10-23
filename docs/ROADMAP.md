@@ -26,6 +26,12 @@ scéniques originales, les matériaux des routes et leur tri visuel, avec captur
 GL reproductibles. La prochaine étape est le playtest artistique / performance,
 puis la qualification Alpha PR 34 ; elle n'est pas acquise par les tests CI.
 
+PR 34 prépare le candidat traçable et le dossier de qualification : pause réelle
+en arrière-plan (y compris les trois chronos de jeu), rapport local consultable /
+copiable, mesures de cadence en jeu et builds P0 téléchargeables. Les critères et
+preuves manquantes sont suivis dans `ALPHA_QUALIFICATION.md`. Aucun équilibrage
+de sensation ni statut « Alpha qualifiée » ne peut être conclu sans ce playtest.
+
 ## M0 — Repository Ready
 
 Cadrage présent, projet Godot ouvrable, conventions, backlog.

@@ -19,13 +19,16 @@ func _run() -> void:
 		return
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUTPUT))
 	_main = load("res://scenes/app/Main.tscn").instantiate()
+	_main.pause_on_focus_loss = false # Non-interactive render fixture, not a lifecycle test.
 	_main.get_node("SettingsStore").save_path = "user://tests/visual_capture_settings.json"
 	root.add_child(_main)
 	await process_frame
 	_main.set_process(false)
 	_main.set_physics_process(false)
 	_main.stage_visuals.set_process(false)
-	for size in [Vector2i(540, 960), Vector2i(1080, 1920)]:
+	_main.playtest_recorder.set_process(false) # Posed software renders are not a device FPS test.
+	_main.playtest_recorder.previous_session = {}
+	for size in [Vector2i(540, 960), Vector2i(1080, 1920), Vector2i(768, 1024)]:
 		# Window owns the root viewport; bypassing it through DisplayServer leaves
 		# its render size stale on X11 without a window manager.
 		root.size = size
@@ -35,6 +38,12 @@ func _run() -> void:
 		await _capture("ready", size)
 		# Deterministic, deliberately posed inspection of art in a lit show.
 		_main._launch_or_restart()
+		_hold_ball(Vector2(540, 1030))
+		_main._request_pause()
+		await _capture("pause", size)
+		_main._open_playtest_report()
+		await _capture("report", size)
+		_main._resume_game()
 		for target in get_nodes_in_group("rig_targets"):
 			_main._on_rig_target_hit(target, target.family_id, target.display_name, target.score_value, target.flow_value)
 		_main.stage_visuals.hit_flash = 0.0

@@ -289,4 +289,18 @@ session, lancements, impacts de bumpers, drains, ball saves, relances, points
 marqués, Sync et Perfect Sync. Cette trace reste locale : aucun réseau, compte ou télémétrie n'est
 utilisé. Elle sert à comparer les sensations entre builds pendant un playtest.
 
+PR 34 : schéma 3, écritures groupées, build source / checkout testé, routes,
+Cues, Rig, Final Show, pauses, pertes numérotées distinctes des drains bonus,
+récupérations, score réel et cadence sont consultables via RAPPORT DE TEST.
+L'ouverture précédente est conservée en mémoire au lancement pour pouvoir
+copier son dernier enregistrement aussi. L'arrêt brutal peut perdre les dernières
+secondes non encore sauvegardées ; ce journal ne sauvegarde pas la partie.
+
+Le runner `tests/godot/qualification_runner.gd` teste rafale sans I/O par hit,
+percentile / cadence Final Show, précédent journal, pause d'une vraie bille
+admise en rampe, reprise jusqu'à la sortie et trois timers suspendus. Un quatrième
+groupe couvre un drain en attente pendant Pause, puis un reset et GO dans la même
+frame : aucun callback ancien ne consomme une nouvelle bille. Les critères
+appareil et le rapport à remplir sont dans `ALPHA_QUALIFICATION.md`.
+
 Avant release publique : au moins Android réel, iPhone/iPad réel pour iOS, navigateurs récents, Windows natif, macOS/Linux selon disponibilité.

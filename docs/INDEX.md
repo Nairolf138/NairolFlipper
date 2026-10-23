@@ -16,6 +16,7 @@ Ce dossier constitue la mémoire durable du projet. `AGENTS.md` reste volontaire
 | Optimiser | `PERFORMANCE_BUDGET.md` |
 | Écrire du GDScript | `CODING_STANDARDS.md` |
 | Tester | `TESTING_QA.md` |
+| Qualifier l'Alpha / fournir un playtest | `ALPHA_QUALIFICATION.md` |
 | Construire / publier | `BUILD_RELEASE.md` |
 | Travailler avec Codex | `AI_CODEX_WORKFLOW.md` |
 | Voir les prochaines tâches | `BACKLOG.md` |

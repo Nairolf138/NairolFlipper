@@ -10,6 +10,11 @@ MVP local-first. Aucun besoin de compte, email, localisation, tracking publicita
 
 ## Télémétrie
 
+Le rapport de test est strictement local : version/SHA publics, plateforme,
+résolution de fenêtre, compteurs de jeu et cadence. Pas de nom, numéro de série,
+identifiant d'appareil, localisation ou accès au réseau. Copier écrit le texte
+dans le presse-papiers uniquement sur demande ; son partage reste manuel.
+
 Aucune par défaut. Si ajout futur : opt-in, finalité claire, données minimales, documentation, jeu possible sans.
 
 ## Leaderboards

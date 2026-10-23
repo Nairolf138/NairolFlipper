@@ -14,6 +14,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+      - name: Stamp tested build identity
+        env:
+          SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python3 .github/scripts/stamp_build.py --source-commit "$SOURCE_COMMIT" --run-number "$GITHUB_RUN_NUMBER" --workflow-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
       - name: Install Godot 4.7.2
         run: |
           wget -q https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip
@@ -38,6 +43,11 @@ jobs:
           set -o pipefail
           godot --headless --display-driver headless --audio-driver Dummy --path . --script res://tests/godot/test_runner.gd 2>&1 | tee build/logs/behavioral-tests.log
           bash .github/scripts/assert_clean_godot_log.sh build/logs/behavioral-tests.log
+      - name: Qualification lifecycle and local report tests
+        run: |
+          set -o pipefail
+          godot --headless --display-driver headless --audio-driver Dummy --path . --script res://tests/godot/qualification_runner.gd 2>&1 | tee build/logs/qualification-tests.log
+          bash .github/scripts/assert_clean_godot_log.sh build/logs/qualification-tests.log
       - name: Headless project smoke test
         run: |
           set -o pipefail
@@ -74,9 +84,34 @@ jobs:
           set -o pipefail
           godot --headless --path . --export-release "Windows Desktop" build/windows/NairolFlipper.exe 2>&1 | tee build/logs/export-windows.log
           bash .github/scripts/assert_clean_godot_log.sh build/logs/export-windows.log
+      - name: Verify and package Alpha candidate evidence
+        run: python3 .github/scripts/package_qualification.py
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
         with:
           name: nairolflipper-android-debug
           path: build/android/nairolflipper-debug.apk
+          if-no-files-found: error
+      - name: Upload Web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: nairolflipper-web
+          retention-days: 14
+          path: build/web/
+          if-no-files-found: error
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: nairolflipper-windows
+          retention-days: 14
+          path: build/windows/
+          if-no-files-found: error
+      - name: Upload Alpha candidate evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: nairolflipper-alpha-qualification
+          retention-days: 14
+          path: |
+            build/qualification/
+            build/logs/
           if-no-files-found: error

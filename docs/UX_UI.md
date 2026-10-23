@@ -19,6 +19,10 @@ les flippers. Un bouton `GO` en bas à droite lance la bille quand elle est prê
 y compris après Safety ou récupération. Il disparaît pendant le jeu ; toucher
 le haut du plateau ne lance plus. Espace et A sur manette restent disponibles.
 Les commandes Recommencer et Quitter restent en haut du plateau.
+La PR 34 remplace Quitter en jeu par **PAUSE**, qui propose Reprendre, Rapport,
+Menu (abandon explicite) et Quitter l'application. Échap / Start manette déclenchent aussi Pause.
+Une perte de focus ou un passage en arrière-plan suspend la partie ; revenir
+dans l'application n'envoie jamais automatiquement la bille en mouvement.
 
 ## Desktop
 
@@ -81,8 +85,13 @@ couleur afin de ne pas dépendre de la perception chromatique.
 
 ## Fin de partie
 
+RAPPORT DE TEST est disponible depuis le menu, Pause et la fin de partie. Le
+texte est consultable / sélectionnable et copiable par un bouton ; aucun partage
+réseau automatique. Le rapport ne couvre pas la chauffe ou la sensation, à
+ajouter manuellement dans le retour de qualification.
+
 Après la troisième bille consommée, le plateau n'accepte plus les touchers de
-jeu. Un écran dédié affiche le score final et propose uniquement Rejouer ou Menu.
+jeu. Un écran dédié affiche le score final et propose Rejouer, Menu et Rapport de test.
 Safety annonce explicitement qu'il s'agit de la même bille et demande une
 relance depuis le launcher.
 
