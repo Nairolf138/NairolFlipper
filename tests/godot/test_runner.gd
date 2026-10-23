@@ -963,6 +963,9 @@ func _test_stagecraft_visual_language() -> void:
 	var cold: Node2D = main.get_node("ColdRamp/PhysicalRoute")
 	var orbit: Node2D = main.get_node("UniverseOrbit/PhysicalRoute")
 	_expect(warm.z_index + 1 < cold.z_index and cold.z_index + 1 < orbit.z_index, "Crossings reserve a separate visual height for every deck and rider")
+	for target in get_nodes_in_group("rig_targets"):
+		_expect(target.get_node("Label").z_index > orbit.z_index + 1 and target.get_node("Indicator").z_index > orbit.z_index + 1, "Objective annotations stay readable above crossing rails")
+	_expect(main.get_node("ConsoleScoop/Label").z_index > orbit.z_index + 1, "The Console annotation cannot be masked by a return wire")
 	var ball: RigidBody2D = main.balls[0]
 	main.start_game()
 	for route in [warm, cold, orbit]:

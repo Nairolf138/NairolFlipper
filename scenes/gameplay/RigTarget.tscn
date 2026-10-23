@@ -22,6 +22,7 @@ polygon = PackedVector2Array(-9, 24, 9, 24, 9, 28, -9, 28)
 color = Color(0.4, 0.45, 0.5, 1)
 
 [node name="Indicator" type="Polygon2D" parent="."]
+z_index = 8
 polygon = PackedVector2Array(-35, 49, 35, 49, 35, 52, -35, 52)
 color = Color(0.28, 0.34, 0.42, 0.8)
 
@@ -29,6 +30,7 @@ color = Color(0.28, 0.34, 0.42, 0.8)
 shape = SubResource("TargetShape")
 
 [node name="Label" type="Label" parent="."]
+z_index = 8
 offset_left = -58.0
 offset_top = 29.0
 offset_right = 58.0

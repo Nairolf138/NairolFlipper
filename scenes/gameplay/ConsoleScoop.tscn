@@ -25,6 +25,7 @@ color = Color(0, 0.898, 1, 0.6)
 shape = SubResource("ScoopShape")
 
 [node name="Label" type="Label" parent="."]
+z_index = 8
 offset_left = -128.0
 offset_top = 45.0
 offset_right = 50.0

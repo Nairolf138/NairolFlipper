@@ -88,6 +88,8 @@ visuel Warm 2 / Cold 4 / Orbit 6 réserve à chaque bille le plan juste au-dessu
 de sa route. Cela reste une approximation 2D, pas une simulation de hauteur 3D.
 Les anciennes grandes bandes néon disparaissent. Les pièces basses restent
 visibles sous les retours ouverts ; aucun décor ne crée un obstacle fictif.
+Les noms et témoins de progression sont des annotations au premier plan : ils
+ne disparaissent pas sous un rail, contrairement aux corps matériels des pièces.
 
 Les captures GL en CI servent à inspecter le menu, le départ, le plateau éclairé,
 le mode sans effets et les trois plans de bille en 540 × 960 / 1080 × 1920.
