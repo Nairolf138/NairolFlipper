@@ -3,6 +3,7 @@ extends SceneTree
 ## Real GL Compatibility captures, not the headless dummy renderer.
 ## These frozen fixtures document art and draw order, not playability or FPS.
 const OUTPUT := "res://build/visuals"
+const CaptureFrame = preload("res://tests/godot/capture_frame.gd")
 var _failed := false
 var _main: Node2D
 var _metrics: Array[Dictionary] = []
@@ -19,13 +20,16 @@ func _run() -> void:
 		return
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUTPUT))
 	_main = load("res://scenes/app/Main.tscn").instantiate()
+	_main.pause_on_focus_loss = false # Non-interactive render fixture, not a lifecycle test.
 	_main.get_node("SettingsStore").save_path = "user://tests/visual_capture_settings.json"
 	root.add_child(_main)
 	await process_frame
 	_main.set_process(false)
 	_main.set_physics_process(false)
 	_main.stage_visuals.set_process(false)
-	for size in [Vector2i(540, 960), Vector2i(1080, 1920)]:
+	_main.playtest_recorder.set_process(false) # Posed software renders are not a device FPS test.
+	_main.playtest_recorder.previous_session = {}
+	for size in [Vector2i(540, 960), Vector2i(1080, 1920), Vector2i(768, 1024)]:
 		# Window owns the root viewport; bypassing it through DisplayServer leaves
 		# its render size stale on X11 without a window manager.
 		root.size = size
@@ -35,6 +39,12 @@ func _run() -> void:
 		await _capture("ready", size)
 		# Deterministic, deliberately posed inspection of art in a lit show.
 		_main._launch_or_restart()
+		_hold_ball(Vector2(540, 1030))
+		_main._request_pause()
+		await _capture("pause", size)
+		_main._open_playtest_report()
+		await _capture("report", size)
+		_main._resume_game()
 		for target in get_nodes_in_group("rig_targets"):
 			_main._on_rig_target_hit(target, target.family_id, target.display_name, target.score_value, target.flow_value)
 		_main.stage_visuals.hit_flash = 0.0
@@ -90,8 +100,17 @@ func _capture(label: String, size: Vector2i) -> void:
 		await process_frame
 		await RenderingServer.frame_post_draw
 	var image := root.get_texture().get_image()
-	if image.is_empty() or image.get_size() != size:
-		push_error("Capture invalid: %s expected %s, got %s (window %s)" % [label, size, image.get_size(), root.size])
+	var content_size := image.get_size()
+	# KEEP renders a 9:16 viewport centered inside wider tablet windows. Do not
+	# stretch it to force the assertion; verify its expected size, then add bars.
+	if content_size != size and root.content_scale_aspect == Window.CONTENT_SCALE_ASPECT_KEEP:
+		var base := Vector2(root.content_scale_size)
+		var factor := minf(size.x / base.x, size.y / base.y)
+		var expected := Vector2i(roundi(base.x * factor), roundi(base.y * factor))
+		if content_size == expected:
+			image = CaptureFrame.with_black_margins(image, size)
+	if image == null or image.is_empty() or image.get_size() != size:
+		push_error("Capture invalid: %s expected %s, got content %s (window %s)" % [label, size, content_size, root.size])
 		_failed = true
 		return
 	var colors: Dictionary = {}
@@ -106,6 +125,8 @@ func _capture(label: String, size: Vector2i) -> void:
 		_failed = true
 	_metrics.append({
 		"image": path.get_file(),
+		"content_pixels": [content_size.x, content_size.y],
+		"window_pixels": [size.x, size.y],
 		"draw_calls": Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),
 		"texture_bytes": Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED),
 		"sampled_colors": colors.size(),

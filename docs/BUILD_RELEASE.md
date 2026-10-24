@@ -48,4 +48,24 @@ LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a -s "-screen 0 1200x2100x24" godot \
 Les images et `render_metrics.json` vont dans `build/visuals/`. Un rendu vide,
 une taille incorrecte ou une erreur Godot fait échouer la validation.
 
+PR 34 ajoute le format tablette 768 × 1024, Pause et Rapport.
+Les captures tablette conservent le viewport 9:16 et ses bandes noires centrées
+selon le mode KEEP de la fenêtre ; aucun pixel de jeu n'est étiré. Les métriques
+distinguent dimensions du contenu et dimensions de fenêtre.
+
+La CI marque
+`data/build_info.json` avant l'import : SHA du checkout testé (merge de test sur
+une PR), SHA de la branche source, run et URL du workflow. Le menu et le rapport
+affichent le SHA source ; le JSON conserve aussi le merge testé. Un build local
+non estampillé annonce honnêtement `local`. Les trois presets incluent ce JSON.
+
+Après les contrôles et les exports, `package_qualification.py` relit l'identité
+dans l'APK et archive les SHA-256 des distributions / captures. Les artifacts
+`nairolflipper-web`, `nairolflipper-windows` et
+`nairolflipper-alpha-qualification` complètent l'APK et les captures existants.
+Ces trois nouveaux artifacts sont conservés quatorze jours.
+Le dossier de qualification contient manifeste, protocole et logs ; il conserve
+`device_playtest: pending` / `alpha_qualified: false`. Ne pas promouvoir un tag
+sur la seule base d'une CI verte.
+
 `nairolflipper-web-<version>`, `nairolflipper-android-debug-<sha>.apk`, `nairolflipper-windows-<version>.zip`, etc.

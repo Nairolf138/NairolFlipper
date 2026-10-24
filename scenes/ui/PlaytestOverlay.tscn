@@ -1,0 +1,105 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/playtest_overlay.gd" id="1"]
+[ext_resource type="Theme" path="res://data/ui/StageTheme.tres" id="2"]
+
+[node name="PlaytestOverlay" type="ColorRect"]
+process_mode = 3
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.008, 0.015, 0.03, 0.97)
+theme = ExtResource("2")
+script = ExtResource("1")
+
+[node name="Panel" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 160.0
+offset_top = 300.0
+offset_right = -160.0
+offset_bottom = -300.0
+
+[node name="PauseMenu" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="Title" type="Label" parent="Panel/PauseMenu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 52
+text = "PARTIE EN PAUSE"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="Panel/PauseMenu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Billes, musique et chronos suspendus.\nLa reprise reste manuelle."
+horizontal_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="Panel/PauseMenu"]
+theme_override_font_sizes/font_size = 34
+layout_mode = 2
+custom_minimum_size = Vector2(0, 100)
+text = "REPRENDRE"
+
+[node name="ReportButton" type="Button" parent="Panel/PauseMenu"]
+theme_override_font_sizes/font_size = 30
+layout_mode = 2
+custom_minimum_size = Vector2(0, 90)
+text = "RAPPORT DE TEST"
+
+[node name="MenuButton" type="Button" parent="Panel/PauseMenu"]
+theme_override_font_sizes/font_size = 26
+layout_mode = 2
+custom_minimum_size = Vector2(0, 90)
+text = "TERMINER ET REVENIR AU MENU"
+
+[node name="QuitButton" type="Button" parent="Panel/PauseMenu"]
+theme_override_font_sizes/font_size = 28
+layout_mode = 2
+custom_minimum_size = Vector2(0, 90)
+text = "QUITTER L'APPLICATION"
+
+[node name="ReportMenu" type="VBoxContainer" parent="Panel"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="Panel/ReportMenu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 42
+text = "RAPPORT DE TEST LOCAL"
+horizontal_alignment = 1
+
+[node name="Report" type="TextEdit" parent="Panel/ReportMenu"]
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 660)
+theme_override_font_sizes/font_size = 24
+editable = false
+theme_override_colors/font_readonly_color = Color(0.88, 0.94, 0.98, 1)
+wrap_mode = 1
+
+[node name="Privacy" type="Label" parent="Panel/ReportMenu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "Rien n'est envoyé automatiquement.\nCopie et partage uniquement si tu le souhaites."
+horizontal_alignment = 1
+
+[node name="CopyButton" type="Button" parent="Panel/ReportMenu"]
+theme_override_font_sizes/font_size = 28
+layout_mode = 2
+custom_minimum_size = Vector2(0, 90)
+text = "COPIER LE RAPPORT"
+
+[node name="BackButton" type="Button" parent="Panel/ReportMenu"]
+theme_override_font_sizes/font_size = 30
+layout_mode = 2
+custom_minimum_size = Vector2(0, 90)
+text = "RETOUR"

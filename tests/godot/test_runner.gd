@@ -1246,6 +1246,11 @@ func _test_alpha_candidate_player_journey() -> void:
 	_expect(main.game_over_overlay.visible, "Complete journey exposes the final score overlay")
 	_expect_equal(main.status_label.text, "PARTIE TERMINÉE", "End state uses final French copy")
 	_expect(not main.audio_service.transport_playing, "Game over stops the music transport")
+	_expect_equal(main.playtest_recorder.events.numbered_balls_lost, 3, "Qualification report distinguishes the three numbered losses from bonus multiball")
+	_expect_equal(main.playtest_recorder.events.cues_completed, 3, "Qualification report counts completed cues")
+	_expect_equal(main.playtest_recorder.events.rig_activations, 6, "Qualification report counts unique Rig activations")
+	_expect_equal(main.playtest_recorder.events.final_shows, 1, "Qualification report counts Final Show entry")
+	_expect_equal(main.playtest_recorder.events.games_finished, 1, "Qualification report records the completed game")
 
 	main.free()
 	await process_frame

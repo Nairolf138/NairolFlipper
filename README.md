@@ -107,10 +107,16 @@ La première étape de développement est définie dans [`docs/BACKLOG.md`](docs
 
 Le prototype dispose désormais d'une partie à trois billes, d'une Cue Stack, du
 Rig en six familles, du Final Show multiball, d'une musique en stems et d'une
-première identité visuelle Stagecraft. Les builds Web, Android et Windows servent
+identité scénique 2,5D Stagecraft. Les builds Web, Android et Windows servent
 maintenant à valider le roulement, le maintien, les tirs visés et les nouveaux
 parcours physiques Warm/Cold/Orbit sur appareil réel. La qualification Alpha
-reste suspendue au playtest et à la refonte artistique du plateau.
+reste suspendue au playtest sur appareil réel, pas à la seule fusion des PR.
+
+La PR 34 prépare cette qualification : pause manuelle / arrière-plan, chronos
+suspendus, rapport local accessible depuis le menu, la pause ou la fin de partie,
+et builds traçables par SHA. Les artifacts CI incluent désormais Web, Windows,
+APK Android et un dossier de preuves avec checksums. Voir le
+[parcours de qualification](docs/ALPHA_QUALIFICATION.md).
 
 ## Licence
 

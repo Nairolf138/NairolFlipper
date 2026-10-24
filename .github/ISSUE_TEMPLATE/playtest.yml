@@ -37,6 +37,12 @@ body:
     attributes:
       label: Bugs observés
   - type: textarea
+    id: local_report
+    attributes:
+      label: Rapport local de l'application (facultatif)
+      description: Menu ou PAUSE → RAPPORT DE TEST → Copier. Rien n'est envoyé automatiquement.
+      render: text
+  - type: textarea
     id: changes
     attributes:
       label: Modifications souhaitées

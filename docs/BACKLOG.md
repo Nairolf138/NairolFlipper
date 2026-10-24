@@ -84,6 +84,14 @@ artistique finale et le Final Show restent hors de cette tâche.
 
 ## P1 — Feel
 
+### T057 — Qualification Alpha, candidat PR 34
+
+Implémentation du candidat : pause / reprise mobile avec chronos réellement
+suspendus, journal local regroupé et consultable, build traçable, tests de
+non-régression et dossier CI des trois exports P0. Qualification humaine **en
+attente** ; voir `ALPHA_QUALIFICATION.md`. Les fusions des PR 30–33 ne prouvent
+pas à elles seules la sensation, l'équilibrage ni le budget de la tablette.
+
 ### T056 — Rampes et orbite physiques
 
 Implémentation PR 32, validation tablette en attente : couloirs à rails générés

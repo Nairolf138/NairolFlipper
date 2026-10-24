@@ -79,12 +79,14 @@ enum SessionState {
 @onready var final_show_label: Label = $Interface/GameControls/FinalShowLabel
 @onready var sync_feedback_label: Label = $Interface/GameControls/SyncFeedbackLabel
 @onready var blackout_overlay: Control = $Interface/BlackoutOverlay
+@onready var playtest_overlay: Control = $Interface/PlaytestOverlay
 
 @export var respawn_delay: float = 1.0
 @export var ball_recovery_delay: float = 5.0
 @export var stuck_speed_threshold: float = 18.0
 @export var recovery_margin: float = 100.0
 @export var blackout_duration: float = 1.1
+@export var pause_on_focus_loss := true
 
 var remaining_balls: int = 3
 var active_ball_index: int = 0
@@ -95,12 +97,16 @@ var session_state: int = SessionState.MENU:
 		session_state = value
 		if is_instance_valid(launch_button):
 			launch_button.visible = gameplay_active and value == SessionState.READY
+		if is_instance_valid(playtest_recorder):
+			playtest_recorder.set_capture_frames(value == SessionState.PLAYING and not game_paused)
 var active_touches: Dictionary[int, StringName] = {}
 var stalled_ball_time: float = 0.0
 var session_generation: int = 0
 var multiball_active: bool = false
 var show_generation: int = 0
 var _sync_feedback_tween: Tween
+var game_paused := false
+var _paused_drains: Dictionary = {}
 
 
 func _ready() -> void:
@@ -150,15 +156,83 @@ func _ready() -> void:
 	how_to_play_panel.closed.connect(_close_how_to_play)
 	reset_button.pressed.connect(_on_reset_pressed)
 	launch_button.button_down.connect(_launch_or_restart)
-	game_quit_button.pressed.connect(_on_quit_pressed)
+	game_quit_button.pressed.connect(_request_pause)
 	replay_button.pressed.connect(start_game)
 	game_over_menu_button.pressed.connect(_show_start_menu)
+	$Interface/StartOverlay/Menu/ReportButton.pressed.connect(_open_playtest_report)
+	$Interface/GameOverOverlay/Menu/ReportButton.pressed.connect(_open_playtest_report)
+	playtest_overlay.resume_requested.connect(_resume_game)
+	playtest_overlay.menu_requested.connect(_leave_paused_game)
+	playtest_overlay.quit_requested.connect(_on_quit_pressed)
+	playtest_overlay.report_requested.connect(_open_playtest_report)
+	playtest_overlay.report_closed.connect(_on_report_closed)
+	$Interface/StartOverlay/Menu/Eyebrow.text = "CANDIDAT ALPHA // " + playtest_recorder.build_label()
 	_sync_audio_sliders_from_store()
 	_apply_audio_settings()
 	_sync_visual_setting_from_store()
 	_apply_visual_settings()
 	restart_game()
 	_show_start_menu()
+
+
+func _notification(what: int) -> void:
+	if pause_on_focus_loss and what in [NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_PAUSED] and is_node_ready():
+		# Flush synchronously: a mobile OS may stop frames immediately afterwards.
+		# No body transform is changed here. Focus gain never auto-resumes.
+		if settings_panel.visible:
+			_store_audio_settings()
+		_request_pause()
+
+
+func _exit_tree() -> void:
+	if game_paused:
+		get_tree().paused = false
+
+
+func _request_pause() -> void:
+	if game_paused:
+		return
+	if not gameplay_active or session_state == SessionState.GAME_OVER:
+		playtest_recorder.save_session()
+		return
+	_release_all_touches()
+	game_paused = true
+	playtest_recorder.set_capture_frames(false)
+	playtest_recorder.record_event(&"pauses")
+	playtest_recorder.save_session()
+	get_tree().paused = true
+	playtest_overlay.show_pause()
+
+
+func _resume_game() -> void:
+	if not game_paused:
+		return
+	_release_all_touches()
+	game_paused = false
+	get_tree().paused = false
+	playtest_overlay.hide()
+	playtest_recorder.set_capture_frames(session_state == SessionState.PLAYING)
+	for body in _paused_drains:
+		if is_instance_valid(body):
+			call_deferred("_resolve_ball_drain", body, _paused_drains[body])
+	_paused_drains.clear()
+
+
+func _leave_paused_game() -> void:
+	_resume_game()
+	_show_start_menu()
+
+
+func _open_playtest_report() -> void:
+	playtest_recorder.save_session()
+	playtest_overlay.show_report(playtest_recorder.report_text(), game_paused)
+
+
+func _on_report_closed() -> void:
+	if game_over_overlay.visible:
+		$Interface/GameOverOverlay/Menu/ReportButton.grab_focus()
+	else:
+		$Interface/StartOverlay/Menu/ReportButton.grab_focus()
 
 
 func _physics_process(delta: float) -> void:
@@ -169,6 +243,7 @@ func _physics_process(delta: float) -> void:
 		for candidate in balls:
 			if candidate.visible and not candidate.freeze and not candidate.drain_locked:
 				if _is_ball_outside_playfield(candidate.global_position):
+					playtest_recorder.record_event(&"out_of_bounds")
 					candidate.mark_drained()
 		return
 	if active_ball_index < 0 or active_ball_index >= balls.size():
@@ -177,7 +252,7 @@ func _physics_process(delta: float) -> void:
 	if ball.freeze or ball.drain_locked:
 		return
 	if _is_ball_outside_playfield(ball.global_position):
-		_recover_active_ball("BILLE RÉCUPÉRÉE — APPUYEZ SUR GO")
+		_recover_active_ball("BILLE RÉCUPÉRÉE — APPUYEZ SUR GO", &"out_of_bounds")
 		return
 	if ball.linear_velocity.length() <= stuck_speed_threshold and not _is_ball_on_held_flipper(ball):
 		stalled_ball_time += delta
@@ -202,6 +277,8 @@ func _input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if playtest_overlay.visible:
+		return
 	if how_to_play_panel.visible and event.is_action_pressed("ui_cancel"):
 		how_to_play_panel.close_panel()
 		get_viewport().set_input_as_handled()
@@ -212,7 +289,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if not gameplay_active:
 		return
-	if event.is_action_pressed("launch_ball"):
+	if event.is_action_pressed("pause"):
+		_request_pause()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("launch_ball"):
 		_launch_or_restart()
 	elif event is InputEventScreenTouch:
 		_handle_touch(event)
@@ -221,7 +301,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _launch_or_restart() -> void:
-	if not gameplay_active or session_state != SessionState.READY:
+	if game_paused or not gameplay_active or session_state != SessionState.READY:
 		return
 	if balls[active_ball_index].launch_ball():
 		session_state = SessionState.PLAYING
@@ -232,6 +312,9 @@ func _launch_or_restart() -> void:
 
 
 func start_game() -> void:
+	_resume_game()
+	playtest_overlay.hide()
+	playtest_recorder.record_event(&"games_started")
 	gameplay_active = true
 	start_overlay.hide()
 	game_over_overlay.hide()
@@ -242,6 +325,8 @@ func start_game() -> void:
 
 
 func _show_start_menu() -> void:
+	_resume_game()
+	playtest_overlay.hide()
 	session_generation += 1
 	session_state = SessionState.MENU
 	gameplay_active = false
@@ -261,9 +346,11 @@ func _show_start_menu() -> void:
 	game_controls.hide()
 	_release_all_touches()
 	_deactivate_all_balls()
+	playtest_recorder.save_session()
 
 
 func _show_game_over() -> void:
+	playtest_recorder.record_event(&"games_finished")
 	session_state = SessionState.GAME_OVER
 	game_over = true
 	show_generation += 1
@@ -281,6 +368,7 @@ func _show_game_over() -> void:
 	final_show_label.hide()
 	sync_feedback_label.hide()
 	status_label.text = "PARTIE TERMINÉE"
+	playtest_recorder.save_session()
 
 
 func _on_reset_pressed() -> void:
@@ -458,6 +546,7 @@ func _on_bumper_hit(points: int, _bumper_name: StringName) -> void:
 
 
 func _on_ramp_completed(ramp_id: StringName, score_value: int, flow_value: int) -> void:
+	playtest_recorder.record_event(ramp_id)
 	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
 	cue_manager.add_condition(ramp_id)
@@ -478,6 +567,7 @@ func _on_rig_target_hit(
 	flow_manager.add_flow(flow_value)
 	var activated := rig_model.activate_family(family_id)
 	if activated:
+		playtest_recorder.record_event(&"rig_activations")
 		target.set_lit(true)
 		stage_visuals.trigger_hit(target.target_color)
 		var active_count := _active_rig_family_count()
@@ -499,6 +589,7 @@ func _on_lane_completed(
 	score_value: int,
 	flow_value: int
 ) -> void:
+	playtest_recorder.record_event(lane_id)
 	_add_score_with_flow(score_value)
 	flow_manager.add_flow(flow_value)
 	cue_manager.add_condition(lane_id)
@@ -570,6 +661,7 @@ func _on_cue_started(_cue_id: StringName) -> void:
 
 
 func _on_cue_completed(_cue_id: StringName) -> void:
+	playtest_recorder.record_event(&"cues_completed")
 	status_label.text = "CUE TERMINÉE"
 	stage_visuals.trigger_hit(Color("7c4dff"))
 
@@ -690,6 +782,7 @@ func _add_score_with_flow(points: int) -> void:
 
 
 func _on_show_state_changed(state: int, display_name: String) -> void:
+	playtest_recorder.set_phase(state == ShowFlowManagerNode.State.FINAL_SHOW)
 	show_state_label.text = "SHOW  %s" % display_name
 	stage_visuals.set_show_state(state)
 	_update_stage_identity()
@@ -745,6 +838,7 @@ func _update_stage_identity() -> void:
 func _start_final_show() -> void:
 	if multiball_active or not show_flow.start_final_show():
 		return
+	playtest_recorder.record_event(&"final_shows")
 	multiball_active = true
 	show_generation += 1
 	var generation := show_generation
@@ -775,7 +869,7 @@ func _start_final_show() -> void:
 
 
 func _run_final_show_timer(generation: int) -> void:
-	await get_tree().create_timer(show_flow.final_show_duration).timeout
+	await get_tree().create_timer(show_flow.final_show_duration, false).timeout
 	if generation == show_generation and multiball_active:
 		_finish_final_show("FINAL SHOW TERMINÉ")
 
@@ -836,7 +930,7 @@ func _show_blackout_feedback() -> void:
 
 
 func _run_blackout_timer(generation: int) -> void:
-	await get_tree().create_timer(blackout_duration).timeout
+	await get_tree().create_timer(blackout_duration, false).timeout
 	if generation != show_generation or game_over:
 		return
 	blackout_overlay.hide()
@@ -848,6 +942,7 @@ func _run_blackout_timer(generation: int) -> void:
 
 
 func _on_score_changed(new_score: int) -> void:
+	playtest_recorder.record_score(new_score)
 	score_label.text = "SCORE %06d" % new_score
 
 
@@ -866,17 +961,23 @@ func _on_drain_body_entered(body: Node) -> void:
 	):
 		# Area2D emits body_entered while the physics server is flushing its
 		# queries. Resolve the drain once the physics step has completed.
-		call_deferred("_resolve_ball_drain", body)
+		call_deferred("_resolve_ball_drain", body, body.route_epoch)
 
 
-func _resolve_ball_drain(body: Node) -> void:
+func _resolve_ball_drain(body: Node, epoch: int = -1) -> void:
 	if (
 		session_state != SessionState.PLAYING
 		or not is_instance_valid(body)
 		or body not in balls
 		or (not multiball_active and body != balls[active_ball_index])
 		or body.drain_locked
+		or (epoch >= 0 and body.route_epoch != epoch)
 	):
+		return
+	if game_paused:
+		# SceneTree pause does not stop the deferred message queue. Preserve the
+		# callback until resume and reject it if that ball has since been reset.
+		_paused_drains[body] = body.route_epoch
 		return
 	if body.try_ball_save():
 		playtest_recorder.record_ball_save()
@@ -905,13 +1006,14 @@ func _on_ball_drained(ball: RigidBody2D) -> void:
 	session_state = SessionState.RESPAWNING
 	stalled_ball_time = 0.0
 	remaining_balls -= 1
+	playtest_recorder.record_event(&"numbered_balls_lost")
 	if remaining_balls <= 0:
 		_show_game_over()
 		return
 	active_ball_index = balls.size() - remaining_balls
 	status_label.text = "BILLE %d / %d" % [active_ball_index + 1, balls.size()]
 	var generation := session_generation
-	await get_tree().create_timer(respawn_delay).timeout
+	await get_tree().create_timer(respawn_delay, false).timeout
 	if generation == session_generation and session_state == SessionState.RESPAWNING:
 		balls[active_ball_index].reset_ball(balls[active_ball_index].spawn_position)
 		session_state = SessionState.READY
@@ -919,6 +1021,7 @@ func _on_ball_drained(ball: RigidBody2D) -> void:
 
 
 func restart_game() -> void:
+	_resume_game()
 	session_generation += 1
 	show_generation += 1
 	_release_all_touches()
@@ -964,9 +1067,10 @@ func restart_game() -> void:
 		_update_stage_identity()
 
 
-func _recover_active_ball(message: String) -> void:
+func _recover_active_ball(message: String, reason: StringName = &"stuck_recoveries") -> void:
 	if session_state != SessionState.PLAYING:
 		return
+	playtest_recorder.record_event(reason)
 	var ball: Node = balls[active_ball_index]
 	ball.reset_ball(ball.spawn_position, false)
 	session_state = SessionState.READY
@@ -991,6 +1095,6 @@ func _deactivate_all_balls() -> void:
 
 
 func _release_all_touches() -> void:
-	for action in active_touches.values():
+	for action in [&"flipper_left", &"flipper_right", &"launch_ball"]:
 		Input.action_release(action)
 	active_touches.clear()

@@ -6,6 +6,19 @@
 
 Le runner Godot n'utilise aucun addon externe.
 
+La PR 34 ajoute quatre groupes séparés :
+
+```text
+godot --headless --audio-driver Dummy --path . --script res://tests/godot/qualification_runner.gd
+```
+
+Ils couvrent journal regroupé / cadence, interruption d'une bille réellement
+admise en rampe, timers Final Show / Blackout / respawn en pause, puis un drain
+différé au moment de la pause / réinitialisation. Les tests
+Python de packaging vérifient SHA, identité APK et absence de qualification
+automatique d'un appareil ; leurs fichiers factices ne prouvent pas un export.
+La CI contrôle les véritables exports et captures après ces tests.
+
 Il exécute 27 groupes. La PR 31 ajoute des mesures sur de vraies billes : pente,
 accélération indépendante de la masse, résistance constante, arrêt, vitesse
 plafonnée et comparaison 60/120 Hz. Les deux flippers sont testés en maintien
