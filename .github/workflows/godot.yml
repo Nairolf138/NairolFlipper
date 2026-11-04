@@ -62,7 +62,7 @@ jobs:
           bash .github/scripts/assert_clean_godot_log.sh build/logs/visuals.log
       - name: Upload playfield inspection captures
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nairolflipper-playfield-captures
           path: |
@@ -87,27 +87,27 @@ jobs:
       - name: Verify and package Alpha candidate evidence
         run: python3 .github/scripts/package_qualification.py
       - name: Upload Android APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nairolflipper-android-debug
           path: build/android/nairolflipper-debug.apk
           if-no-files-found: error
       - name: Upload Web build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nairolflipper-web
           retention-days: 14
           path: build/web/
           if-no-files-found: error
       - name: Upload Windows build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nairolflipper-windows
           retention-days: 14
           path: build/windows/
           if-no-files-found: error
       - name: Upload Alpha candidate evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nairolflipper-alpha-qualification
           retention-days: 14
